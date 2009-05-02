@@ -17,6 +17,14 @@ LOCAL_SRC_FILES += bootchart.c
 LOCAL_CFLAGS    += -DBOOTCHART=1
 endif
 
+ifneq (, $(filter qsd8250_surf qsd8250_ffa, $(TARGET_PRODUCT)))
+  LOCAL_CFLAGS += -DSURF8K
+endif
+
+ifneq (, $(filter msm7201a_surf msm7201a_ffa, $(TARGET_PRODUCT)))
+  LOCAL_CFLAGS += -DSURF7201A
+endif
+
 LOCAL_MODULE:= init
 
 LOCAL_FORCE_STATIC_EXECUTABLE := true

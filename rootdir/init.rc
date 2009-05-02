@@ -1,43 +1,19 @@
+#  Copyright (c) 2009, Code Aurora Forum.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
 
-on init
-
-sysclktz 0
-
-loglevel 3
-
-# setup the global environment
-    export PATH /sbin:/system/sbin:/system/bin:/system/xbin
-    export LD_LIBRARY_PATH /system/lib
-    export ANDROID_BOOTLOGO 1
-    export ANDROID_ROOT /system
-    export ANDROID_ASSETS /system/app
-    export ANDROID_DATA /data
-    export EXTERNAL_STORAGE /sdcard
-    export BOOTCLASSPATH /system/framework/core.jar:/system/framework/ext.jar:/system/framework/framework.jar:/system/framework/android.policy.jar:/system/framework/services.jar
-
-# Backward compatibility
-    symlink /system/etc /etc
-
-# create mountpoints and mount tmpfs on sqlite_stmt_journals
-    mkdir /sdcard 0000 system system
-    mkdir /system
-    mkdir /data 0771 system system
-    mkdir /cache 0770 system cache
-    mkdir /sqlite_stmt_journals 01777 root root
-    mount tmpfs tmpfs /sqlite_stmt_journals size=4m
-
-    mount rootfs rootfs / ro remount
-
-    write /proc/sys/kernel/panic_on_oops 1
-    write /proc/sys/kernel/hung_task_timeout_secs 0
-    write /proc/cpu/alignment 4
-    write /proc/sys/kernel/sched_latency_ns 10000000
-    write /proc/sys/kernel/sched_wakeup_granularity_ns 2000000
-
-# mount mtd partitions
-    # Mount /system rw first to give the filesystem a chance to save a checkpoint
-    mount yaffs2 mtd@system /system 
-    mount yaffs2 mtd@system /system ro remount
+#    mount yaffs2 mtd@system /system ro remount
 
     # We chown/chmod /data again so because mount is run as root + defaults
     mount yaffs2 mtd@userdata /data nosuid nodev
@@ -110,6 +86,7 @@ on boot
     setprop ro.CONTENT_PROVIDER_MEM 5632
     setprop ro.EMPTY_APP_MEM 6144
 
+    setprop ro.com.google.location_feature 1
 # Write value must be consistent with the above properties.
 # Note that the driver only supports 6 slots, so we have HOME_APP at the
 # same memory level as services.
@@ -160,6 +137,14 @@ on boot
     chown system system /sys/kernel/ipv4/tcp_rmem_def
     chown system system /sys/kernel/ipv4/tcp_rmem_max
     chown root radio /proc/cmdline
+    chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
+    chown bluetooth bluetooth /proc/bluetooth/sleep/proto
+    chown system system /sys/module/sco/parameters/disable_esco
+    chmod 0660 /sys/module/bluetooth_power/parameters/power
+    chmod 0660 /proc/bluetooth/sleep/proto
+    chown bluetooth bluetooth /dev/ttyHS0
+    chmod 0660 /dev/ttyHS0
+    chmod 0666 /dev/msm_snd
 
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
@@ -190,6 +175,8 @@ on property:persist.service.adb.enable=1
 on property:persist.service.adb.enable=0
     stop adbd
 
+#ln -s /dev/oncrpc/30000002:00010000 /dev/oncrpc/30000002:00010001
+
 service servicemanager /system/bin/servicemanager
     user system
     critical
@@ -199,9 +186,6 @@ service servicemanager /system/bin/servicemanager
 service vold /system/bin/vold
     socket vold stream 0660 root mount
 
-#service mountd /system/bin/mountd
-#    socket mountd stream 0660 root mount
-
 service debuggerd /system/bin/debuggerd
 
 service ril-daemon /system/bin/rild
@@ -209,6 +193,7 @@ service ril-daemon /system/bin/rild
     socket rild-debug stream 660 radio system
     user root
     group radio cache inet misc
+
 
 service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
     socket zygote stream 666
@@ -254,3 +239,5 @@ service installd /system/bin/installd
 
 service flash_recovery /system/bin/flash_image recovery /system/recovery.img
     oneshot
+
+busybox --install 
