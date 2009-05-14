@@ -64,6 +64,7 @@ int usage(void)
             "       [ --second <2ndbootloader-filename> ]\n"
             "       [ --cmdline <kernel-commandline> ]\n"
             "       [ --board <boardname> ]\n"
+            "       [ --base <address> ]\n"
             "       -o|--output <filename>\n"
             );
     return 1;
@@ -115,6 +116,14 @@ int main(int argc, char **argv)
 
     memset(&hdr, 0, sizeof(hdr));
 
+        /* default load addresses */
+    hdr.kernel_addr =  0x10008000;
+    hdr.ramdisk_addr = 0x11000000;
+    hdr.second_addr =  0x10F00000;
+    hdr.tags_addr =    0x10000100;
+
+    hdr.page_size = pagesize;
+
     while(argc > 0){
         char *arg = argv[0];
         char *val = argv[1];
@@ -133,8 +142,12 @@ int main(int argc, char **argv)
             second_fn = val;
         } else if(!strcmp(arg, "--cmdline")) {
             cmdline = val;
-        } else if(!strcmp(arg, "--saddr")) {
-            saddr = strtoul(val, 0, 16);
+        } else if(!strcmp(arg, "--base")) {
+            unsigned base = strtoul(val, 0, 16);
+            hdr.kernel_addr =  base + 0x00008000;
+            hdr.ramdisk_addr = base + 0x01000000;
+            hdr.second_addr =  base + 0x00F00000;
+            hdr.tags_addr =    base + 0x00000100;
         } else if(!strcmp(arg, "--board")) {
             board = val;
         } else {

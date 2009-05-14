@@ -41,7 +41,7 @@ void bootimg_set_cmdline(boot_img_hdr *h, const char *cmdline)
 boot_img_hdr *mkbootimg(void *kernel, unsigned kernel_size,
                         void *ramdisk, unsigned ramdisk_size,
                         void *second, unsigned second_size,
-                        unsigned page_size,
+                        unsigned page_size, unsigned base,
                         unsigned *bootimg_size)
 {
     unsigned kernel_actual;
