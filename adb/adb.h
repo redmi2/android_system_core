@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -362,6 +363,19 @@ typedef enum {
 
 // HTC's USB Vendor ID
 #define VENDOR_ID_HTC           0x0bb4
+// QUALCOMM's USB Vendor ID
+#define VENDOR_ID_QUALCOMM      0x05c6
+
+// products for VENDOR_ID_GOOGLE
+#define PRODUCT_ID_SOONER       0xd00d  // Sooner bootloader
+#define PRODUCT_ID_SOONER_COMP  0xdeed  // Sooner composite device
+
+// products for VENDOR_ID_HTC
+#define PRODUCT_ID_DREAM        0x0c01  // Dream bootloader
+#define PRODUCT_ID_DREAM_COMP   0x0c02  // Dream composite device
+
+// products for VENDOR_ID_QUALCOMM
+#define PRODUCT_ID_QUALCOMM     0x9018  // Qualcomm bootloader
 
 void local_init();
 int  local_connect(int  port);
