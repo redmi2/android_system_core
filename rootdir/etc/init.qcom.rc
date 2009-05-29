@@ -47,6 +47,7 @@ on boot
     chown system system /sys/bus/platform/devices/msm_sdcc.2/polling
     chown system system /sys/bus/platform/devices/msm_sdcc.3/polling
     chown system system /sys/bus/platform/devices/msm_sdcc.4/polling
+    chown system system /sys/devices/platform/msm_hsusb_periphera/composition
 
 # Enable MASS storage on SDCARD
     write /sys/devices/platform/mass_storage/lun0/file /dev/block/mmcblk0p1
