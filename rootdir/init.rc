@@ -136,6 +136,10 @@ on boot
     setprop ro.EMPTY_APP_MEM 6144
 
     setprop ro.com.google.location_feature 1
+#   EONS ALG (Enhanced One Name String)
+#   Setting variable ro.EONS_ALG_TYPE to 0 enables default ONS ALG
+#   Setting variable ro.EONS_ALG_TYPE to 1 enables EONS ALG
+    setprop ro.EONS_ALG_TYPE 1
 # Write value must be consistent with the above properties.
 # Note that the driver only supports 6 slots, so we have HOME_APP at the
 # same memory level as services.
