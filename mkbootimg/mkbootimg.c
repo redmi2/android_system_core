@@ -201,14 +201,14 @@ int main(int argc, char **argv)
     hdr.page_size = pagesize;
 #elif defined(SURF7X30)
     /* MSM 7x30 */
-    hdr.kernel_addr =  0x40208000;
-    hdr.ramdisk_addr = 0x41200000;
+    hdr.kernel_addr =  0x00208000;
+    hdr.ramdisk_addr = 0x01200000;
     if(saddr) {
-        hdr.second_addr =  0x40300000;
+        hdr.second_addr =  0x00300000;
     } else {
-        hdr.second_addr =  0x40F00000;
+        hdr.second_addr =  0x00F00000;
     }
-    hdr.tags_addr   =  0x40200100;
+    hdr.tags_addr   =  0x00200100;
     hdr.page_size = pagesize;
 #else
     /* MSM 7x00 and 7x01 */
