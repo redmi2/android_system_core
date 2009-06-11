@@ -15,7 +15,7 @@ ifneq (, $(filter msm7630_surf msm7630_ffa, $(TARGET_PRODUCT)))
   LOCAL_CFLAGS += -DSURF7X30
 endif
 
-LOCAL_MODULE := mkbootimg
+LOCAL_MODULE := mkbootimg-$(TARGET_PRODUCT)
 
 include $(BUILD_HOST_EXECUTABLE)
 
