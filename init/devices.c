@@ -114,12 +114,9 @@ static struct perms_ devperms[] = {
     { "/dev/pmem_gpu",      0666,   AID_SYSTEM,     AID_GRAPHICS,   1 },
     { "/dev/pmem_adsp",     0660,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/pmem_camera",   0660,   AID_SYSTEM,     AID_CAMERA,     1 },
-	{ "/dev/msm_camera",    0660,   AID_SYSTEM,     AID_CAMERA,     1 },
+	  { "/dev/msm_camera/",    0660,   AID_SYSTEM,     AID_CAMERA,     1 },
     { "/dev/oncrpc/",       0660,   AID_ROOT,       AID_SYSTEM,     1 },
     { "/dev/adsp/",         0660,   AID_SYSTEM,     AID_AUDIO,      1 },
-    { "/dev/mt9t013",       0660,   AID_SYSTEM,     AID_SYSTEM,     1 },
-	{ "/dev/mt9d112",       0660,   AID_SYSTEM,     AID_SYSTEM,     1 },
-    { "/dev/mt9p012",       0660,   AID_SYSTEM,     AID_SYSTEM,     1 },
     { "/dev/akm8976_daemon",0640,   AID_COMPASS,    AID_SYSTEM,     0 },
     { "/dev/akm8976_aot",   0640,   AID_COMPASS,    AID_SYSTEM,     0 },
     { "/dev/akm8976_pffd",  0640,   AID_COMPASS,    AID_SYSTEM,     0 },
@@ -412,6 +409,9 @@ static void handle_device_event(struct uevent *uevent)
             base = "/dev/log/";
             mkdir(base, 0755);
             name += 4;
+        } else if  (!strncmp(uevent->subsystem, "msm_camera", 10)) {
+            base = "/dev/msm_camera/";
+            mkdir(base, 0755);
         } else
             base = "/dev/";
     }
