@@ -179,14 +179,14 @@ int main(int argc, char **argv)
 
 #if defined(SURF8K)
     /* QSD 8K */
-    hdr.kernel_addr =  0x16008000;
-    hdr.ramdisk_addr = 0x1A000000;
+    hdr.kernel_addr =  0x24008000;
+    hdr.ramdisk_addr = 0x28000000;
     if(saddr) {
         hdr.second_addr =  0x00300000;
     } else {
-        hdr.second_addr =  0x16F00000;
+        hdr.second_addr =  0x24F00000;
     }
-    hdr.tags_addr   =  0x16000100;
+    hdr.tags_addr   =  0x24000100;
     hdr.page_size = pagesize;
 #elif defined(SURF7X2X)
     /* MSM 7x25 and 7x27 */
