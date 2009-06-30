@@ -92,6 +92,24 @@ int write_padding(int fd, unsigned pagesize, unsigned itemsize)
     }
 }
 
+int write_page_padding (int fd, unsigned pagesize, unsigned itemsize)
+{
+    int pagecount = itemsize/pagesize;
+    if (itemsize % pagesize)
+    {
+        pagecount++;
+    }
+    if ((pagecount%2) == 0){
+        return 0;
+    }
+
+    if(write(fd, padding, pagesize) != pagesize) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
 int main(int argc, char **argv)
 {
     boot_img_hdr hdr;
@@ -278,16 +296,20 @@ int main(int argc, char **argv)
 
     if(write(fd, &hdr, sizeof(hdr)) != sizeof(hdr)) goto fail;
     if(write_padding(fd, pagesize, sizeof(hdr))) goto fail;
+    if(write_page_padding(fd, pagesize, sizeof(hdr))) goto fail;
 
     if(write(fd, kernel_data, hdr.kernel_size) != hdr.kernel_size) goto fail;
     if(write_padding(fd, pagesize, hdr.kernel_size)) goto fail;
+    if(write_page_padding(fd, pagesize, hdr.kernel_size)) goto fail;
 
     if(write(fd, ramdisk_data, hdr.ramdisk_size) != hdr.ramdisk_size) goto fail;
     if(write_padding(fd, pagesize, hdr.ramdisk_size)) goto fail;
+    if(write_page_padding(fd, pagesize,  hdr.ramdisk_size)) goto fail;
 
     if(second_data) {
         if(write(fd, second_data, hdr.second_size) != hdr.second_size) goto fail;
         if(write_padding(fd, pagesize, hdr.ramdisk_size)) goto fail;
+        if(write_page_padding(fd, pagesize,  hdr.ramdisk_size)) goto fail;
     }
 
     return 0;
