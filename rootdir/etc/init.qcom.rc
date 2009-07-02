@@ -90,6 +90,18 @@ service hsag /system/bin/sdptool add --channel=11 HSAG
     disabled
     oneshot
 
+service bm3OPP /system/bin/sdptool add --channel=4 OPUSH
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service bm3FTP /system/bin/sdptool add --channel=7 FTP
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
 service qcom-sh /system/bin/sh /init.qcom.sh
     user root
     oneshot
