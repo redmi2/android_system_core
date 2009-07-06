@@ -18,6 +18,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <limits.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -59,6 +60,7 @@ static int handle_battery_event(struct uevent *);
 static int handle_mmc_event(struct uevent *);
 static int handle_block_event(struct uevent *);
 static int handle_bdi_event(struct uevent *);
+static int handle_usb_event(struct uevent *);
 static void _cb_blkdev_ok_to_destroy(blkdev_t *dev);
 
 static struct uevent_dispatch dispatch_table[] = {
@@ -68,6 +70,8 @@ static struct uevent_dispatch dispatch_table[] = {
     { "block", handle_block_event },
     { "bdi", handle_bdi_event },
     { "power_supply", handle_powersupply_event },
+    { "usb", handle_usb_event },
+    { "scsi", handle_usb_event },
     { NULL, NULL }
 };
 
@@ -326,7 +330,21 @@ static int handle_block_event(struct uevent *event)
          * If there isn't a disk already its because *we*
          * are the disk
          */
-        disk = blkdev_lookup_by_devno(maj, 0);
+        if (media->media_type == media_usb) {
+            char path[PATH_MAX];
+            /*
+             * Truncate partition name from the device path.
+             * partition names are created using their
+             * major and minor number
+             */
+            if (n == 3)
+                truncate_sysfs_path(event->path, 1, path, sizeof(path));
+            else
+                strlcpy(path, event->path, sizeof(path));
+
+            disk = blkdev_lookup_by_path(path);
+        } else
+            disk = blkdev_lookup_by_devno(maj, 0);
 
         if (!(blkdev = blkdev_create(disk,
                                      event->path,
@@ -437,5 +455,41 @@ static int handle_mmc_event(struct uevent *event)
 #endif
     }
 
+    return 0;
+}
+
+static int handle_usb_event(struct uevent *event)
+{
+    if (event->action == action_add) {
+        media_t *media;
+        char serial[80];
+        char *type;
+
+        type = get_uevent_param(event, "DEVTYPE");
+        LOG_VOL("Device type: %s Event path: %s", type, event->path);
+        if (strcmp(type, "scsi_device"))
+            return 0;
+
+        if (!(media = media_create(event->path,
+                                   "USB",
+                                   NULL,
+                                   media_usb))) {
+            LOGE("Unable to allocate new media (%m)");
+            return -1;
+        }
+        LOG_VOL("New usb host '%s' added @ %s", media->name, media->devpath);
+    } else if (event->action == action_remove) {
+        media_t *media;
+
+       if (!(media = media_lookup_by_path(event->path, false))) {
+            LOGE("Unable to lookup media '%s'", event->path);
+            return -1;
+        }
+
+        LOG_VOL("usb host '%s' @ %s removed", media->name, media->devpath);
+        media_destroy(media);
+    } else {
+        LOGE("No handler implemented for action %d", event->action);
+    }
     return 0;
 }
