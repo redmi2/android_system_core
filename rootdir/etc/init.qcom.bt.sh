@@ -65,13 +65,6 @@ kill_hciattach ()
   # this shell doesn't exit now -- wait returns for normal exit
 }
 
-start_bm3 ()
-{
-  /system/bin/dbus_bt -i /etc/bm3 &
-  bm3_pid=$!
-  logi "start_bm3: pid = $bm3_pid"
-}
-
 # mimic hciattach options parsing -- maybe a waste of effort
 USAGE="hciattach [-n] [-p] [-b] [-t timeout] [-s initial_speed] <tty> <type | id> [speed] [flow|noflow] [bdaddr]"
 
@@ -90,7 +83,7 @@ QSOC_DEVICE=${1:-"/dev/ttyHS0"}
 QSOC_TYPE=${2:-"any"}
 QSOC_BAUD=${3:-"3000000"}
 
-/system/bin/hci_qcomm_init -d $QSOC_DEVICE -s $QSOC_BAUD
+/system/bin/hci_qcomm_init -d $QSOC_DEVICE -s $QSOC_BAUD 
 
 exit_code_hci_qcomm_init=$?
 
@@ -103,11 +96,6 @@ esac
 trap "kill_hciattach" TERM INT
 
 start_hciattach
-
-is_qcom_obex=`getprop ro.qualcomm.proprietary_obex 0`
-case "$is_qcom_obex" in
-  1|true) start_bm3;;
-esac
 
 wait $hciattach_pid
 
