@@ -35,7 +35,7 @@
 
 static char E2FSCK_PATH[] = "/system/bin/e2fsck";
 
-int ext_identify(blkdev_t *dev)
+int ext_identify(blkdev_t *dev, char **volume_name)
 {
     int rc = -1;
     int fd;
@@ -73,6 +73,14 @@ int ext_identify(blkdev_t *dev)
     else
         rc = -ENODATA;
 
+    if (rc == 0) {
+        if (strlen(sb.s_volume_name))
+            *volume_name = strdup(sb.s_volume_name);
+        else
+            *volume_name = NULL;
+    }
+    LOGE("Ext Volume name = %s", sb.s_volume_name);
+
  out:
 #if EXT_DEBUG
     LOG_VOL("ext_identify(%s): rc = %d", devpath, rc);
@@ -86,11 +94,11 @@ int ext_check(blkdev_t *dev)
 {
     char *devpath;
 
-#if EXT_DEBUG
-    LOG_VOL("ext_check(%s):", dev->dev_fspath);
-#endif
+   devpath = blkdev_get_devpath(dev);
 
-    devpath = blkdev_get_devpath(dev);
+#if EXT_DEBUG
+    LOG_VOL("ext_check(%s):", devpath);
+#endif
 
     if (access(E2FSCK_PATH, X_OK)) {
         LOGE("ext_check(%s): %s not found (skipping checks)",
@@ -134,7 +142,7 @@ int ext_check(blkdev_t *dev)
 int ext_mount(blkdev_t *dev, volume_t *vol, boolean safe_mode)
 {
 #if EXT_DEBUG
-    LOG_VOL("ext_mount(%s, %s, %d):", dev->dev_fspath, vol->mount_point, safe_mode);
+    LOG_VOL("ext_mount(%s, %d):", vol->mount_point, safe_mode);
 #endif
 
     char *fs[] = { "ext3", "ext2", NULL };
