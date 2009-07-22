@@ -317,7 +317,15 @@ void handle_packet(apacket *p, atransport *t)
             handle_offline(t);
             send_packet(p, t);
         }
-        return;
+#if LINUX_ENABLED
+        /* Check for any Zombie process of shell at exit */
+        if (pid_service != 0) {
+            int stat_val;
+            pid_t child_pid;
+            child_pid = wait(&stat_val);
+        } /* Wait for service thread child to finish */
+#endif
+	return;
 
     case A_CNXN: /* CONNECT(version, maxdata, "system-id-string") */
             /* XXX verify version, etc */
@@ -364,7 +372,15 @@ void handle_packet(apacket *p, atransport *t)
                 s->close(s);
             }
         }
-        break;
+#if LINUX_ENABLED
+        /* Check for any Zombie process of shell at exit */
+        if (pid_service != 0) {
+            int stat_val;
+            pid_t child_pid;
+            child_pid = wait(&stat_val);
+        } /* Wait for service thread child to finish */
+#endif
+	break;
 
     case A_WRTE:
         if(t->connection_state != CS_OFFLINE) {

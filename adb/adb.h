@@ -326,6 +326,10 @@ typedef enum {
     TRACE_JDWP,
 } AdbTrace;
 
+#if LINUX_ENABLED
+pid_t pid_service;
+#endif
+
 #if ADB_TRACE
 
   int     adb_trace_mask;

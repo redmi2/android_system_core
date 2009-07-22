@@ -27,7 +27,9 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
+#if !LINUX_ENABLED
 #include <linux/ashmem.h>
+#endif	/* !LINUX_ENABLED */
 #include <cutils/ashmem.h>
 
 #define ASHMEM_DEVICE	"/dev/ashmem"
