@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -690,6 +691,7 @@ int launch_server()
     STARTUPINFO           startup;
     PROCESS_INFORMATION   pinfo;
     char                  program_path[ MAX_PATH ];
+    char                  command_line[ MAX_PATH ];
     int                   ret;
 
     sa.nLength = sizeof(sa);
@@ -717,10 +719,13 @@ int launch_server()
     /* get path of current program */
     GetModuleFileName( NULL, program_path, sizeof(program_path) );
 
+    /* compose command line with custom USB vendor ID parameter */
+    snprintf(command_line, MAX_PATH, "adb -i 0x%x fork-server server",
+             adb_get_usb_vendor_id());
+
     ret = CreateProcess(
             program_path,                              /* program path  */
-            "adb fork-server server",
-                                    /* the fork-server argument will set the
+            command_line,           /* the fork-server argument will set the
                                        debug = 2 in the child           */
             NULL,                   /* process handle is not inheritable */
             NULL,                    /* thread handle is not inheritable */
@@ -760,6 +765,7 @@ int launch_server()
     }
 #elif defined(HAVE_FORKEXEC)
     char    path[PATH_MAX];
+    char    usb_vid[7];
     int     fd[2];
 
     // set up a pipe so the child can tell us when it is ready.
@@ -781,8 +787,11 @@ int launch_server()
         dup2(fd[1], STDERR_FILENO);
         adb_close(fd[1]);
 
+        /* compose custom/user-specified USB vendor ID string */
+        snprintf(usb_vid, 7, "0x%x", adb_get_usb_vendor_id());
+
         // child process
-        int result = execl(path, "adb", "fork-server", "server", NULL);
+        int result = execl(path, "adb", "fork-server", "server", "-i", usb_vid, NULL);
         // this should not return
         fprintf(stderr, "OOPS! execl returned %d, errno: %d\n", result, errno);
     } else  {

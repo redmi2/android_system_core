@@ -24,6 +24,9 @@
 #define  TRACE_TAG  TRACE_TRANSPORT
 #include "adb.h"
 
+
+static unsigned short vendor_id = 0;
+
 /* XXX better define? */
 #ifdef __ppc__
 #define H4(x)	(((x) & 0xFF000000) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | (((x) & 0x000000FF) << 24)
@@ -134,6 +137,8 @@ int is_adb_interface(int vid, int pid, int usb_class, int usb_subclass, int usb_
             /* might support adb */
     } else if (vid == VENDOR_ID_QUALCOMM) {
             /* might support adb */
+    } else if ((vid != 0) && (vid == vendor_id)) {
+            /* might support adb */
     } else {
             /* not supported */
         return 0;
@@ -147,4 +152,14 @@ int is_adb_interface(int vid, int pid, int usb_class, int usb_subclass, int usb_
     }
 
     return 0;
+}
+
+void adb_set_usb_vendor_id(unsigned short vid)
+{
+    vendor_id = vid;
+}
+
+unsigned short adb_get_usb_vendor_id(void)
+{
+    return vendor_id;
 }
