@@ -28,6 +28,8 @@
 #include "usb_vendors.h"
 #endif
 
+static unsigned short vendor_id = 0;
+
 /* XXX better define? */
 #ifdef __ppc__
 #define H4(x)	(((x) & 0xFF000000) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | (((x) & 0x000000FF) << 24)
@@ -134,17 +136,35 @@ void init_usb_transport(atransport *t, usb_handle *h)
 int is_adb_interface(int vid, int pid, int usb_class, int usb_subclass, int usb_protocol)
 {
     unsigned i;
-    for (i = 0; i < vendorIdCount; i++) {
-        if (vid == vendorIds[i]) {
-            if (usb_class == ADB_CLASS && usb_subclass == ADB_SUBCLASS &&
-                    usb_protocol == ADB_PROTOCOL) {
-                return 1;
-            }
+    int check_adb = 0;
 
-            return 0;
+    if ((vid != 0) && (vid == vendor_id)) {
+        check_adb = 1;
+    } else {
+        for (i = 0; i < vendorIdCount; i++) {
+            if (vid == vendorIds[i]) {
+                check_adb = 1;
+                break;
+            }
         }
     }
 
+    if (check_adb) {
+        if (usb_class == ADB_CLASS && usb_subclass == ADB_SUBCLASS &&
+                usb_protocol == ADB_PROTOCOL) {
+            return 1;
+        }
+    }
     return 0;
 }
 #endif
+
+void adb_set_usb_vendor_id(unsigned short vid)
+{
+    vendor_id = vid;
+}
+
+unsigned short adb_get_usb_vendor_id(void)
+{
+    return vendor_id;
+}

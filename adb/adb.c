@@ -733,8 +733,8 @@ int launch_server()
     GetModuleFileName( NULL, program_path, sizeof(program_path) );
 
     /* compose command line with custom USB vendor ID parameter */
-//    snprintf(command_line, MAX_PATH, "adb -i 0x%x fork-server server",
-//             adb_get_usb_vendor_id());
+    snprintf(command_line, MAX_PATH, "adb -i 0x%x fork-server server",
+             adb_get_usb_vendor_id());
 
     ret = CreateProcess(
             program_path,                              /* program path  */
@@ -801,7 +801,7 @@ int launch_server()
         adb_close(fd[1]);
 
         /* compose custom/user-specified USB vendor ID string */
-//        snprintf(usb_vid, 7, "0x%x", adb_get_usb_vendor_id());
+        snprintf(usb_vid, 7, "0x%x", adb_get_usb_vendor_id());
 
         // child process
         int result = execl(path, "adb", "fork-server", "server", "-i", usb_vid, NULL);

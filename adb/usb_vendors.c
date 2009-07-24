@@ -39,11 +39,14 @@
 #define VENDOR_ID_GOOGLE        0x18d1
 // HTC's USB Vendor ID
 #define VENDOR_ID_HTC           0x0bb4
+// Qualcomm's USB Vendor ID
+#define VENDOR_ID_QUALCOMM      0x05c6
 
 /** built-in vendor list */
 int builtInVendorIds[] = {
     VENDOR_ID_GOOGLE,
     VENDOR_ID_HTC,
+    VENDOR_ID_QUALCOMM,
 };
 
 #define BUILT_IN_VENDOR_COUNT    (sizeof(builtInVendorIds)/sizeof(builtInVendorIds[0]))
