@@ -79,7 +79,7 @@ struct volume;
 
 struct volmgr_fstable_entry {
     char *name;
-    int     (*identify_fn) (blkdev_t *dev);
+    int     (*identify_fn) (blkdev_t *dev, char **volume_name);
     int     (*check_fn) (blkdev_t *dev);
     int     (*mount_fn) (blkdev_t *dev, struct volume *vol, boolean safe_mode);
     boolean case_sensitive_paths;
