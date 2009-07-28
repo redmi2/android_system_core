@@ -23,6 +23,10 @@
 #include <fcntl.h>
 #include <errno.h>
 
+#ifndef GENERIC
+#include <boot/boardconfig.h>
+#endif
+
 #include "mincrypt/sha.h"
 #include "bootimg.h"
 
@@ -195,41 +199,17 @@ int main(int argc, char **argv)
 
     strcpy(hdr.name, board);
 
-#if defined(SURF8K)
-    /* QSD 8K */
-    hdr.kernel_addr =  0x24008000;
-    hdr.ramdisk_addr = 0x28000000;
+#ifndef GENERIC
+    hdr.kernel_addr =  KERNEL_ADDR;
+    hdr.ramdisk_addr = RAMDISK_ADDR;
     if(saddr) {
         hdr.second_addr =  0x00300000;
     } else {
-        hdr.second_addr =  0x24F00000;
+        hdr.second_addr =  SECONDARY_ADDR;
     }
-    hdr.tags_addr   =  0x24000100;
-    hdr.page_size = pagesize;
-#elif defined(SURF7X2X)
-    /* MSM 7x25 and 7x27 */
-    hdr.kernel_addr =  0x00208000;
-    hdr.ramdisk_addr = 0x01200000;
-    if(saddr) {
-        hdr.second_addr =  0x00300000;
-    } else {
-        hdr.second_addr =  0x01100000;
-    }
-    hdr.tags_addr   =  0x00200100;
-    hdr.page_size = pagesize;
-#elif defined(SURF7X30)
-    /* MSM 7x30 */
-    hdr.kernel_addr =  0x00208000;
-    hdr.ramdisk_addr = 0x01200000;
-    if(saddr) {
-        hdr.second_addr =  0x00300000;
-    } else {
-        hdr.second_addr =  0x00F00000;
-    }
-    hdr.tags_addr   =  0x00200100;
+    hdr.tags_addr   =  TAGS_ADDR;
     hdr.page_size = pagesize;
 #else
-    /* MSM 7x00 and 7x01 */
     hdr.kernel_addr =  0x10008000;
     hdr.ramdisk_addr = 0x11000000;
     if(saddr) {
