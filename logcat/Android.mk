@@ -4,8 +4,6 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_C_INCLUDES := $(TARGET_OUT_HEADERS)/diag/include
-
 LOCAL_SRC_FILES:= logcat.cpp
 
 LOCAL_SHARED_LIBRARIES := liblog
@@ -13,6 +11,8 @@ LOCAL_SHARED_LIBRARIES := liblog
 ifeq ($(strip $(BOARD_USES_QCOM_HARDWARE)), true)
 LOCAL_SHARED_LIBRARIES += libdiag
 LOCAL_CFLAGS += -DUSE_DIAG
+LOCAL_C_INCLUDES := $(TARGET_OUT_HEADERS)/diag/include
+LOCAL_C_INCLUDES += vendor/qcom-proprietary/common/inc
 endif
 
 LOCAL_MODULE:= logcat
