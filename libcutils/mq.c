@@ -56,12 +56,6 @@ typedef struct {
 
 #include <linux/types.h>
 
-struct ucred {
-    __u32 pid;
-    __u32 uid;
-    __u32 gid;
-};
-
 enum {
     PTHREAD_MUTEX_NORMAL = 0,
     PTHREAD_MUTEX_RECURSIVE = 1,
