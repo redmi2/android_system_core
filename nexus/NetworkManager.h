@@ -13,23 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef _NETWORKMANAGER_H
 #define _NETWORKMANAGER_H
 
 #include <sysutils/SocketListener.h>
 
 #include "Controller.h"
+#include "PropertyManager.h"
+#include "IControllerHandler.h"
+#include "IDhcpEventHandlers.h"
 
-class NetworkManager {
+class InterfaceConfig;
+class DhcpClient;
+
+class NetworkManager : public IControllerHandler, public IDhcpEventHandlers {
 private:
     static NetworkManager *sInstance;
 
 private:
     ControllerCollection *mControllers;
     SocketListener       *mBroadcaster;
+    PropertyManager      *mPropMngr;
+    DhcpClient           *mDhcp;
 
 public:
-    virtual ~NetworkManager() {}
+    virtual ~NetworkManager();
 
     int run();
 
@@ -39,18 +48,17 @@ public:
 
     void setBroadcaster(SocketListener *sl) { mBroadcaster = sl; }
     SocketListener *getBroadcaster() { return mBroadcaster; }
+    PropertyManager *getPropMngr() { return mPropMngr; }
 
     static NetworkManager *Instance();
 
 private:
     int startControllers();
     int stopControllers();
-    NetworkManager();
 
-public:
-// XXX: Extract these into an interface
-    int onInterfaceCreated(Controller *c, char *name);
-    int onInterfaceDestroyed(Controller *c, char *name);
+    NetworkManager(PropertyManager *propMngr);
 
+    void onInterfaceConnected(Controller *c, const InterfaceConfig *cfg);
+    void onInterfaceDisconnected(Controller *c, const char *name);
 };
 #endif

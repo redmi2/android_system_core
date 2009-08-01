@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -32,8 +34,19 @@
 extern "C" int init_module(void *, unsigned int, const char *);
 extern "C" int delete_module(const char *, unsigned int);
 
-Controller::Controller(const char *name) {
-    mName = name;
+Controller::Controller(const char *name, PropertyManager *propMngr,
+                       IControllerHandler *handlers) {
+    mPropMngr = propMngr;
+    mName = strdup(name);
+    mHandlers = handlers;
+    mBoundInterface = NULL;
+}
+
+Controller::~Controller() {
+    if (mBoundInterface)
+        free(mBoundInterface);
+    if (mName)
+        free(mName);
 }
 
 int Controller::start() {
@@ -44,11 +57,19 @@ int Controller::stop() {
     return 0;
 }
 
+int Controller::set(const char *name, const char *value) {
+    errno = ENOENT;
+    return -1;
+}
+
+const char *Controller::get(const char *name, char *buffer, size_t maxsize) {
+    errno = ENOENT;
+    return NULL;
+}
+
 int Controller::loadKernelModule(char *modpath, const char *args) {
     void *module;
     unsigned int size;
-
-    LOGD("loadKernelModule(%s, %s)", modpath, args);
 
     module = loadFile(modpath, &size);
     if (!module) {
@@ -65,7 +86,6 @@ int Controller::unloadKernelModule(const char *modtag) {
     int rc = -1;
     int retries = 10;
 
-    LOGD("unloadKernelModule(%s)", modtag);
     while (retries--) {
         rc = delete_module(modtag, O_NONBLOCK | O_EXCL);
         if (rc < 0 && errno == EAGAIN)
@@ -75,7 +95,7 @@ int Controller::unloadKernelModule(const char *modtag) {
     }
 
     if (rc != 0) {
-        LOGW("Unable to unload kernel driver '%s' (%s)", modtag, 
+        LOGW("Unable to unload kernel driver '%s' (%s)", modtag,
              strerror(errno));
     }
     return rc;
@@ -106,7 +126,6 @@ bool Controller::isKernelModuleLoaded(const char *modtag) {
     fclose(fp);
     return false;
 }
-
 
 void *Controller::loadFile(char *filename, unsigned int *_size)
 {
@@ -141,4 +160,17 @@ void *Controller::loadFile(char *filename, unsigned int *_size)
 bail:
 	close(fd);
 	return buffer;
+}
+
+int Controller::bindInterface(const char *ifname) {
+    mBoundInterface = strdup(ifname);
+    LOGD("Controller %s bound to %s", mName, ifname);
+    return 0;
+}
+
+int Controller::unbindInterface(const char *ifname) {
+    free(mBoundInterface);
+    mBoundInterface = NULL;
+    LOGD("Controller %s unbound from %s", mName, ifname);
+    return 0;
 }

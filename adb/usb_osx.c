@@ -29,6 +29,7 @@
 
 #define TRACE_TAG   TRACE_USB
 #include "adb.h"
+#include "usb_vendors.h"
 
 #define  DBG   D
 
@@ -55,7 +56,7 @@ VendorProduct kSupportedDevices[kSupportedDeviceCount] = {
 #define NUM_VENDORS             (sizeof(vendorIds)/sizeof(vendorIds[0]))
 
 static IONotificationPortRef    notificationPort = 0;
-static io_iterator_t            notificationIterators[NUM_VENDORS];
+static io_iterator_t*           notificationIterators;
 
 struct usb_handle
 {
@@ -95,7 +96,7 @@ InitUSB()
     memset(notificationIterators, 0, sizeof(notificationIterators));
 
     //* loop through all supported vendors
-    for (i = 0; i < NUM_VENDORS; i++) {
+    for (i = 0; i < vendorIdCount; i++) {
         //* Create our matching dictionary to find the Android device's
         //* adb interface
         //* IOServiceAddMatchingNotification consumes the reference, so we do
@@ -388,7 +389,7 @@ void* RunLoopThread(void* unused)
     CFRunLoopRun();
     currentRunLoop = 0;
 
-    for (i = 0; i < NUM_VENDORS; i++) {
+    for (i = 0; i < vendorIdCount; i++) {
         IOObjectRelease(notificationIterators[i]);
     }
     IONotificationPortDestroy(notificationPort);
@@ -404,6 +405,9 @@ void usb_init()
     if (!initialized)
     {
         adb_thread_t    tid;
+
+        notificationIterators = (io_iterator_t*)malloc(
+            vendorIdCount * sizeof(io_iterator_t));
 
         adb_mutex_init(&start_lock, NULL);
         adb_cond_init(&start_cond, NULL);
@@ -429,6 +433,11 @@ void usb_cleanup()
     close_usb_devices();
     if (currentRunLoop)
         CFRunLoopStop(currentRunLoop);
+
+    if (notificationIterators != NULL) {
+        free(notificationIterators);
+        notificationIterators = NULL;
+    }
 }
 
 int usb_write(usb_handle *handle, const void *buf, int len)

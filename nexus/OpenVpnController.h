@@ -17,24 +17,26 @@
 #ifndef _OPEN_VPN_CONTROLLER_H
 #define _OPEN_VPN_CONTROLLER_H
 
+#include "PropertyManager.h"
 #include "VpnController.h"
 
+class ServiceManager;
+class IControllerHandler;
+
 class OpenVpnController : public VpnController {
+private:
+    ServiceManager *mServiceManager;
 
 public:
-    OpenVpnController();
-    virtual ~OpenVpnController() {}
+    OpenVpnController(PropertyManager *propmngr, IControllerHandler *handlers);
+    virtual ~OpenVpnController();
 
     int start();
     int stop();
-    int enable();
-    int disable();
-
-protected:
 
 private:
-    int startServiceDaemon();
-    int stopServiceDaemon();
+    int enable();
+    int disable();
 };
 
 #endif

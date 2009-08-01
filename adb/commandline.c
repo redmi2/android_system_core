@@ -104,7 +104,6 @@ void help()
         "                                 If -p is not specified, the ANDROID_PRODUCT_OUT\n"
         "                                 environment variable is used, which must\n"
         "                                 be an absolute path.\n"
-        " -i <vendor id>                - specify a custom USB vendor id\n"
         " devices                       - list all connected devices\n"
         "\n"
         "device commands:\n"
@@ -809,21 +808,6 @@ int adb_commandline(int argc, char **argv)
                 argc--;
                 argv++;
             }
-        } else if (argv[0][0]=='-' && argv[0][1]=='i') {
-            char          *vstr = NULL;
-            char          *endptr = NULL;
-            unsigned long  vid;
-            if (isdigit(argv[0][2])) {
-                vstr = argv[0] + 2;
-            } else {
-                if(argc < 2) return usage();
-                vstr = argv[1];
-                argc--;
-                argv++;
-            }
-            vid = strtoul(vstr, &endptr, 0);
-            if (!endptr || *endptr != '\0' || (vid & ~0xffff)) return usage();
-            adb_set_usb_vendor_id((unsigned short)vid);
         } else if (!strcmp(argv[0],"-d")) {
             ttype = kTransportUsb;
         } else if (!strcmp(argv[0],"-e")) {

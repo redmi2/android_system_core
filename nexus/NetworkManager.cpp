@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <stdio.h>
 #include <errno.h>
 
@@ -21,18 +22,25 @@
 #include <cutils/log.h>
 
 #include "NetworkManager.h"
+#include "InterfaceConfig.h"
+#include "DhcpClient.h"
 
 NetworkManager *NetworkManager::sInstance = NULL;
 
 NetworkManager *NetworkManager::Instance() {
     if (!sInstance)
-        sInstance = new NetworkManager();
+        sInstance = new NetworkManager(new PropertyManager());
     return sInstance;
 }
 
-NetworkManager::NetworkManager() {
+NetworkManager::NetworkManager(PropertyManager *propMngr) {
     mBroadcaster = NULL;
     mControllers = new ControllerCollection();
+    mPropMngr = propMngr;
+    mDhcp = new DhcpClient(this);
+}
+
+NetworkManager::~NetworkManager() {
 }
 
 int NetworkManager::run() {
@@ -54,7 +62,7 @@ int NetworkManager::startControllers() {
     for (i = mControllers->begin(); i != mControllers->end(); ++i) {
         int irc = (*i)->start();
         LOGD("Controller '%s' start rc = %d", (*i)->getName(), irc);
-        if (irc && !rc) 
+        if (irc && !rc)
             rc = irc;
     }
     return rc;
@@ -67,7 +75,7 @@ int NetworkManager::stopControllers() {
     for (i = mControllers->begin(); i != mControllers->end(); ++i) {
         int irc = (*i)->stop();
         LOGD("Controller '%s' stop rc = %d", (*i)->getName(), irc);
-        if (irc && !rc) 
+        if (irc && !rc)
             rc = irc;
     }
     return rc;
@@ -83,12 +91,31 @@ Controller *NetworkManager::findController(const char *name) {
     return NULL;
 }
 
-int NetworkManager::onInterfaceCreated(Controller *c, char *name) {
-    LOGD("Interface %s created by controller %s", name, c->getName());
-    return 0;
+void NetworkManager::onInterfaceConnected(Controller *c, const InterfaceConfig *cfg) {
+    LOGD("Controller %s interface %s connected", c->getName(), c->getBoundInterface());
+
+    // Look up the interface
+
+    if (0) { // already started?
+    }
+
+    if (cfg) {
+        if (cfg->getUseDhcp() && mDhcp->start(c->getBoundInterface())) {
+            LOGE("DHCP start failed");
+        } else if (!cfg->getUseDhcp()) {
+            // Static configuration
+        }
+    } else {
+        LOGD("No InterfaceConfig for %s:%s - assuming self-managed",
+            c->getName(), c->getBoundInterface());
+    }
 }
 
-int NetworkManager::onInterfaceDestroyed(Controller *c, char *name) {
-    LOGD("Interface %s destroyed by controller %s", name, c->getName());
-    return 0;
+void NetworkManager::onInterfaceDisconnected(Controller *c, const char *name) {
+    LOGD("Controller %s interface %s disconnected", c->getName(), name);
+
+    // If we have a DHCP request out on this interface then stop it
+    if (1) {
+        mDhcp->stop();
+    }
 }

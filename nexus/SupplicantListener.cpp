@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <errno.h>
 #include <sys/types.h>
 #include <pthread.h>
@@ -22,14 +23,22 @@
 
 #include "libwpa_client/wpa_ctrl.h"
 
-#include "Supplicant.h"
 #include "SupplicantListener.h"
+#include "ISupplicantEventHandler.h"
+#include "SupplicantEventFactory.h"
 #include "SupplicantEvent.h"
+#include "SupplicantAssociatingEvent.h"
+#include "SupplicantAssociatedEvent.h"
+#include "SupplicantConnectedEvent.h"
+#include "SupplicantScanResultsEvent.h"
+#include "SupplicantStateChangeEvent.h"
 
-SupplicantListener::SupplicantListener(Supplicant *supplicant, struct wpa_ctrl *monitor) :
+SupplicantListener::SupplicantListener(ISupplicantEventHandler *handlers, 
+                                       struct wpa_ctrl *monitor) :
                     SocketListener(wpa_ctrl_get_fd(monitor), false) {
-    mSupplicant = supplicant;
+    mHandlers = handlers;
     mMonitor = monitor;
+    mFactory = new SupplicantEventFactory();
 }
 
 bool SupplicantListener::onDataAvailable(SocketClient *cli) {
@@ -51,44 +60,50 @@ bool SupplicantListener::onDataAvailable(SocketClient *cli) {
         return false;
     }
 
-    SupplicantEvent *evt = new SupplicantEvent(buf, nread);
+    SupplicantEvent *evt = mFactory->createEvent(buf, nread);
 
-    // XXX: Make this a factory
-    // XXX: Instead of calling Supplicant directly
-    // extract an Interface and use that instead
-    if (evt->getType() == SupplicantEvent::EVENT_CONNECTED)
-        rc = mSupplicant->onConnectedEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_DISCONNECTED)
-        rc = mSupplicant->onDisconnectedEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_TERMINATING)
-        rc = mSupplicant->onTerminatingEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_PASSWORD_CHANGED)
-        rc = mSupplicant->onPasswordChangedEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_EAP_NOTIFICATION)
-        rc = mSupplicant->onEapNotificationEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_EAP_STARTED)
-        rc = mSupplicant->onEapStartedEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_EAP_SUCCESS)
-        rc = mSupplicant->onEapSuccessEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_EAP_FAILURE)
-        rc = mSupplicant->onEapFailureEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_SCAN_RESULTS)
-        rc = mSupplicant->onScanResultsEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_STATE_CHANGE)
-        rc = mSupplicant->onStateChangeEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_LINK_SPEED)
-        rc = mSupplicant->onLinkSpeedEvent(evt);
-    else if (evt->getType() == SupplicantEvent::EVENT_DRIVER_STATE)
-        rc = mSupplicant->onDriverStateEvent(evt);
-    else {
-        LOGW("Ignoring unknown event");
+    if (!evt) {
+        LOGW("Dropping unknown supplicant event '%s'", buf);
+        return true;
     }
+
+    // Call the appropriate handler
+    if (evt->getType() == SupplicantEvent::EVENT_ASSOCIATING)
+        mHandlers->onAssociatingEvent((SupplicantAssociatingEvent *) evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_ASSOCIATED)
+        mHandlers->onAssociatedEvent((SupplicantAssociatedEvent *) evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_CONNECTED)
+        mHandlers->onConnectedEvent((SupplicantConnectedEvent *) evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_SCAN_RESULTS)
+        mHandlers->onScanResultsEvent((SupplicantScanResultsEvent *) evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_STATE_CHANGE)
+        mHandlers->onStateChangeEvent((SupplicantStateChangeEvent *) evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_CONNECTIONTIMEOUT)
+        mHandlers->onConnectionTimeoutEvent((SupplicantConnectionTimeoutEvent *) evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_DISCONNECTED)
+        mHandlers->onDisconnectedEvent((SupplicantDisconnectedEvent *) evt);
+    else
+        LOGW("Whoops - no handler available for event '%s'\n", buf);
+#if 0
+    else if (evt->getType() == SupplicantEvent::EVENT_TERMINATING)
+        mHandlers->onTerminatingEvent(evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_PASSWORD_CHANGED)
+        mHandlers->onPasswordChangedEvent(evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_EAP_NOTIFICATION)
+        mHandlers->onEapNotificationEvent(evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_EAP_STARTED)
+        mHandlers->onEapStartedEvent(evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_EAP_SUCCESS)
+        mHandlers->onEapSuccessEvent(evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_EAP_FAILURE)
+        mHandlers->onEapFailureEvent(evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_LINK_SPEED)
+        mHandlers->onLinkSpeedEvent(evt);
+    else if (evt->getType() == SupplicantEvent::EVENT_DRIVER_STATE)
+        mHandlers->onDriverStateEvent(evt);
+#endif
 
     delete evt;
-    
-    if (rc) {
-        LOGW("Handler %d (%s) error: %s", evt->getType(), evt->getEvent(), strerror(errno));
-        return false;
-    }
+
     return true;
 }

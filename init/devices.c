@@ -147,6 +147,8 @@ static struct perms_ devperms[] = {
     { "/dev/qmi1",          0640,   AID_RADIO,      AID_RADIO,      0 },
     { "/dev/qmi2",          0640,   AID_RADIO,      AID_RADIO,      0 },
     { "/dev/q6venc",        0660,   AID_SYSTEM,     AID_SYSTEM,     0 },
+    { "/dev/ppp",           0660,   AID_RADIO,      AID_VPN,        0 },
+    { "/dev/tun",           0640,   AID_VPN,        AID_VPN,        0 },
     { NULL, 0, 0, 0, 0 },
 };
 
@@ -397,7 +399,7 @@ static void handle_device_event(struct uevent *uevent)
         } else if (!strncmp(uevent->subsystem, "adsp", 4)) {
             base = "/dev/adsp/";
             mkdir(base, 0755);
-      } else if(!strncmp(uevent->subsystem, "input", 5)) {
+        } else if(!strncmp(uevent->subsystem, "input", 5)) {
             base = "/dev/input/";
             mkdir(base, 0755);
         } else if(!strncmp(uevent->subsystem, "mtd", 3)) {

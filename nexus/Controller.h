@@ -13,31 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef _CONTROLLER_H
 #define _CONTROLLER_H
 
-#include "../../../frameworks/base/include/utils/List.h"
+#include <unistd.h>
+#include <sys/types.h>
 
-class Controller {
-private:
-    const char *mName;
+#include <utils/List.h>
+
+class PropertyManager;
+class IControllerHandler;
+
+#include "PropertyManager.h"
+#include "IPropertyProvider.h"
+
+class Controller : public IPropertyProvider {
+    /*
+     * Name of this controller - WIFI/VPN/USBNET/BTNET/BTDUN/LOOP/etc
+     */
+    char *mName;
+
+    /*
+     * Name of the system ethernet interface which this controller is
+     * bound to.
+     */
+    char *mBoundInterface;
+
+protected:
+    PropertyManager *mPropMngr;
+    IControllerHandler *mHandlers;
     
 public:
-    Controller(const char *name);
-    virtual ~Controller() {}
+    Controller(const char *name, PropertyManager *propMngr,
+               IControllerHandler *handlers);
+    virtual ~Controller();
 
     virtual int start();
     virtual int stop();
 
-    virtual int enable() = 0;
-    virtual int disable() = 0;
+    const char *getName() { return mName; }
+    const char *getBoundInterface() { return mBoundInterface; }
 
-    virtual const char *getName() { return mName; }
+    /* IPropertyProvider methods */
+    virtual int set(const char *name, const char *value);
+    virtual const char *get(const char *name, char *buffer, size_t maxsize);
 
 protected:
     int loadKernelModule(char *modpath, const char *args);
     bool isKernelModuleLoaded(const char *modtag);
     int unloadKernelModule(const char *modtag);
+    int bindInterface(const char *ifname);
+    int unbindInterface(const char *ifname);
 
 private:
     void *loadFile(char *filename, unsigned int *_size);

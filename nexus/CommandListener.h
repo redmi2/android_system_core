@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef _COMMANDLISTENER_H__
 #define _COMMANDLISTENER_H__
 
@@ -25,83 +26,62 @@ public:
     virtual ~CommandListener() {}
 
 private:
-    class WifiEnableCmd : public NexusCommand {
-    public:
-        WifiEnableCmd();
-        virtual ~WifiEnableCmd() {}
-        int runCommand(SocketClient *c, char *data);
-    };
-
-    class WifiDisableCmd : public NexusCommand {
-    public:
-        WifiDisableCmd();
-        virtual ~WifiDisableCmd() {}
-        int runCommand(SocketClient *c, char *data);
-    };
 
     class WifiScanCmd : public NexusCommand {
     public:
         WifiScanCmd();
         virtual ~WifiScanCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
 
     class WifiScanResultsCmd : public NexusCommand {
     public:
         WifiScanResultsCmd();
         virtual ~WifiScanResultsCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
 
-    class WifiAddNetworkCmd : public NexusCommand {
+    class WifiCreateNetworkCmd : public NexusCommand {
     public:
-        WifiAddNetworkCmd();
-        virtual ~WifiAddNetworkCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        WifiCreateNetworkCmd();
+        virtual ~WifiCreateNetworkCmd() {}
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
 
     class WifiRemoveNetworkCmd : public NexusCommand {
     public:
         WifiRemoveNetworkCmd();
         virtual ~WifiRemoveNetworkCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
 
     class WifiListNetworksCmd : public NexusCommand {
     public:
         WifiListNetworksCmd();
         virtual ~WifiListNetworksCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
 
-    class WifiSetVarCmd : public NexusCommand {
+    class SetCmd : public NexusCommand {
     public:
-        WifiSetVarCmd();
-        virtual ~WifiSetVarCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        SetCmd();
+        virtual ~SetCmd() {}
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
 
-    class WifiGetVarCmd : public NexusCommand {
+    class GetCmd : public NexusCommand {
     public:
-        WifiGetVarCmd();
-        virtual ~WifiGetVarCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        GetCmd();
+        virtual ~GetCmd() {}
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
 
-    class VpnEnableCmd : public NexusCommand {
+    class ListCmd : public NexusCommand {
     public:
-        VpnEnableCmd();
-        virtual ~VpnEnableCmd() {}
-        int runCommand(SocketClient *c, char *data);
+        ListCmd();
+        virtual ~ListCmd() {}
+        int runCommand(SocketClient *c, int argc, char ** argv);
     };
-
-    class VpnDisableCmd : public NexusCommand {
-    public:
-        VpnDisableCmd();
-        virtual ~VpnDisableCmd() {}
-        int runCommand(SocketClient *c, char *data);
-    };
-
 };
 
 #endif

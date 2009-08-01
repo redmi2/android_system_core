@@ -14,9 +14,9 @@ SocketClient::SocketClient(int socket) {
     pthread_mutex_init(&mWriteMutex, NULL);
 }
 
-int SocketClient::sendMsg(int code, char *msg, bool addErrno) {
+int SocketClient::sendMsg(int code, const char *msg, bool addErrno) {
     char *buf;
-    
+
     if (addErrno) {
         buf = (char *) alloca(strlen(msg) + strlen(strerror(errno)) + 8);
         sprintf(buf, "%.3d %s (%s)", code, msg, strerror(errno));
@@ -27,24 +27,16 @@ int SocketClient::sendMsg(int code, char *msg, bool addErrno) {
     return sendMsg(buf);
 }
 
-int SocketClient::sendMsg(char *msg) {
+int SocketClient::sendMsg(const char *msg) {
     if (mSocket < 0) {
         errno = EHOSTUNREACH;
         return -1;
     }
 
-    char *bp;
-  
-    if (msg[strlen(msg)] != '\n') {
-        bp = (char *) alloca(strlen(msg) + 1);
-        strcpy(bp, msg);
-        strcat(bp, "\n");
-    } else
-        bp = msg;
-       
+    // Send the message including null character
     int rc = 0;
-    char *p = bp;
-    int brtw = strlen(bp);
+    const char *p = msg;
+    int brtw = strlen(msg) + 1;
 
     pthread_mutex_lock(&mWriteMutex);
     while(brtw) {

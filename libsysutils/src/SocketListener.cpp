@@ -125,7 +125,7 @@ void SocketListener::runListener() {
                 max = (*it)->getSocket();
         }
         pthread_mutex_unlock(&mClientsLock);
-        
+
         if ((rc = select(max + 1, &read_fds, NULL, NULL, NULL)) < 0) {
             LOGE("select failed (%s)", strerror(errno));
             sleep(1);
@@ -157,7 +157,6 @@ void SocketListener::runListener() {
                 if (FD_ISSET(fd, &read_fds)) {
                     pthread_mutex_unlock(&mClientsLock);
                     if (!onDataAvailable(*it)) {
-                        LOGD("SocketListener closing client socket");
                         close(fd);
                         pthread_mutex_lock(&mClientsLock);
                         delete *it;
@@ -173,7 +172,7 @@ void SocketListener::runListener() {
     }
 }
 
-void SocketListener::sendBroadcast(int code, char *msg, bool addErrno) {
+void SocketListener::sendBroadcast(int code, const char *msg, bool addErrno) {
     pthread_mutex_lock(&mClientsLock);
     SocketClientCollection::iterator i;
 
@@ -185,7 +184,7 @@ void SocketListener::sendBroadcast(int code, char *msg, bool addErrno) {
     pthread_mutex_unlock(&mClientsLock);
 }
 
-void SocketListener::sendBroadcast(char *msg) {
+void SocketListener::sendBroadcast(const char *msg) {
     pthread_mutex_lock(&mClientsLock);
     SocketClientCollection::iterator i;
 
