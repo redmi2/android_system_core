@@ -51,8 +51,8 @@ on boot
 
 # Enable MASS storage on SDCARD
     write /sys/devices/platform/mass_storage/lun0/file /dev/block/mmcblk0p1
-    write /sys/bus/platform/drivers/msm_sdcc/msm_sdcc.1/polling 1   
-    write /sys/bus/platform/drivers/msm_sdcc/msm_sdcc.4/polling 1  
+    write /sys/bus/platform/drivers/msm_sdcc/msm_sdcc.1/polling 1
+    write /sys/bus/platform/drivers/msm_sdcc/msm_sdcc.4/polling 1
 
 on property:init.svc.hcid=running
     write /sys/devices/virtual/bluetooth/hci0/idle_timeout 7000
@@ -69,7 +69,7 @@ service qmuxd /system/bin/qmuxd &
 
 service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     user bluetooth
-    group qcom_oncrpc bluetooth net_bt_admin system
+    group qcom_oncrpc bluetooth net_bt_admin system sdcard_rw
     disabled
     oneshot
 
@@ -88,6 +88,18 @@ service hfag /system/bin/sdptool add --channel=10 HFAG
     oneshot
 
 service hsag /system/bin/sdptool add --channel=11 HSAG
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service opp /system/bin/sdptool add --channel=4 OPUSH
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service ftp /system/bin/sdptool add --channel=7 FTP
     user bluetooth
     group bluetooth net_bt_admin
     disabled
