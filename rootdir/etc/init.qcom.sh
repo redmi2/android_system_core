@@ -42,7 +42,6 @@ case "$target" in
         echo 30 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/down_differential
         echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
         echo 245760 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-        echo 4 > /sys/module/pm2/parameters/idle_sleep_mode
         ;;
 
     "qsd8250_surf" | "qsd8250_ffa")
