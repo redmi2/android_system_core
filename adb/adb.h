@@ -372,6 +372,8 @@ void usb_kick(usb_handle *h);
 #if ADB_HOST
 int is_adb_interface(int vid, int pid, int usb_class, int usb_subclass, int usb_protocol);
 #endif
+void adb_set_usb_vendor_id(unsigned short vid);
+unsigned short adb_get_usb_vendor_id(void);
 
 unsigned host_to_le32(unsigned n);
 int adb_commandline(int argc, char **argv);
