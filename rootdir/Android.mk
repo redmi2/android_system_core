@@ -8,7 +8,6 @@ copy_from := \
 	etc/dbus.conf \
 	etc/init.goldfish.sh \
 	etc/init.qcom.bt.sh \
-	etc/ppp/ip-up-vpn \
 	etc/hosts
 
 copy_to := $(addprefix $(TARGET_OUT)/,$(copy_from))

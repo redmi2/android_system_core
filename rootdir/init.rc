@@ -93,11 +93,10 @@ loglevel 3
     mkdir /data/misc/keystore 0770 keystore keystore
     mkdir /data/misc/vpn 0770 system system
     mkdir /data/misc/vpn/profiles 0770 system system
-    mkdir /data/misc/wifi 0770 wifi system
-    chown wifi system /data/misc/wifi
-    touch /data/misc/wifi/wpa_supplicant.conf
+    # give system access to wpa_supplicant.conf for backup and restore
+    mkdir /data/misc/wifi 0770 wifi wifi
+    chmod 0770 /data/misc/wifi
     chmod 0660 /data/misc/wifi/wpa_supplicant.conf
-    chown wifi system /data/misc/wifi/wpa_supplicant.conf
     mkdir /data/local 0771 shell shell
     mkdir /data/local/tmp 0771 shell shell
     mkdir /data/data 0771 system system
@@ -315,7 +314,7 @@ service hsag /system/bin/sdptool add --channel=11 HSAG
 service installd /system/bin/installd
     socket installd stream 600 system system
 
-service flash_recovery /system/bin/flash_image recovery /system/recovery.img
+service flash_recovery /system/etc/install-recovery.sh
     oneshot
 
 busybox --install 
