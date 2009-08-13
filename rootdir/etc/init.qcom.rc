@@ -56,6 +56,10 @@ on boot
 
 on property:init.svc.hcid=running
     write /sys/devices/virtual/bluetooth/hci0/idle_timeout 7000
+    start dbus_bt
+
+on property:init.svc.hcid=stopped
+    stop dbus_bt
 
 service hci_qcomm_init /system/bin/log -t qcom-bluetooth -p i "hci_qcomm_init service requested"
     user bluetooth
@@ -69,7 +73,7 @@ service qmuxd /system/bin/qmuxd &
 
 service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     user bluetooth
-    group qcom_oncrpc bluetooth net_bt_admin system sdcard_rw
+    group qcom_oncrpc bluetooth net_bt_admin system
     disabled
     oneshot
 
@@ -80,6 +84,12 @@ service hcid /system/bin/hcid -s -n -f /etc/bluez/hcid.conf
     # let hcid drop uid to bluetooth with the right linux capabilities
     group bluetooth net_bt_admin misc
     disabled
+
+service dbus_bt /system/bin/sh /etc/dbus_bt/dbus_bt.sh
+    user bluetooth
+    group bluetooth net_bt_admin system sdcard_rw
+    disabled
+    oneshot
 
 service hfag /system/bin/sdptool add --channel=10 HFAG
     user bluetooth
