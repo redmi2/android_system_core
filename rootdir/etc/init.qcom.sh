@@ -45,16 +45,17 @@ case "$target" in
         ;;
 
     "qsd8250_surf" | "qsd8250_ffa")
-        value=`getprop persist.maxcpukhz`
-        case "$value" in
-            "")
-                cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq >\
-                /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-                ;;
-            *)
-                echo $value > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-                ;;
-        esac
+#        value=`getprop persist.maxcpukhz`
+#        case "$value" in
+#            "")
+#                cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq >\
+#                /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+#                ;;
+#            *)
+#                echo $value > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+#                ;;
+#        esac
+        echo 768000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
         echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
         echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
         echo 30 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/down_differential
