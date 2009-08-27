@@ -270,6 +270,7 @@ static void shell_service(int s, void *command)
 {
     char    buffer[MAX_PAYLOAD];
     char    buffer2[MAX_PAYLOAD];
+char dbgbuf[4096];
     struct pollfd ufds[2];
     int     fd, ret = 0;
     unsigned count = 0;
@@ -386,15 +387,11 @@ int service_to_fd(const char *name)
     } else if (!strncmp(name, "log:", 4)) {
         ret = create_service_thread(log_service, get_log_file_path(name + 4));
     } else if(!HOST && !strncmp(name, "shell:", 6)) {
-        const char* args[2];
         if(name[6]) {
-            args[0] = "-c";
-            args[1] = name + 6;
+            ret = create_subprocess(SHELL_COMMAND, "-c", name + 6);
         } else {
-            args[0] = "-";
-            args[1] = 0;
+            ret = create_subprocess(SHELL_COMMAND, "-", 0);
         }
-        ret = create_service_thread(shell_service, (void *)args);
     } else if(!strncmp(name, "sync:", 5)) {
         ret = create_service_thread(file_sync_service, NULL);
     } else if(!strncmp(name, "remount:", 8)) {
