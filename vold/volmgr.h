@@ -122,6 +122,9 @@ typedef struct volume {
     struct volume            *next;
 } volume_t;
 
+extern char *default_usb_devpath;
+extern char *default_usb2_devpath;
+
 int volmgr_consider_disk(blkdev_t *dev);
 int volmgr_notify_eject(blkdev_t *dev, void (* cb) (blkdev_t *));
 int volmgr_send_states(void);
@@ -131,5 +134,6 @@ int volmgr_start_volume_by_mountpoint(char *mount_point);
 int volmgr_safe_mode(boolean enable);
 int volmgr_format_volume(char *mount_point);
 int volmgr_set_volume_key(char *mount_point, unsigned char *key);
+int volmgr_send_mount_status(void);
 void KillProcessesWithOpenFiles(const char* mountPoint, boolean sigkill, int *excluded, int num_excluded);
 #endif

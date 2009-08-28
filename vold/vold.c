@@ -128,6 +128,14 @@ int main(int argc, char **argv)
      * Main loop
      */
     LOG_VOL("Bootstrapping complete");
+    /*
+     * The code changes done for not handling the MMC/SD block events
+     * during the vold bootstrap affect USB mass storage devices
+     * detection, connected during the system boot up.  As a workaround,
+     * store UMS devices uevents in a list and process them after
+     * vold bootstrap.
+     */
+    process_uevent_list();
     while(1) {
         fd_set read_fds;
         struct timeval to;
