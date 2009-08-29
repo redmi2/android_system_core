@@ -40,15 +40,15 @@
 
 #define DEBUG_VOLMGR 0
 
-#define DEFAULT_USB_DEVICEPATH "/devices/platform/msm_hsusb_host.0/usb1"
-#define DEFAULT_USB2_DEVICEPATH "/devices/platform/msm_hsusb_host.1/usb2"
-#define DEFAULT_USB_MOUNTPOINT "/data/disk"
-#define DEFAULT_USB_MOUNTPATH "/data/"
 #define DISK_NUM_LENGTH 3
 #define DISK_NUM_MAX 128
 
 static volume_t *vol_root = NULL;
 static boolean safe_mode = true;
+char *default_usb_devpath = NULL;
+char *default_usb2_devpath = NULL;
+static char *default_usb_mountpoint = NULL;
+static char *default_usb_mountpath = NULL;
 
 static struct volmgr_fstable_entry fs_table[] = {
     { "ext3", ext_identify, ext_check, ext_mount , true },
@@ -207,6 +207,14 @@ int volmgr_bootstrap(void)
         return rc;
     }
 
+   /*
+    * Cleanup the mount path directory
+    */
+    if (default_usb_mountpath) {
+        remove(default_usb_mountpath);
+        mkdir(default_usb_mountpath, 0777);
+    }
+
     /*
      * Check to see if any of our volumes is mounted
      */
@@ -268,6 +276,27 @@ int volmgr_send_states(void)
 
     return 0;
 }
+/*
+ * Called when Mount Service asks for the mount status of all the devices
+ * which are mounted before Mount Service start during the boot up
+ */
+int volmgr_send_mount_status(void)
+{
+    int rc = 0;
+    volume_t *vol_scan = vol_root;
+
+    while (vol_scan) {
+        pthread_mutex_lock(&vol_scan->lock);
+        if (vol_scan->state == volstate_mounted) {
+            if ((rc = volume_send_state(vol_scan)) < 0) {
+                LOGE("Error sending state to framework (%d)", rc);
+            }
+        }
+        pthread_mutex_unlock(&vol_scan->lock);
+        vol_scan = vol_scan->next;
+    }
+    return rc;
+}
 
 /*
  * Called when a block device is ready to be
@@ -281,16 +310,19 @@ int volmgr_consider_disk(blkdev_t *dev)
 
     if (!(vol = volmgr_lookup_volume_by_mediapath(dev->media->devpath, true)))
         return 0;
+
     /**
      * If volume name is not found for the block device
      * then use defualt mount point name for mounting this device
      */
+    pthread_mutex_lock(&vol->lock);
     if (!volmgr_lookup_volume_by_mediapath(dev->media->devpath, false))
          exact = 0;
     else
          exact = 1;
+    pthread_mutex_unlock(&vol->lock);
 
-    if (vol->state == volstate_mounted) {
+    if (vol->state == volstate_mounted || vol->state == volstate_checking) {
         if (!exact && (vol->media_type == media_usb)) {
             if ((dev->major == vol->dev->major) && (dev->minor != vol->dev->minor)) {
 
@@ -303,10 +335,11 @@ int volmgr_consider_disk(blkdev_t *dev)
 
                 volmgr_add_mediapath_to_volume(vol_new, dev->media->devpath);
                 vol_new->media_type = vol->media_type;
-                vol_new->mount_point = strdup(DEFAULT_USB_MOUNTPOINT);
+                vol_new->mount_point = strdup(default_usb_mountpoint);
                 if (vol->ums_path)
                     vol_new->ums_path = strdup(vol->ums_path);
 
+                pthread_mutex_lock(&vol->lock);
                 if (!vol_root)
                     vol_root = vol_new;
                 else {
@@ -315,6 +348,7 @@ int volmgr_consider_disk(blkdev_t *dev)
                         scan = scan->next;
                     scan->next = vol_new;
                 }
+                pthread_mutex_unlock(&vol->lock);
                 vol = vol_new;
             }
         } else {
@@ -372,10 +406,10 @@ static int volmgr_delete_volume_structure(volume_t *v)
     if (v->media_type != media_usb)
         return -1;
 
-    if (!strncmp(v->media_paths[0], DEFAULT_USB_DEVICEPATH, sizeof(DEFAULT_USB_DEVICEPATH)) ||
-         (!strncmp(v->media_paths[0], DEFAULT_USB2_DEVICEPATH, sizeof(DEFAULT_USB2_DEVICEPATH)))) {
+    if (!strncmp(v->media_paths[0], default_usb_devpath, sizeof(default_usb_devpath)) ||
+         (!strncmp(v->media_paths[0], default_usb_devpath, sizeof(default_usb2_devpath)))) {
         free (v->mount_point);
-        v->mount_point =  strdup(DEFAULT_USB_MOUNTPOINT);
+        v->mount_point =  strdup(default_usb_mountpoint);
         return -1;
     }
 
@@ -832,7 +866,7 @@ static int volmgr_stop_volume(volume_t *v, void (*cb) (volume_t *, void *), void
             LOGI("volmgr_stop_volume(%s): Volume unmounted sucessfully",
                     v->mount_point);
 
-            if (v->media_type == media_usb && strncmp(v->mount_point, DEFAULT_USB_MOUNTPOINT,strlen(DEFAULT_USB_MOUNTPOINT))) {
+            if (v->media_type == media_usb) {
                 if (rmdir(v->mount_point) == -1)
                     LOGE("volmgr_stop_volume: Failed to remove directory %s : %s", v->mount_point, strerror(errno));
             }
@@ -1032,6 +1066,26 @@ static int volmgr_config_volume(cnode *node)
         }
         LOG_VOL("media path for devmapper volume = '%s'", dm_mediapath);
         volmgr_add_mediapath_to_volume(new, dm_mediapath);
+    } else if (new->media_type == media_usb) {
+       /*
+        * Read default device path, mount point and mount path from
+        * vold configuration file
+        */
+        if (!(default_usb_devpath)) {
+            default_usb_devpath = strdup(new->media_paths[0]);
+        } else if (!default_usb2_devpath) {
+            default_usb2_devpath = strdup(new->media_paths[0]);
+        }
+        if (!default_usb_mountpoint) {
+            default_usb_mountpoint = strdup(new->mount_point);
+            default_usb_mountpath = strdup(new->mount_point);
+            for (i=strlen(default_usb_mountpath); i > 0; i--) {
+                 if (default_usb_mountpath[i] == '/') {
+                     default_usb_mountpath[i+1] = '\0';
+                     break;
+                 }
+            }
+        }
     }
 
     if (!vol_root)
@@ -1165,26 +1219,45 @@ static int _volmgr_start(volume_t *vol, blkdev_t *dev)
         return -ENODATA;
     }
 
-    if (volume_name && vol->media_type == media_usb) {
+    if (vol->media_type == media_usb) {
         char disk_num [DISK_NUM_LENGTH + 1];
-        int length = strlen(DEFAULT_USB_MOUNTPATH) + strlen(volume_name) + DISK_NUM_LENGTH + 1;
-        char *path = malloc(length);
-
-        if (path == NULL){
+        char *path;
+        unsigned int length, path_length;
+        int ret = -1;
+       /*
+        * If the device has a valid volume name then mount file system
+        * with that volume name otherwise mount it with default mount point
+        */
+        if (volume_name) {
+            length = strlen(default_usb_mountpath) +
+                     strlen(volume_name) + DISK_NUM_LENGTH + 1;
+            path = calloc(length, sizeof(char));
+            if (path == NULL){
+                free(volume_name);
+                return -ENOMEM;
+            }
+            /* Create mount point with volume name */
+            strlcpy(path, default_usb_mountpath, (length-1));
+            strlcat(path, volume_name, (length-1));
             free(volume_name);
-            return -ENOMEM;
+        } else {
+            length = strlen(default_usb_mountpoint) +
+                     DISK_NUM_LENGTH + 1;
+            path = calloc(length, sizeof(char));
+            if (path == NULL){
+                return -ENOMEM;
+            }
+            strlcpy(path, default_usb_mountpoint, (length-1));
         }
-        memset(path, 0, length);
-        strlcpy(path, DEFAULT_USB_MOUNTPATH, (length-1));
-        strlcat(path, volume_name, (length-1));
-        free(volume_name);
+        ret = mkdir(path, 0777);
 
-        int path_length = strlen(path);
-        LOGE("Mount point directory %s", path);
-        int ret = mkdir(path, 0777);
-
+       /*
+        * If the mount point already used then add a serial number
+        * and create new mount point
+        */
+        path_length = strlen(path);
         while (ret == -1 && num < DISK_NUM_MAX) {
-            int i;
+            unsigned int i;
             for (i = path_length; i < length; i++) {
                 path[i] = '\0';
             }
@@ -1201,6 +1274,10 @@ static int _volmgr_start(volume_t *vol, blkdev_t *dev)
 
         if (!ret)
             vol->mount_point = path;
+        else {
+            free(path);
+            return ret;
+        }
     }
 
     return volmgr_start_fs(fs, vol, dev);

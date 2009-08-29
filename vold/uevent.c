@@ -49,6 +49,14 @@ struct uevent_dispatch {
     int (* dispatch) (struct uevent *);
 };
 
+typedef struct uevent_list {
+    struct uevent *event;
+    struct uevent_list *next;
+} uevent_list_t;
+
+struct uevent_list *uevent_list_root = NULL;
+
+
 static void dump_uevent(struct uevent *);
 static int dispatch_uevent(struct uevent *event);
 static void free_uevent(struct uevent *event);
@@ -62,6 +70,7 @@ static int handle_block_event(struct uevent *);
 static int handle_bdi_event(struct uevent *);
 static int handle_usb_event(struct uevent *);
 static void _cb_blkdev_ok_to_destroy(blkdev_t *dev);
+static int add_usb_uevent_to_list(struct uevent *event);
 
 static struct uevent_dispatch dispatch_table[] = {
     { "switch", handle_switch_event }, 
@@ -169,10 +178,61 @@ int simulate_uevent(char *subsys, char *path, char *action, char **params)
             break;
         event->param[i] = strdup(params[i]);
     }
-
-    rc = dispatch_uevent(event);
-    free_uevent(event);
+    if (!strncmp(path, default_usb_devpath, strlen(default_usb_devpath)) ||
+        !strncmp(path, default_usb2_devpath, strlen(default_usb2_devpath))) {
+        rc = add_usb_uevent_to_list(event);
+    } else {
+        rc = dispatch_uevent(event);
+        free_uevent(event);
+    }
     return rc;
+}
+/*
+ * Store USB devices uevents and process them after vold bootstrap.
+ */
+int add_usb_uevent_to_list(struct uevent *event)
+{
+    int rc = 0;
+    struct uevent_list *node;
+
+    if (!(node = malloc(sizeof(struct uevent_list)))) {
+        free_uevent(event);
+        return -errno;
+    }
+    node->event = event;
+    node->next = NULL;
+
+    if (!uevent_list_root)
+        uevent_list_root = node;
+    else {
+        struct uevent_list *list_scan;
+        list_scan = uevent_list_root;
+        while(list_scan->next)
+            list_scan = list_scan->next;
+
+        list_scan->next = node;
+    }
+
+    return rc;
+}
+/*
+ * Dispatch uevent to the event handlers and delete event node from the list.
+ */
+void process_uevent_list()
+{
+    struct uevent_list *list_scan, *node;
+    if (!uevent_list_root) {
+        return;
+    }
+    list_scan = uevent_list_root;
+    while(list_scan) {
+        node = list_scan;
+        dispatch_uevent(node->event);
+        list_scan = list_scan->next;
+        free_uevent(node->event);
+        free(node);
+    }
+    return;
 }
 
 static int dispatch_uevent(struct uevent *event)
