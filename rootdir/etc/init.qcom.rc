@@ -61,6 +61,10 @@ on property:init.svc.hcid=running
 on property:init.svc.hcid=stopped
     stop dbus_bt
 
+service factory_reset /system/bin/factory_reset
+    user root
+    disabled
+
 service hci_qcomm_init /system/bin/log -t qcom-bluetooth -p i "hci_qcomm_init service requested"
     user bluetooth
     group bluetooth net_bt_admin
