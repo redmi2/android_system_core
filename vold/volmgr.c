@@ -1240,9 +1240,11 @@ static volume_t *volmgr_lookup_volume_by_mountpoint(char *mount_point, boolean l
     while(v) {
         pthread_mutex_lock(&v->lock);
         if (!strcmp(v->mount_point, mount_point)) {
-            if (!leave_locked)
-                pthread_mutex_unlock(&v->lock);
-            return v;
+           if((v->state == volstate_unmounted) || (v->state == volstate_checking)) {
+            if(!leave_locked)
+              pthread_mutex_unlock(&v->lock);
+           return v;
+           }
         }
         pthread_mutex_unlock(&v->lock);
         v = v->next;
