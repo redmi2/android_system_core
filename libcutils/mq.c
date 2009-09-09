@@ -62,6 +62,14 @@ enum {
     PTHREAD_MUTEX_ERRORCHECK = 2,
     PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL
 };
+
+struct ucred
+{
+  pid_t pid;                    /* PID of sending process.  */
+  uid_t uid;                    /* UID of sending process.  */
+  gid_t gid;                    /* GID of sending process.  */
+};
+
 #endif	/* LINUX_ENABLED */
 
 /** Listens for bytes coming from remote peers. */
