@@ -60,4 +60,8 @@ case "$target" in
         echo 30 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/down_differential
         echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
         ;;
+
+    "msm7630_surf" | "msm7630_ffa")
+        start rmt_storage
+	;;
 esac
