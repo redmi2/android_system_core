@@ -43,6 +43,10 @@
 #define DISK_NUM_LENGTH 3
 #define DISK_NUM_MAX 128
 
+/* Stores mount points of all USB mass storage devices that are connected */
+#define MOUNTS_FILE "/data/.mounts"
+#define TEMP_MOUNTS_FILE "/data/.temp_mounts"
+
 static volume_t *vol_root = NULL;
 static boolean safe_mode = true;
 char *default_usb_devpath = NULL;
@@ -101,6 +105,7 @@ static void volmgr_reaper_thread_sighandler(int signo);
 static void volmgr_add_mediapath_to_volume(volume_t *v, char *media_path);
 static int volmgr_send_eject_request(volume_t *v);
 static volume_t *volmgr_lookup_volume_by_mountpoint(char *mount_point, boolean leave_locked);
+static void  volmgr_update_mounts_file(char *mount_point);
 
 static boolean _mountpoint_mounted(char *mp)
 {
@@ -198,6 +203,35 @@ int volmgr_format_volume(char *mount_point)
     return rc;
 }
 
+/*
+ * Cleans up stale mount points on reboot
+ */
+static void volmgr_cleanup_stale_mountpoints(void)
+{
+    int len;
+    FILE *fp;
+    char mp[PATH_MAX];
+    if ((fp = fopen(MOUNTS_FILE, "r"))) {
+        while(fgets(mp, sizeof(mp), fp) != NULL) {
+            len = strlen(mp);
+            /* Remove delimiter '\n' from mount point string
+             * before calling rmdir()
+             */
+            if (len > 0) {
+                if (mp[len-1] == '\n')
+                    mp[len-1] = '\0';
+                rmdir (mp);
+            }
+        }
+        fclose(fp);
+    }
+    /* All entries of the file are removed by opening it in write mode */
+    if ((fp = fopen(MOUNTS_FILE, "w")))
+        fclose(fp);
+
+    return;
+}
+
 int volmgr_bootstrap(void)
 {
     int rc;
@@ -210,10 +244,7 @@ int volmgr_bootstrap(void)
    /*
     * Cleanup the mount path directory
     */
-    if (default_usb_mountpath) {
-        remove(default_usb_mountpath);
-        mkdir(default_usb_mountpath, 0777);
-    }
+    volmgr_cleanup_stale_mountpoints();
 
     /*
      * Check to see if any of our volumes is mounted
@@ -407,7 +438,7 @@ static int volmgr_delete_volume_structure(volume_t *v)
         return -1;
 
     if (!strncmp(v->media_paths[0], default_usb_devpath, sizeof(default_usb_devpath)) ||
-         (!strncmp(v->media_paths[0], default_usb_devpath, sizeof(default_usb2_devpath)))) {
+         (!strncmp(v->media_paths[0], default_usb2_devpath, sizeof(default_usb2_devpath)))) {
         free (v->mount_point);
         v->mount_point =  strdup(default_usb_mountpoint);
         return -1;
@@ -807,6 +838,7 @@ static void *volmgr_reaper_thread(void *arg)
         LOGI("Reaper sucessfully unmounted %s", vol->mount_point);
         vol->fs = NULL;
         volume_setstate(vol, volstate_unmounted);
+        volmgr_update_mounts_file(vol->mount_point);
     } else {
         LOGE("Unable to unmount!! (%d)", rc);
     }
@@ -869,6 +901,9 @@ static int volmgr_stop_volume(volume_t *v, void (*cb) (volume_t *, void *), void
             if (v->media_type == media_usb) {
                 if (rmdir(v->mount_point) == -1)
                     LOGE("volmgr_stop_volume: Failed to remove directory %s : %s", v->mount_point, strerror(errno));
+                else {
+                    volmgr_update_mounts_file(v->mount_point);
+                }
             }
 
             if (emit_statechange)
@@ -900,7 +935,38 @@ static int volmgr_stop_volume(volume_t *v, void (*cb) (volume_t *, void *), void
     return 0;
 }
 
-
+/*
+ * This function is called when an USB Mass storage device
+ * is unmounted. Update mounts file after removing
+ * the unmounted mount point.
+ */
+static void volmgr_update_mounts_file(char *mount_point)
+{
+    FILE *fp, *fp2;
+    char mp[PATH_MAX];
+    int len;
+    if ((fp = fopen(MOUNTS_FILE, "r")) &&
+        (fp2 = fopen(TEMP_MOUNTS_FILE, "a"))) {
+        while(fgets(mp, sizeof(mp), fp) != NULL) {
+            len = strlen(mp);
+            /*
+             * Copy all mount points from mounts file to a temorary file
+             * except mount point which is unmounted. Then remove mounts file
+             * and rename temporary file as mounts file.
+             * We need to comapare strings with their lengths also because they
+             * should exactly match.
+             */
+            if (strncmp(mount_point, mp, (len-1)) || (strlen(mount_point) != len-1)) {
+                fputs(mp, fp2);
+            }
+        }
+        fclose(fp2);
+        fclose(fp);
+        remove(MOUNTS_FILE);
+        rename(TEMP_MOUNTS_FILE, MOUNTS_FILE);
+    }
+    return;
+}
 /*
  * Gracefully stop a volume
  * v->lock must be held!
@@ -1272,9 +1338,15 @@ static int _volmgr_start(volume_t *vol, blkdev_t *dev)
                 break;
         }
 
-        if (!ret)
+        if (!ret) {
             vol->mount_point = path;
-        else {
+            FILE *fp;
+            if ((fp = fopen(MOUNTS_FILE, "a"))) {
+                fputs(path, fp);
+                fputc('\n', fp);
+                fclose(fp);
+            }
+        } else {
             free(path);
             return ret;
         }
