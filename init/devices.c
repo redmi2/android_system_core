@@ -152,6 +152,8 @@ static struct perms_ devperms[] = {
     { "/dev/q6venc",        0660,   AID_SYSTEM,     AID_SYSTEM,     0 },
     { "/dev/ppp",           0660,   AID_RADIO,      AID_VPN,        0 },
     { "/dev/tun",           0640,   AID_VPN,        AID_VPN,        0 },
+    { "/dev/system_bus_freq", 0666, AID_ROOT,       AID_ROOT,       0 },
+    { "/dev/cpu_dma_latency", 0666, AID_ROOT,       AID_ROOT,       0 },
     { NULL, 0, 0, 0, 0 },
 };
 
