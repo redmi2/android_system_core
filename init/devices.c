@@ -128,7 +128,6 @@ static struct perms_ devperms[] = {
 #ifdef AUDIOV2
     { "/dev/msm_audio_dev_ctrl",  0666,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/msm_pcm_dec",  0666,   AID_SYSTEM,     AID_AUDIO,      1 },
-    { "/dev/msm_voice",  0666,   AID_SYSTEM,     AID_AUDIO,      1 },
 #endif
 
 #else
