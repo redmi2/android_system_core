@@ -181,8 +181,10 @@ int add_devperms_partners(const char *name, mode_t perm, unsigned int uid,
         return -ENOMEM;
 
     size = strlen(name) + 1;
-    if ((node->dp.name = malloc(size)) == NULL)
+    if ((node->dp.name = malloc(size)) == NULL) {
+        free(node);
         return -ENOMEM;
+    }
 
     memcpy(node->dp.name, name, size);
     node->dp.perm = perm;
