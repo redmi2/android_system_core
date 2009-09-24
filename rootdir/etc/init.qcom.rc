@@ -48,6 +48,8 @@ on boot
     chown system system /sys/bus/platform/devices/msm_sdcc.3/polling
     chown system system /sys/bus/platform/devices/msm_sdcc.4/polling
     chown system system /sys/devices/platform/msm_hsusb_periphera/composition
+    mkdir /data/wpstiles/ 0777
+    chgrp shell /data/wpstiles/
 
 # Enable MASS storage on SDCARD
     write /sys/devices/platform/mass_storage/lun0/file /dev/block/mmcblk0p1
@@ -109,6 +111,11 @@ service hsag /system/bin/sdptool add --channel=11 HSAG
     user bluetooth
     group bluetooth net_bt_admin
     disabled
+    oneshot
+
+service wiperiface /system/bin/wiperiface
+    user root
+    group system
     oneshot
 
 service qcom-sh /system/bin/sh /init.qcom.sh
