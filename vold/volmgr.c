@@ -593,6 +593,13 @@ int volmgr_notify_eject(blkdev_t *dev, void (* cb) (blkdev_t *))
     return 0; 
 }
 
+int volmgr_send_speed_mismatch(char *mfr_name)
+{
+    char *event = VOLD_EVT_SPEED_MISMATCH;
+
+    return send_msg_with_data(event, mfr_name);
+}
+
 static void _cb_volume_stopped_for_eject(volume_t *v, void *arg)
 {
     void (* eject_cb) (blkdev_t *) = arg;
