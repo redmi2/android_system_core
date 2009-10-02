@@ -75,6 +75,7 @@ typedef enum volume_state {
     volstate_formatting,
 } volume_state_t;
 
+#define VOLD_EVT_SPEED_MISMATCH   "speed_mismatch:"
 struct volume;
 
 struct volmgr_fstable_entry {
@@ -135,5 +136,6 @@ int volmgr_safe_mode(boolean enable);
 int volmgr_format_volume(char *mount_point);
 int volmgr_set_volume_key(char *mount_point, unsigned char *key);
 int volmgr_send_mount_status(void);
+int volmgr_send_speed_mismatch(char *mfr_name);
 void KillProcessesWithOpenFiles(const char* mountPoint, boolean sigkill, int *excluded, int num_excluded);
 #endif

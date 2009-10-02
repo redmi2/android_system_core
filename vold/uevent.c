@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <limits.h>
+#include <fcntl.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -34,6 +35,11 @@
 
 #define UEVENT_PARAMS_MAX 32
 
+#define SPEED_MAX 6
+#define VERSION_MAX 6
+#define MANUFACTURER_MAX 16
+#define USB1_VERSION 1
+#define USB_FULL_SPEED 12
 enum uevent_action { action_add, action_remove, action_change };
 
 struct uevent {
@@ -71,6 +77,7 @@ static int handle_bdi_event(struct uevent *);
 static int handle_usb_event(struct uevent *);
 static void _cb_blkdev_ok_to_destroy(blkdev_t *dev);
 static int add_usb_uevent_to_list(struct uevent *event);
+static int read_usb_device_property(char *event_path, char *prop, char *dev_prop, int len);
 
 static struct uevent_dispatch dispatch_table[] = {
     { "switch", handle_switch_event }, 
@@ -527,9 +534,42 @@ static int handle_usb_event(struct uevent *event)
         media_t *media;
         char serial[80];
         char *type;
+        char speed[SPEED_MAX], manf[MANUFACTURER_MAX];
+        char version[VERSION_MAX];
+        int len, speed_len;
+        char *endptr;
+        long val;
 
         type = get_uevent_param(event, "DEVTYPE");
         LOG_VOL("Device type: %s Event path: %s", type, event->path);
+        /*
+         * Read version and speed properties of the device that are connected
+         * to FSUSB port. If version is 2 and speed is 12 Mbs then device is
+         * not running at top speed. Send a notification to Mount Services.
+         */
+        if (!strncmp(type, "usb_device", strlen(type)) &&
+            !strncmp(event->path, default_usb2_devpath,
+                             strlen(default_usb2_devpath))) {
+
+            len = read_usb_device_property(event->path, "/version",
+                                                   version, sizeof(version));
+
+            speed_len = read_usb_device_property(event->path, "/speed",
+                                                       speed, sizeof(speed));
+            if (speed_len > 0  && len > 0) {
+                errno = 0;
+                val = strtol(version, &endptr, 10);
+                if ((errno == 0) && (endptr != version) && (val > USB1_VERSION)) {
+                    val = strtol(speed, &endptr, 10);
+                    if ((errno == 0) && (endptr != speed) && (val == USB_FULL_SPEED)) {
+                        len = read_usb_device_property(event->path,
+                                         "/manufacturer", manf, sizeof(manf));
+                        if (len)
+                            volmgr_send_speed_mismatch(manf);
+                   }
+                }
+            }
+        }
         if (strcmp(type, "scsi_device"))
             return 0;
 
@@ -555,4 +595,24 @@ static int handle_usb_event(struct uevent *event)
         LOGE("No handler implemented for action %d", event->action);
     }
     return 0;
+}
+
+static int read_usb_device_property(char *event_path, char *prop, char *dev_prop, int len)
+{
+    char path[PATH_MAX];
+    int fd, rc;
+
+    memset(dev_prop, 0, len);
+    strlcpy(path, "/sys", sizeof(path));
+    strlcat(path, event_path, sizeof(path));
+    strlcat(path, prop, sizeof(path));
+    if ((fd = open(path, O_RDONLY)) < 0) {
+        LOGE("Unable to open device '%s' (%s)", path, strerror(errno));
+        rc = 0;
+    } else if ((rc = read(fd, dev_prop, len)) < 0)  {
+        LOGE("Unable to read device property (%d, %s)",
+                      rc, strerror(errno));
+        rc = 0;
+    }
+    return rc;
 }
