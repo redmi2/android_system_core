@@ -234,7 +234,8 @@ static void volmgr_cleanup_stale_mountpoints(void)
 
 int volmgr_bootstrap(void)
 {
-    int rc;
+    int i, rc;
+    char path[PATH_MAX];
 
     if ((rc = volmgr_readconfig("/system/etc/vold.conf")) < 0) {
         LOGE("Unable to process config");
@@ -246,6 +247,18 @@ int volmgr_bootstrap(void)
     */
     volmgr_cleanup_stale_mountpoints();
 
+    /* Create all parent directories of UMS device mount path */
+    if (default_usb_mountpath) {
+        i = 0;
+        while (default_usb_mountpath[i] != '\0') {
+            if (default_usb_mountpath[i] == '/' && i >= 2) {
+                path[i] = '\0';
+                mkdir(path, 0777);
+            }
+            path[i] = default_usb_mountpath[i];
+            i++;
+        }
+    }
     /*
      * Check to see if any of our volumes is mounted
      */
