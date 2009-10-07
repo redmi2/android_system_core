@@ -59,6 +59,5 @@ case "$target" in
         echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
         echo 30 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/down_differential
         echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
-        echo 3 > /sys/module/pm2/parameters/idle_sleep_mode
         ;;
 esac
