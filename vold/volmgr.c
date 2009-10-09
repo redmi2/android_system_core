@@ -1,6 +1,7 @@
 
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1284,6 +1285,10 @@ static int _volmgr_start(volume_t *vol, blkdev_t *dev)
     char *volume_name = NULL;
     unsigned int num = 1;
 
+    // bind here so that we don't need to lookup a device if
+    // the filesystem is invalid and we need to format (volmgr_format_volume)
+    vol->dev = dev;
+
 #if DEBUG_VOLMGR
     LOG_VOL("_volmgr_start(%s, %d:%d):", vol->mount_point,
             dev->major, dev->minor);
@@ -1299,7 +1304,7 @@ static int _volmgr_start(volume_t *vol, blkdev_t *dev)
             break;
     }
 
-    if (!fs) {
+    if (!fs || !fs->name) {
         LOGE("No supported filesystems on %d:%d", dev->major, dev->minor);
         volume_setstate(vol, volstate_nofs);
         return -ENODATA;
