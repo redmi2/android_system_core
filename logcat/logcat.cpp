@@ -336,7 +336,11 @@ int main (int argc, char **argv)
     /* Initialise Diag */
     boolean bInit_Success = FALSE;
 
-    bInit_Success = Diag_LSM_Init(NULL);//, FALSE);
+    /* Diag spits error messages to stdout, so we check here */
+    /* if initialising Diag will fail due to permissions and don't try */
+    /* if we can't access the device file */
+    if (access("/dev/diag", R_OK) != -1)
+        bInit_Success = Diag_LSM_Init(NULL);//, FALSE);
 #endif
      
     g_logformat = android_log_format_new();
@@ -618,8 +622,9 @@ int main (int argc, char **argv)
     android::readLogLines(logfd);
 
 #ifdef USE_DIAG
-    /* De-intialize Diag */
-    Diag_LSM_DeInit(); 
+    /* De-intialize Diag, but only if we initialised it */
+    if (bInit_Success)
+        Diag_LSM_DeInit();
 #endif
 
     return 0;
