@@ -151,11 +151,6 @@ on boot
     setprop ro.EMPTY_APP_MEM 6144
 
     setprop ro.com.google.location_feature 1
-# Setting below properties to 0 disables touch event and key event logging
-# Set these properties to 1 inorder to enable touch and key event logging
-    setprop GET_TOUCH_EVENTS 0
-    setprop GET_KEY_EVENTS 0
-
 # Write value must be consistent with the above properties.
 # Note that the driver only supports 6 slots, so we have HOME_APP at the
 # same memory level as services.
