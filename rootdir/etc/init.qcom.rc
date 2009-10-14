@@ -96,3 +96,11 @@ service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
 service qcom-sh /system/bin/sh /init.qcom.sh
     user root
     oneshot
+
+service qcom-post-boot /system/bin/sh /init.qcom.post_boot.sh
+    user root
+    disabled
+    oneshot
+
+on property:dev.bootdone=1
+    start qcom-post-boot
