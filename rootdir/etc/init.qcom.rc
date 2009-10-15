@@ -73,9 +73,12 @@ service hci_qcomm_init /system/bin/log -t qcom-bluetooth -p i "hci_qcomm_init se
     disabled
     oneshot
 
-service rmt_storage /system/bin/rmt_storage
-    user system
+service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p10 /dev/block/mmcblk0p11
+    user root
     disabled
+
+on property:ro.emmc=1
+    start rmt_storage
 
 service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyHSUSB0 &
 

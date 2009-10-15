@@ -41,7 +41,4 @@ case "$target" in
         esac
         ;;
 
-    "msm7630_surf" | "msm7630_ffa")
-        start rmt_storage
-	;;
 esac
