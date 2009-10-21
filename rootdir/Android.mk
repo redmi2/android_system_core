@@ -45,6 +45,11 @@ $(file) : $(LOCAL_PATH)/etc/init.qcom.sh | $(ACP)
 	$(transform-prebuilt-to-target)
 ALL_PREBUILT += $(file)
 
+file := $(TARGET_ROOT_OUT)/init.qcom.post_boot.sh
+$(file) : $(LOCAL_PATH)/etc/init.qcom.post_boot.sh | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+
 # create some directories (some are mount points)
 DIRS := $(addprefix $(TARGET_ROOT_OUT)/, \
 		sbin \
