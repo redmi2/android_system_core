@@ -111,10 +111,10 @@ service qcom-sh /system/bin/sh /init.qcom.sh
     user root
     oneshot
 
-service qcom-post_boot-sh /system/bin/sh /init.qcom.post_boot.sh
+service qcom-post-boot /system/bin/sh /init.qcom.post_boot.sh
     user root
     disabled
     oneshot
 
 on property:dev.bootdone=1
-    start qcom-post_boot-sh
+    start qcom-post-boot
