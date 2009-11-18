@@ -451,8 +451,10 @@ static int volmgr_delete_volume_structure(volume_t *v)
     if (v->media_type != media_usb)
         return -1;
 
-    if (!strncmp(v->media_paths[0], default_usb_devpath, sizeof(default_usb_devpath)) ||
-         (!strncmp(v->media_paths[0], default_usb2_devpath, sizeof(default_usb2_devpath)))) {
+    if ((default_usb_devpath != NULL &&
+         !strncmp(v->media_paths[0], default_usb_devpath, sizeof(default_usb_devpath))) ||
+        (default_usb2_devpath != NULL &&
+         !strncmp(v->media_paths[0], default_usb2_devpath, sizeof(default_usb2_devpath)))) {
         free (v->mount_point);
         v->mount_point =  strdup(default_usb_mountpoint);
         return -1;

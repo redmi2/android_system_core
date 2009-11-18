@@ -185,8 +185,10 @@ int simulate_uevent(char *subsys, char *path, char *action, char **params)
             break;
         event->param[i] = strdup(params[i]);
     }
-    if (!strncmp(path, default_usb_devpath, strlen(default_usb_devpath)) ||
-        !strncmp(path, default_usb2_devpath, strlen(default_usb2_devpath))) {
+    if ((default_usb_devpath != NULL &&
+        !strncmp(path, default_usb_devpath, strlen(default_usb_devpath))) ||
+        (default_usb2_devpath != NULL &&
+        !strncmp(path, default_usb2_devpath, strlen(default_usb2_devpath)))) {
         rc = add_usb_uevent_to_list(event);
     } else {
         rc = dispatch_uevent(event);
