@@ -332,7 +332,9 @@ int volmgr_send_mount_status(void)
 
     while (vol_scan) {
         pthread_mutex_lock(&vol_scan->lock);
-        if (vol_scan->state == volstate_mounted) {
+        if (vol_scan->media_type == media_usb &&
+            vol_scan->state == volstate_mounted) {
+
             if ((rc = volume_send_state(vol_scan)) < 0) {
                 LOGE("Error sending state to framework (%d)", rc);
             }
