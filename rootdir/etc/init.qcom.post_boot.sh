@@ -36,6 +36,13 @@ case "$target" in
         echo 245760 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
         ;;
 
+    "msm7625_surf" | "msm7625_ffa")
+        echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
+        echo 30 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/down_differential
+        echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+        ;;
+
     "msm7627_ffa" | "msm7627_surf")
         echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
         echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
