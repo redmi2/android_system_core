@@ -11,6 +11,7 @@ ifeq ($(TARGET_PRODUCT),generic)
 copy_from += etc/vold.conf
 endif
 
+
 # the /system/etc/init.goldfish.sh is needed to enable emulator support
 # in the system image. In theory, we don't need these for -user builds
 # which are device-specific. However, these builds require at the moment
@@ -28,6 +29,12 @@ $(copy_to) : $(TARGET_OUT)/% : $(LOCAL_PATH)/% | $(ACP)
 
 ALL_PREBUILT += $(copy_to)
 
+ifeq ($(BOARD_USES_QCOM_HARDWARE), true)
+file := $(TARGET_OUT)/etc/vold.conf
+$(file) : $(LOCAL_PATH)/etc/vold.qcom.conf | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+endif
 
 # files that live under /...
 
