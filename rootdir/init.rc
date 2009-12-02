@@ -372,3 +372,10 @@ service dumpstate /system/bin/dumpstate -s
     socket dumpstate stream 0660 shell log
     disabled
     oneshot
+
+service dhcp-service /system/bin/netcfg eth0 dhcp
+        oneshot
+
+on property:dev.bootcomplete=1
+        stop dhcp-service
+        start dhcp-service
