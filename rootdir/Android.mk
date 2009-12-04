@@ -5,6 +5,7 @@ include $(CLEAR_VARS)
 
 copy_from := \
 	etc/dbus.conf \
+	etc/init.qcom.bt.sh \
 	etc/hosts
 
 ifeq ($(TARGET_PRODUCT),generic)
@@ -51,6 +52,11 @@ endif
 # the emulator.
 file := $(TARGET_ROOT_OUT)/init.goldfish.rc
 $(file) : $(LOCAL_PATH)/etc/init.goldfish.rc | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+
+file := $(TARGET_ROOT_OUT)/init.qcom.rc
+$(file) : $(LOCAL_PATH)/etc/init.qcom.rc | $(ACP)
 	$(transform-prebuilt-to-target)
 ALL_PREBUILT += $(file)
 
