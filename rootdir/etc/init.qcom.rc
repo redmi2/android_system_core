@@ -37,6 +37,9 @@ on boot
     chown bluetooth bluetooth /dev/ttyHS0
     chmod 0660 /dev/ttyHS0
 
+on property:init.svc.hcid=running
+    write /sys/devices/virtual/bluetooth/hci0/idle_timeout 7000
+
 service hci_qcomm_init /system/bin/log -t qcom-bluetooth -p i "hci_qcomm_init service requested"
     user bluetooth
     group bluetooth net_bt_admin
