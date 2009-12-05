@@ -410,9 +410,18 @@ int volmgr_consider_disk(blkdev_t *dev)
 
 int volmgr_start_volume_by_mountpoint(char *mount_point)
 { 
-    volume_t *v;
+    volume_t *v = vol_root;
 
-    v = volmgr_lookup_volume_by_mountpoint(mount_point, true);
+    while(v) {
+        pthread_mutex_lock(&v->lock);
+        if (!strcmp(v->mount_point, mount_point)) {
+           if((v->state == volstate_unmounted) || (v->state == volstate_checking)) {
+              break;
+           }
+        }
+        pthread_mutex_unlock(&v->lock);
+        v = v->next;
+    }
     if (!v)
         return -ENOENT;
 
@@ -488,9 +497,18 @@ static int volmgr_delete_volume_structure(volume_t *v)
 int volmgr_stop_volume_by_mountpoint(char *mount_point)
 {
     int rc;
-    volume_t *v;
+    volume_t *v = vol_root;
 
-    v = volmgr_lookup_volume_by_mountpoint(mount_point, true);
+    while(v) {
+        pthread_mutex_lock(&v->lock);
+        if (!strcmp(v->mount_point, mount_point)) {
+           if(v->state == volstate_mounted) {
+              break;
+           }
+        }
+        pthread_mutex_unlock(&v->lock);
+        v = v->next;
+    }
     if (!v)
         return -ENOENT;
 
