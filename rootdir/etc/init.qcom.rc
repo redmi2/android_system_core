@@ -66,3 +66,7 @@ service dbus_bt /system/bin/sh /etc/bm3/dbus_bt.sh
     group bluetooth net_bt_admin system qcom_oncrpc diag
     disabled
     oneshot
+
+service qcom-sh /system/bin/sh /init.qcom.sh
+    user root
+    oneshot
