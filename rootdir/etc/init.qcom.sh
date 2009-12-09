@@ -32,8 +32,8 @@ case "$target" in
         insmod /system/lib/modules/ss_mfcinit.ko
         insmod /system/lib/modules/ss_vencoder.ko
         insmod /system/lib/modules/ss_vdecoder.ko
-        chmod 0660 /dev/ss_mfc_reg
-        chmod 0660 /dev/ss_vdec
-        chmod 0660 /dev/ss_venc
+        chmod 0666 /dev/ss_mfc_reg
+        chmod 0666 /dev/ss_vdec
+        chmod 0666 /dev/ss_venc
         ;;
 esac
