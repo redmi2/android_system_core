@@ -86,6 +86,10 @@ service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant -Dwext 
 # used to get its output to appear in the logs. This will
 # be removed before shipping.
 service dhcpcd /system/bin/dhcpcd -d wlan0
+
+service fm_dl /system/bin/fm_qsoc_patches
+    user fm_radio
+    group fm_radio
     disabled
     oneshot
 
