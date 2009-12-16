@@ -88,8 +88,7 @@ service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant -Dwext 
 service dhcpcd /system/bin/dhcpcd -d wlan0
 
 service fm_dl /system/bin/fm_qsoc_patches
-    user fm_radio
-    group fm_radio
+    user root
     disabled
     oneshot
 
