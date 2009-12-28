@@ -103,7 +103,7 @@ static struct perms_ devperms[] = {
     { "/dev/kgsl",          0666,   AID_ROOT,       AID_ROOT,       0 },
 
         /* these should not be world writable */
-    { "/dev/diag",          0660,   AID_RADIO,      AID_RADIO,        0 },
+    { "/dev/diag",          0660,   AID_SYSTEM,      AID_DIAG,        1 },
     { "/dev/diag_arm9",     0660,   AID_RADIO,      AID_RADIO,        0 },
     { "/dev/android_adb",   0660,   AID_ADB,        AID_ADB,        0 },
     { "/dev/android_adb_enable",   0660,   AID_ADB,        AID_ADB,        0 },
