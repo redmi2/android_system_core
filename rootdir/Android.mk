@@ -33,7 +33,7 @@ ALL_PREBUILT += $(copy_to)
 
 ifeq ($(BOARD_USES_QCOM_HARDWARE), true)
 file := $(TARGET_OUT)/etc/vold.conf
-$(file) : $(LOCAL_PATH)/etc/vold.qcom.conf | $(ACP)
+$(file) : $(LOCAL_PATH)/etc/$(TARGET_PRODUCT)/vold.qcom.conf | $(ACP)
 	$(transform-prebuilt-to-target)
 ALL_PREBUILT += $(file)
 endif
