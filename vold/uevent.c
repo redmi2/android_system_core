@@ -258,7 +258,18 @@ static int handle_switch_event(struct uevent *event)
     char *name = get_uevent_param(event, "SWITCH_NAME");
     char *state = get_uevent_param(event, "SWITCH_STATE");
 
-
+    /* As a part of compostiion switch, mass storage driver
+     * sends offline event and de-register its event from switch
+     * Hence there is possibility that before handling the switch
+     * event, the mass storage sysfs mass storage entries might
+     * have removed. So, if name or state is NULL, consider it as
+     * offline and send false
+     * */
+    if(name == NULL || state == NULL) {
+        ums_hostconnected_set(false);
+        volmgr_enable_ums(false);
+	return 0;
+    }
     if (!strcmp(name, "usb_mass_storage")) {
         if (!strcmp(state, "online")) {
             ums_hostconnected_set(true);
@@ -273,7 +284,6 @@ static int handle_switch_event(struct uevent *event)
             door_open = false;
         volmgr_safe_mode(low_batt || door_open);
     }
-
     return 0;
 }
 
