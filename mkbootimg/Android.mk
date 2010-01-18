@@ -15,7 +15,7 @@ endif
 ifneq (, $(filter msm7630_surf msm7630_ffa, $(TARGET_PRODUCT)))
   LOCAL_CFLAGS += -DSURF7X30
 endif
-ifneq (, $(filter sim emulator generic, $(TARGET_PRODUCT)))
+ifneq (, $(filter sim emulator generic sdk, $(TARGET_PRODUCT)))
   LOCAL_CFLAGS += -DGENERIC
 endif
 
