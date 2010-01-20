@@ -20,6 +20,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -317,9 +318,19 @@ int blkdev_get_num_pending_partitions(blkdev_t *blk)
         if (list_scan->dev->major != blk->major)
             goto next;
 
-        if (list_scan->dev->nr_sec != 0xffffffff &&
-            list_scan->dev->devpath) {
-            num--;
+        if (blk->media->media_type == media_usb) {
+            char path[PATH_MAX];
+            truncate_sysfs_path(list_scan->dev->devpath, 1, path, sizeof(path));
+
+            if (list_scan->dev->nr_sec != 0xffffffff &&
+                !(strncmp(path, blk->devpath, sizeof(path)))) {
+                num--;
+            }
+        } else {
+            if (list_scan->dev->nr_sec != 0xffffffff &&
+                list_scan->dev->devpath) {
+                num--;
+            }
         }
  next:
         list_scan = list_scan->next;
