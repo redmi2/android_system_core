@@ -300,6 +300,10 @@ service ril-daemon /system/bin/rild
 
 service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0  &
 
+service cnd /system/bin/cnd
+    socket cnd stream 660 root radio
+    socket cne stream 660 root radio
+
 service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
     socket zygote stream 666
     onrestart write /sys/android_power/request_state wake
