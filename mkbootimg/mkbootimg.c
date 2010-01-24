@@ -139,10 +139,10 @@ int main(int argc, char **argv)
     memset(&hdr, 0, sizeof(hdr));
 
         /* default load addresses */
-    hdr.kernel_addr =  0x10008000;
-    hdr.ramdisk_addr = 0x11000000;
-    hdr.second_addr =  0x10F00000;
-    hdr.tags_addr =    0x10000100;
+    hdr.kernel_addr =  0x00008000;
+    hdr.ramdisk_addr = 0x01000000;
+    hdr.second_addr =  0x00F00000;
+    hdr.tags_addr =    0x00000100;
 
     hdr.page_size = pagesize;
 
@@ -210,14 +210,14 @@ int main(int argc, char **argv)
     hdr.tags_addr   =  TAGS_ADDR;
     hdr.page_size = pagesize;
 #else
-    hdr.kernel_addr =  0x10008000;
-    hdr.ramdisk_addr = 0x11000000;
+    hdr.kernel_addr =  0x00008000;
+    hdr.ramdisk_addr = 0x01000000;
     if(saddr) {
         hdr.second_addr =  0x00300000;
     } else {
-        hdr.second_addr =  0x10F00000;
+        hdr.second_addr =  0x00F00000;
     }
-    hdr.tags_addr   =  0x10000100;
+    hdr.tags_addr   =  0x00000100;
     hdr.page_size = pagesize;
 #endif
 
