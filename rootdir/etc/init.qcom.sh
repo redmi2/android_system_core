@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -41,6 +41,93 @@ case "$target" in
              ln -s  /system/usr/keychars/surf_keypad_numeric.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
             *)
              ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
+        esac
+
+# Dynamic Memory Managment (DMM) provides a sys file system to the userspace
+# that can be used to plug in/out memory that has been configured as unstable.
+# This unstable memory can be in Active, SelfRefresh(sr) or DeepPowerDown(dpd)
+# modes. Each of which the userspace can request by writing to the sys file
+# system.
+
+# ro.dev.dmm = 1; Indicates that DMM is enabled in the Android User Space. This
+# property is set in the Android system properties file.
+
+# ro.dev.dmm.dpd.start_address is set when the target has a 2x256Mb memory
+# configuration. This is also used to indicate that the target is capable of
+# setting EBI-1 to Deep Power Down or Self Refresh.
+
+# ro.dev.dmm.sr.start_address is set when the target has a 2x128Mb memory
+# configuration. This is also used to indicate that the target is capable of
+# setting EBI-1 to Self Refresh Only.
+
+        mem="/sys/devices/system/memory"
+        op=`cat $mem/movable_start_bytes`
+        case "$op" in
+           "0" )
+                echo "DMM Disabled. (movable_start_bytes not set: $op)" > /data/DMM
+            ;;
+
+            "$mem/movable_start_bytes: No such file or directory " )
+                echo "DMM Disabled. (movable_start_bytes does not exist: $op)" > /data/DMM
+            ;;
+
+            * )
+                echo "DMM available. (movable_start_bytes at $op)" > /data/DMM
+                movable_start_bytes=0x`cat $mem/movable_start_bytes`
+                block_size_bytes=0x`cat $mem/block_size_bytes`
+                block=$(($movable_start_bytes/$block_size_bytes))
+
+                chown system system $mem/probe
+                chown system system $mem/remove
+                chown system system $mem/low_power
+                chown system system $mem/active
+
+                echo $movable_start_bytes > $mem/probe
+                case "$?" in
+                    "0" )
+                        echo "$movable_start_bytes to physical hotplug succeeded." >> /data/DMM
+                    ;;
+                    * )
+                        echo "$movable_start_bytes to physical hotplug failed." >> /data/DMM
+                        return 1
+                    ;;
+                esac
+
+               chown system system $mem/memory$block/state
+
+                echo online > $mem/memory$block/state
+                case "$?" in
+                    "0" )
+                        echo "echo 'online' to logical hotplug succeeded." >> /data/DMM
+                    ;;
+                    * )
+                        echo "echo 'online' to logical hotplug failed." >> /data/DMM
+                        return 1
+                    ;;
+                esac
+
+                setprop ro.dev.dmm.dpd.start_address $movable_start_bytes
+                setprop ro.dev.dmm.dpd.block $block
+            ;;
+        esac
+
+        op=`cat $mem/low_power_memory_start_bytes`
+        case "$op" in
+            "0" )
+                echo "Self-Refresh-Only Disabled.  (low_power_memory_start_bytes not set: $op)" >> /data/DMM
+            ;;
+
+            "$mem/low_power_memory_start_bytes No such file or directory " )
+                echo "Self-Refresh-Only Disabled.  (low_power_memory_start_bytes does not exist: $op) " >> /data/DMM
+            ;;
+
+            * )
+                chown system system $mem/low_power
+                chown system system $mem/active
+
+                setprop ro.dev.dmm.sr.start_address 0x$op
+                echo "Self-Refresh-Only available.  (low_power_memory_start_bytes at $op)" >> /data/DMM
+            ;;
         esac
         ;;
 esac
