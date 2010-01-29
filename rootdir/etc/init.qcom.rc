@@ -72,6 +72,10 @@ service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     disabled
     oneshot
 
+service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
+
+service qmuxd /system/bin/qmuxd
+
 service dbus_bt /system/bin/sh /etc/bm3/dbus_bt.sh
     socket bluetooth stream 660 bluetooth bluetooth
     user bluetooth
