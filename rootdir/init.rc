@@ -285,15 +285,11 @@ service nexus /system/bin/nexus
 
 service debuggerd /system/bin/debuggerd
 
-service qmuxd /system/bin/qmuxd &
-
 service ril-daemon /system/bin/rild
     socket rild stream 660 root radio
     socket rild-debug stream 660 radio system
     user root
     group radio cache inet misc audio qcom_oncrpc diag
-
-service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0  &
 
 service cnd /system/bin/cnd
     socket cnd stream 660 root radio
