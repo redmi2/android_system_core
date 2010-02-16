@@ -35,5 +35,12 @@ case "$target" in
         chmod 0666 /dev/ss_mfc_reg
         chmod 0666 /dev/ss_vdec
         chmod 0666 /dev/ss_venc
+        value=`cat /sys/devices/system/soc/soc0/hw_platform`
+        case "$value" in
+            "FFA")
+             ln -s  /system/usr/keychars/surf_keypad_numeric.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
+            *)
+             ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
+        esac
         ;;
 esac
