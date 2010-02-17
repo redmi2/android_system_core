@@ -7,6 +7,7 @@ copy_from := \
 	etc/dbus.conf \
 	etc/init.qcom.bt.sh \
 	etc/init.qcom.fm.sh \
+	etc/init.qcom.sdio.sh \
 	etc/hosts
 
 ifeq ($(TARGET_PRODUCT),generic)
