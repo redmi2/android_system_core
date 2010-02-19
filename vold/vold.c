@@ -204,11 +204,9 @@ int main(int argc, char **argv)
                 }
             }
         }
-        if (bootcompleted > 0) {
-            if (FD_ISSET(uevent_sock, &read_fds)) {
-                if ((rc = process_uevent_message(uevent_sock)) < 0) {
-                    LOGE("Error processing uevent msg (%s)", strerror(errno));
-                }
+        if (FD_ISSET(uevent_sock, &read_fds)) {
+            if ((rc = process_uevent_message(uevent_sock)) < 0) {
+                LOGE("Error processing uevent msg (%s)", strerror(errno));
             }
         }
     } // while
