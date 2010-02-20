@@ -76,13 +76,6 @@ service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
 
 service qmuxd /system/bin/qmuxd
 
-service dbus_bt /system/bin/sh /etc/bm3/dbus_bt.sh
-    socket bluetooth stream 660 bluetooth bluetooth
-    user bluetooth
-    group bluetooth net_bt_admin system qcom_oncrpc diag
-    disabled
-    oneshot
-
 service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant -Dwext -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf -dd
     user root
     group wifi inet
