@@ -43,7 +43,7 @@
 
 
 #define VOLD_SOCKET "vold"
-
+#define DEFAULT_USBCOMPOSITION_ID  "9017"
 /*
  * Globals
  */
@@ -61,7 +61,25 @@ int main(int argc, char **argv)
     int uevent_sock = -1;
     struct sockaddr_nl nladdr;
     int uevent_sz = 64 * 1024;
+    int fd;
+    char value[PROPERTY_VALUE_MAX];
 
+    /* Read USB composition product id from system properties
+     * and set it in sysfs
+     */
+    if ((fd = open("/sys/module/g_android/parameters/product_id", O_RDWR)) < 0)
+    {
+        LOGE("Unable to open /sys/module/g_android/parameters/product_id (%s)",
+             strerror(errno));
+    }
+    /* Check and wirte product id only if the file is empty  */
+    else if(read(fd, value, strlen(DEFAULT_USBCOMPOSITION_ID)) !=
+                               strlen(DEFAULT_USBCOMPOSITION_ID)) {
+        property_get("persist.sys.usbcomposition.id", value,
+                                       DEFAULT_USBCOMPOSITION_ID);
+        write(fd, value, strlen(value));
+        close(fd);
+    }
     LOGI("Android Volume Daemon version %d.%d", ver_major, ver_minor);
 
     /*
