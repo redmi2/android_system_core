@@ -9,8 +9,8 @@ on emmc
     devwait /dev/block/mmcblk0p13
     exec /system/bin/e2fsck -p /dev/block/mmcblk0p13
     mount ext3 /dev/block/mmcblk0p13 /data nosuid nodev
-    devwait /dev/block/mmcblk0p14
-    mount ext3 /dev/block/mmcblk0p14 /persist nosuid nodev
+    #devwait /dev/block/mmcblk0p14
+    #mount ext3 /dev/block/mmcblk0p14 /persist nosuid nodev
 
 on nand
 
