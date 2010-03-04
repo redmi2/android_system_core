@@ -329,7 +329,9 @@ int blkdev_get_num_pending_partitions(blkdev_t *blk)
         } else {
             if (list_scan->dev->nr_sec != 0xffffffff &&
                 list_scan->dev->devpath) {
-                num--;
+                if ((list_scan->dev->minor > blk->minor) &&
+                    (list_scan->dev->minor < (blk->minor + MMC_PARTS_PER_CARD)))
+                    num--;
             }
         }
  next:
