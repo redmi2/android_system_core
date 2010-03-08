@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ failed ()
 start_hciattach ()
 {
   echo 1 > $BLUETOOTH_SLEEP_PATH
-  /system/bin/hciattach -n $QSOC_DEVICE $QSOC_TYPE $QSOC_BAUD &
+  /system/bin/hciattach -n $BTS_DEVICE $BTS_TYPE $BTS_BAUD &
   hciattach_pid=$!
   logi "start_hciattach: pid = $hciattach_pid"
 }
@@ -79,16 +79,13 @@ do
 done
 shift $(($OPTIND-1))
 
-QSOC_DEVICE=${1:-"/dev/ttyHS0"}
-QSOC_TYPE=${2:-"any"}
-QSOC_BAUD=${3:-"3000000"}
+# Note that "hci_qcomm_init -e" prints expressions to set the shell variables
+# BTS_DEVICE, BTS_TYPE, BTS_BAUD, and BTS_ADDRESS.
 
-/system/bin/hci_qcomm_init -d $QSOC_DEVICE -s $QSOC_BAUD 
-
-exit_code_hci_qcomm_init=$?
+eval $(/system/bin/hci_qcomm_init -e && echo "exit_code_hci_qcomm_init=0" || echo "exit_code_hci_qcomm_init=1")
 
 case $exit_code_hci_qcomm_init in
-  0) logi "Bluetooth QSoC firmware download succeeded";;
+  0) logi "Bluetooth QSoC firmware download succeeded, $BTS_DEVICE $BTS_TYPE $BTS_BAUD $BTS_ADDRESS";;
   *) failed "Bluetooth QSoC firmware download failed" $exit_code_hci_qcomm_init;;
 esac
 
