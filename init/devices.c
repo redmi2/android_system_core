@@ -150,6 +150,7 @@ static struct perms_ devperms[] = {
     { "/dev/msm_pcm_out",   0660,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/msm_pcm_in",    0660,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/msm_pcm_ctl",   0660,   AID_SYSTEM,     AID_AUDIO,      1 },
+    { "/dev/msm_preproc_ctl", 0660, AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/msm_snd",       0660,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/msm_mp3",       0660,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/msm_aac",       0660,   AID_SYSTEM,     AID_AUDIO,      1 },
