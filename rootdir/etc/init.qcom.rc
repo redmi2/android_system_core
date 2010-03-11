@@ -76,6 +76,12 @@ service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
 
 service qmuxd /system/bin/qmuxd
 
+service btwlancoex /system/bin/sh /system/etc/init.qcom.coex.sh -c -r
+    user root
+    group qcom_oncrpc bluetooth net_bt_admin
+    disabled
+    oneshot
+
 service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant -Dwext -iwlan0 -c/data/misc/wifi/wpa_supplicant.conf -dd
     user root
     group wifi inet
