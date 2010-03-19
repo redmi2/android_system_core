@@ -48,6 +48,10 @@ on boot
     chown dhcp dhcp /data/misc/dhcp
     symlink /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
 
+     # Create directories for wiper services
+    mkdir /data/wpstiles/ 0777 shell
+    mkdir /etc/wiper 0777 location qcom_oncrpc
+
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
 
@@ -92,6 +96,11 @@ service wpa_supplicant /system/bin/logwrapper /system/bin/wpa_supplicant -Dwext 
 
 service dhcpcd /system/bin/dhcpcd -BKL wlan0
     disabled
+    oneshot
+
+service wiperiface /system/bin/wiperiface
+    user location
+    group qcom_oncrpc
     oneshot
 
 service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
