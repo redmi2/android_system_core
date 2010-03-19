@@ -52,6 +52,7 @@
 #define AID_VPN           1016  /* vpn system */
 #define AID_KEYSTORE      1017  /* keystore subsystem */
 #define AID_FM_RADIO	  1018  /* FM radio */
+#define AID_LOCATION      1019  /* Location */
 
 #define AID_SHELL         2000  /* adb and debug shell user */
 #define AID_CACHE         2001  /* cache access */
@@ -108,6 +109,7 @@ static struct android_id_info android_ids[] = {
     { "qcom_oncrpc", AID_QCOM_ONCRPC, },
     { "misc",      AID_MISC, },
     { "fm_radio",   AID_FM_RADIO, },
+    { "location",   AID_LOCATION, },
     { "nobody",    AID_NOBODY, },
 };
 
