@@ -250,7 +250,7 @@ on boot
     chown system system /sys/devices/platform/msm_sdcc.3/polling
     chown system system /sys/devices/platform/msm_sdcc.4/polling
     chown system system /sys/devices/platform/android_usb/composition
-    chown system system /sys/devices/platform/android_usb/gadget/wakeup
+    chown system system /sys/devices/platform/android_usb/remote_wakeup
 
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
