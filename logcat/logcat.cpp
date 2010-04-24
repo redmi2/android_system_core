@@ -19,9 +19,16 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <arpa/inet.h>
+#ifdef USE_DIAG
+#include <diag_os.h>
+#endif
 
 #define DEFAULT_LOG_ROTATE_SIZE_KBYTES 16
 #define DEFAULT_MAX_ROTATED_LOGS 4
+
+#ifdef USE_DIAG
+#define MSG_SIZE 512
+#endif
 
 static AndroidLogFormat * g_logformat;
 
@@ -44,6 +51,17 @@ static int g_isBinary = 0;
 static int g_printBinary = 0;
 
 static EventTagMap* g_eventTagMap = NULL;
+
+#ifdef USE_DIAG
+static void printToDiag(AndroidLogEntry entry)
+{
+    char strMsg[MSG_SIZE];
+    /* Truncating messages > 512 bytes (max DIAG message size) */
+    snprintf(strMsg,MSG_SIZE,"%s : %s",entry.tag,entry.message);
+    /* Diag API */
+    MSG_SPRINTF_1(MSG_SSID_ANDROID_ADB, MSG_LEGACY_HIGH,"%s",strMsg);
+}
+#endif
 
 static int openLogFile (const char *pathname)
 {
@@ -123,6 +141,12 @@ static void processBuffer(struct logger_entry *buf)
 
     bytesWritten = android_log_filterAndPrintLogLine(
                         g_logformat, g_outFD, &entry);
+#ifdef USE_DIAG
+    /* Route the log message to Diag */
+    if (bytesWritten > 0) {
+        printToDiag(entry);
+    }
+#endif
 
     if (bytesWritten < 0) {
         perror("output error");
@@ -285,6 +309,17 @@ int main (int argc, char **argv)
     int mode = O_RDONLY;
     char *log_device = strdup("/dev/"LOGGER_LOG_MAIN);
     const char *forceFilters = NULL;
+
+#ifdef USE_DIAG
+    /* Initialise Diag */
+    boolean bInit_Success = FALSE;
+
+    /* Diag spits error messages to stdout, so we check here */
+    /* if initialising Diag will fail due to permissions and don't try */
+    /* if we can't access the device file */
+    if (access("/dev/diag", R_OK) != -1)
+        bInit_Success = Diag_LSM_Init(NULL);
+#endif
 
     g_logformat = android_log_format_new();
 
@@ -563,6 +598,12 @@ int main (int argc, char **argv)
         android::g_eventTagMap = android_openEventTagMap(EVENT_TAG_MAP_FILE);
 
     android::readLogLines(logfd);
+
+#ifdef USE_DIAG
+    /* De-intialize Diag, but only if we initialised it */
+    if (bInit_Success)
+        Diag_LSM_DeInit();
+#endif
 
     return 0;
 }
