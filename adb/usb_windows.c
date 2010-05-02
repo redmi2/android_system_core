@@ -102,7 +102,7 @@ int usb_write(usb_handle* handle, const void* data, int len);
 int usb_read(usb_handle *handle, void* data, int len);
 
 /// Cleans up opened usb handle
-void usb_cleanup_handle(usb_handle* handle, int final_cleanup);
+void usb_cleanup_handle(usb_handle* handle);
 
 /// Cleans up (but don't close) opened usb handle
 void usb_kick(usb_handle* handle);
@@ -247,7 +247,7 @@ usb_handle* do_usb_open(const wchar_t* interface_name) {
 
   // Something went wrong.
   errno = GetLastError();
-  usb_cleanup_handle(ret, 1);
+  usb_cleanup_handle(ret);
   free(ret);
   SetLastError(errno);
 
@@ -338,12 +338,10 @@ int usb_read(usb_handle *handle, void* data, int len) {
   return -1;
 }
 
-void usb_cleanup_handle(usb_handle* handle, int final_cleanup) {
+void usb_cleanup_handle(usb_handle* handle) {
   if (NULL != handle) {
-    if (final_cleanup && (NULL != handle->interface_name)) {
+    if (NULL != handle->interface_name)
       free(handle->interface_name);
-      handle->interface_name = NULL;
-    }
     if (NULL != handle->adb_write_pipe)
       AdbCloseHandle(handle->adb_write_pipe);
     if (NULL != handle->adb_read_pipe)
@@ -351,6 +349,7 @@ void usb_cleanup_handle(usb_handle* handle, int final_cleanup) {
     if (NULL != handle->adb_interface)
       AdbCloseHandle(handle->adb_interface);
 
+    handle->interface_name = NULL;
     handle->adb_write_pipe = NULL;
     handle->adb_read_pipe = NULL;
     handle->adb_interface = NULL;
@@ -361,7 +360,7 @@ void usb_kick(usb_handle* handle) {
   if (NULL != handle) {
     adb_mutex_lock(&usb_lock);
 
-    usb_cleanup_handle(handle, 0);
+    usb_cleanup_handle(handle);
 
     adb_mutex_unlock(&usb_lock);
   } else {
@@ -387,7 +386,7 @@ int usb_close(usb_handle* handle) {
     adb_mutex_unlock(&usb_lock);
 
     // Cleanup handle
-    usb_cleanup_handle(handle, 1);
+    usb_cleanup_handle(handle);
     free(handle);
   }
 
@@ -492,16 +491,16 @@ void find_devices() {
               register_usb_transport(handle, serial_number);
             } else {
               D("register_new_device failed for %s\n", interf_name);
-              usb_cleanup_handle(handle, 1);
+              usb_cleanup_handle(handle);
               free(handle);
             }
           } else {
             D("cannot get serial number\n");
-            usb_cleanup_handle(handle, 1);
+            usb_cleanup_handle(handle);
             free(handle);
           }
         } else {
-          usb_cleanup_handle(handle, 1);
+          usb_cleanup_handle(handle);
           free(handle);
         }
       }
