@@ -120,3 +120,8 @@ service qcom-post-boot /system/bin/sh /init.qcom.post_boot.sh
 
 on property:dev.bootdone=1
     start qcom-post-boot
+
+service ckpd /system/bin/CKPD-daemon
+    user radio
+    group radio
+    onrestart /system/bin/log -t RIL-CKPD -p w "CKPD daemon restarted"
