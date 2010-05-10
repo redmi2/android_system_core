@@ -49,7 +49,9 @@ struct FB {
 
 #define fb_width(fb) ((fb)->vi.xres)
 #define fb_height(fb) ((fb)->vi.yres)
-#define fb_size(fb) ((fb)->vi.xres * (fb)->vi.yres * 2)
+#define fb_bpp(fb) ((fb)->vi.bits_per_pixel)
+#define fb_size(fb) ((fb)->vi.xres * (fb)->vi.yres * \
+	((fb)->vi.bits_per_pixel/8))
 
 static int fb_open(struct FB *fb)
 {
@@ -62,7 +64,7 @@ static int fb_open(struct FB *fb)
     if (ioctl(fb->fd, FBIOGET_VSCREENINFO, &fb->vi) < 0)
         goto fail;
 
-    fb->bits = mmap(0, fb_size(fb), PROT_READ | PROT_WRITE, 
+    fb->bits = mmap(0, fb_size(fb), PROT_READ | PROT_WRITE,
                     MAP_SHARED, fb->fd, 0);
     if (fb->bits == MAP_FAILED)
         goto fail;
@@ -107,6 +109,7 @@ int load_565rle_image(char *fn)
     struct FB fb;
     struct stat s;
     unsigned short *data, *bits, *ptr;
+    uint32_t rgb32, red, green, blue, alpha;
     unsigned count, max;
     int fd;
 
@@ -138,8 +141,23 @@ int load_565rle_image(char *fn)
         unsigned n = ptr[0];
         if (n > max)
             break;
-        android_memset16(bits, ptr[1], n << 1);
-        bits += n;
+                if (fb_bpp(&fb) == 16) {
+                        android_memset16(bits, ptr[1], n << 1);
+                        bits += n;
+                } else {
+                        /* convert 16 bits to 32 bits */
+                        rgb32 = ((ptr[1] >> 11) & 0x1F);
+                        red = (rgb32 << 3) | (rgb32 >> 2);
+                        rgb32 = ((ptr[1] >> 5) & 0x3F);
+                        green = (rgb32 << 2) | (rgb32 >> 4);
+                        rgb32 = ((ptr[1]) & 0x1F);
+                        blue = (rgb32 << 3) | (rgb32 >> 2);
+                        alpha = 0xff;
+                        rgb32 = (alpha << 24) | (blue << 16)
+                        | (green << 8) | (red);
+                        android_memset32((uint32_t *)bits, rgb32, n << 2);
+                        bits += (n * 2);
+               }
         max -= n;
         ptr += 2;
         count -= 4;
