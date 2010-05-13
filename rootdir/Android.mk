@@ -40,6 +40,13 @@ $(file) : $(LOCAL_PATH)/etc/$(TARGET_PRODUCT)/vold.qcom.conf | $(ACP)
 ALL_PREBUILT += $(file)
 endif
 
+ifeq ($(TARGET_PRODUCT), msm8660_surf)
+file := $(TARGET_OUT)/etc/vold.conf
+$(file) : $(LOCAL_PATH)/etc/$(TARGET_PRODUCT)/vold.qcom.conf | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+endif
+
 # files that live under /...
 
 # Only copy init.rc if the target doesn't have its own.
