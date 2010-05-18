@@ -129,3 +129,6 @@ on property:dev.bootdone=1
 
 service ckpd /system/bin/CKPD-daemon
     onrestart /system/bin/log -t RIL-CKPD -p w "CKPD daemon restarted"
+
+service hdmid /system/bin/hdmid
+    socket hdmid stream 0660 root system graphics
