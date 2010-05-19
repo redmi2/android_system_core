@@ -81,6 +81,12 @@ service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
 
 service qmuxd /system/bin/qmuxd
 
+service netmgrd /system/bin/netmgrd -E
+    disabled
+
+on property:ro.use_data_netmgrd=true
+    start netmgrd
+
 service btwlancoex /system/bin/sh /system/etc/init.qcom.coex.sh -c -r
     user root
     group qcom_oncrpc bluetooth net_bt_admin
