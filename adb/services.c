@@ -179,9 +179,13 @@ void reboot_service(int fd, void *arg)
     int ret;
 
     sync();
+#if ADB_HOST
     ret = __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
                     LINUX_REBOOT_CMD_RESTART2, (char *)arg);
-    if (ret < 0) {
+#else
+	ret = 0;
+#endif
+	if (ret < 0) {
         snprintf(buf, sizeof(buf), "reboot failed: %s\n", strerror(errno));
         writex(fd, buf, strlen(buf));
     }

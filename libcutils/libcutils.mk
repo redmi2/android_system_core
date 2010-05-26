@@ -1,3 +1,4 @@
+SRCDIR := $(TOPDIR)/system/core
 
 vpath %.c $(SRCDIR)/libcutils
 vpath %.S $(SRCDIR)/libcutils
