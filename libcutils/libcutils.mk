@@ -1,7 +1,5 @@
-SRCDIR := $(TOPDIR)/system/core
-
-vpath %.c $(SRCDIR)/libcutils
-vpath %.S $(SRCDIR)/libcutils
+vpath %.c $(SRCDIR)
+vpath %.S $(SRCDIR)
 
 LIBCUTILS_SRCLIST := \
 	array.c \
@@ -37,7 +35,7 @@ LIBCUTILS_SRCLIST := \
 
 LIBCUTILS_OBJS := $(LIBCUTILS_SRCLIST:%.c=%.o)
 
-LIBCUTILS_CFLAGS := -I$(SRCDIR)/include -I$(SRCDIR)/libcutils -I$(SRCDIR)/liblog -DHAVE_PTHREADS -DLINUX_ENABLED=1
+LIBCUTILS_CFLAGS := -I$(SRCDIR)/../include -I$(SRCDIR) -I$(SRCDIR)/../liblog -DHAVE_PTHREADS -DLINUX_ENABLED=1
 
 all: libcutils.a
 
