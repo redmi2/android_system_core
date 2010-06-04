@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2005 The Android Open Source Project
+ * Copyright (C) 2010, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,12 +41,16 @@ enum GGLPixelFormat {
     GGL_PIXEL_FORMAT_RGB_332     = 0xB,  // 8-bit RGB (non paletted)
 
     // YCbCr formats (SP=semi-planar, P=planar)
-    GGL_PIXEL_FORMAT_YCbCr_422_SP= 0x10,
-    GGL_PIXEL_FORMAT_YCbCr_420_SP= 0x11,
-    GGL_PIXEL_FORMAT_YCbCr_422_P = 0x12,
-    GGL_PIXEL_FORMAT_YCbCr_420_P = 0x13,
-    GGL_PIXEL_FORMAT_YCbCr_422_I = 0x14,
-    GGL_PIXEL_FORMAT_YCbCr_420_I = 0x15,
+    GGL_PIXEL_FORMAT_YCbCr_422_SP	       = 0x10,
+    GGL_PIXEL_FORMAT_YCbCr_420_SP	       = 0x11,
+    GGL_PIXEL_FORMAT_YCbCr_422_P	       = 0x12,
+    GGL_PIXEL_FORMAT_YCbCr_420_P	       = 0x13,
+    GGL_PIXEL_FORMAT_YCbCr_422_I	       = 0x14,
+    GGL_PIXEL_FORMAT_YCbCr_420_I	       = 0x15,
+    GGL_PIXEL_FORMAT_YCbCr_420_SP_TILED	       = 0x20,
+    GGL_PIXEL_FORMAT_YCrCb_420_SP	       = 0x21,
+    GGL_PIXEL_FORMAT_YCrCb_420_SP_YAMATO       = 0x22,
+
 
     // reserved/special formats
     GGL_PIXEL_FORMAT_Z_16       =  0x18,
