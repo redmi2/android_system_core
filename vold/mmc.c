@@ -150,18 +150,25 @@ static int mmc_bootstrap_card(char *sysfs_path)
 
     sprintf(filename, "/sys%s/type", devpath);
     p = read_file(filename, &sz);
-    p[strlen(p) - 1] = '\0';
-    sprintf(tmp, "MMC_TYPE=%s", p);
-    free(p);
-    uevent_params[1] = (char *) strdup(tmp);
+    if (p != NULL) {
+        p[strlen(p) - 1] = '\0';
+        sprintf(tmp, "MMC_TYPE=%s", p);
+        free(p);
+        uevent_params[1] = (char *) strdup(tmp);
+    } else {
+        uevent_params[1] = (char *) NULL;
+    }
 
     sprintf(filename, "/sys%s/name", devpath);
     p = read_file(filename, &sz);
-    p[strlen(p) - 1] = '\0';
-    sprintf(tmp, "MMC_NAME=%s", p);
-    free(p);
-    uevent_params[2] = (char *) strdup(tmp);
-
+    if (p != NULL) {
+        p[strlen(p) - 1] = '\0';
+        sprintf(tmp, "MMC_NAME=%s", p);
+        free(p);
+        uevent_params[2] = (char *) strdup(tmp);
+     } else {
+        uevent_params[2] = (char *) NULL;
+     }
     uevent_params[3] = (char *) NULL;
 
     if (simulate_uevent("mmc", devpath, "add", uevent_params) < 0) {
