@@ -5,11 +5,16 @@ include $(CLEAR_VARS)
 
 copy_from := \
 	etc/dbus.conf \
-	etc/hosts
+	etc/hosts \
+	etc/init.qcom.post_boot.sh \
+	etc/init.qcom.bt.sh \
+	etc/init.qcom.coex.sh \
+	etc/init.qcom.fm.sh \
+	etc/init.qcom.sdio.sh 
 
-ifeq ($(TARGET_PRODUCT),generic)
+# ifeq ($(TARGET_PRODUCT),generic)
 copy_from += etc/vold.fstab
-endif
+# endif
 
 # the /system/etc/init.goldfish.sh is needed to enable emulator support
 # in the system image. In theory, we don't need these for -user builds
@@ -44,6 +49,11 @@ endif
 # the emulator.
 file := $(TARGET_ROOT_OUT)/init.goldfish.rc
 $(file) : $(LOCAL_PATH)/etc/init.goldfish.rc | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+
+file := $(TARGET_ROOT_OUT)/init.qcom.rc
+$(file) : $(LOCAL_PATH)/etc/init.qcom.rc | $(ACP)
 	$(transform-prebuilt-to-target)
 ALL_PREBUILT += $(file)
 
