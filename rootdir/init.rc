@@ -289,6 +289,8 @@ service servicemanager /system/bin/servicemanager
 
 service vold /system/bin/vold
     socket vold stream 0660 root mount
+    # started by init.qcom.sh
+    disabled
 
 service nexus /system/bin/nexus
     socket nexus stream 0660 root system

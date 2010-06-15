@@ -38,7 +38,16 @@ case "$target" in
         value=`cat /sys/devices/system/soc/soc0/hw_platform`
         case "$value" in
             "FFA")
-             ln -s  /system/usr/keychars/surf_keypad_numeric.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
+             ln -s  /system/usr/keychars/surf_keypad_numeric.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin
+
+             case `getprop ro.emmc` in
+                 "1")
+                     # Use eMMC partition 14 (mmcblk0p14) for SD card on FFA eMMC device
+                     setprop emmc.sdcard.partition 14
+                     ;;
+             esac
+             ;;
+
             *)
              ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
         esac
@@ -131,3 +140,6 @@ case "$target" in
         esac
         ;;
 esac
+
+# Start vold
+start vold
