@@ -30,9 +30,9 @@ typedef enum media_type {
 } media_type_t;
 
 /*
- * max 8 partitions per card
+ * max 16 partitions per card
  */
-#define MMC_PARTS_PER_CARD (1<<3)
+#define MMC_PARTS_PER_CARD (1<<4)
 #define ALIGN_MMC_MINOR(min) (min / MMC_PARTS_PER_CARD * MMC_PARTS_PER_CARD)
 
 typedef struct media {
