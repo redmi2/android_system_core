@@ -233,7 +233,7 @@ static int mmc_bootstrap_mmcblk(char *devpath)
          *mmcblk_devname != '/'; mmcblk_devname--);
     mmcblk_devname++;
 
-    for (part_no = 0; part_no < 4; part_no++) {
+    for (part_no = 1; part_no < 17; part_no++) {
         char part_file[255];
         sprintf(part_file, "/sys%s/%sp%d", devpath, mmcblk_devname, part_no);
         if (!access(part_file, F_OK)) {

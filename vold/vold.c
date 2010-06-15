@@ -54,6 +54,7 @@ static pthread_mutex_t write_mutex = PTHREAD_MUTEX_INITIALIZER;
 static int fw_sock = -1;
 static int bootcompleted = 0;
 int bootstrap = 0;
+int sdcard_partition_override = 0;
 
 int main(int argc, char **argv)
 {
@@ -122,6 +123,12 @@ int main(int argc, char **argv)
     if (bind(uevent_sock, (struct sockaddr *) &nladdr, sizeof(nladdr)) < 0) {
         LOGE("Unable to bind uevent socket: %s", strerror(errno));
         exit(1);
+    }
+
+    property_get("emmc.sdcard.partition", value, "");
+    sscanf(value, "%d", &sdcard_partition_override);
+    if (sdcard_partition_override > 0) {
+        LOGW("Overriding SD card partition to %d", sdcard_partition_override);
     }
 
     /*

@@ -191,6 +191,22 @@ int volmgr_format_volume(char *mount_point)
             pthread_mutex_unlock(&v->lock);
             return rc;
         }
+    } else if ((v->media_type == media_mmc) && (sdcard_partition_override)) {
+        blkdev_t *part;
+        rc = -ENOMEDIUM;
+        part = blkdev_lookup_by_devno(v->dev->major, ALIGN_MMC_MINOR(v->dev->minor) + sdcard_partition_override);
+        if (part) {
+            LOGW("Formatting SD card partition %d", sdcard_partition_override);
+            if ((rc = format_partition(part, FORMAT_TYPE_FAT32)) < 0) {
+                LOGE("format failed (%d)", rc);
+            }
+            LOGW("Re-mounting SD card partition %d", sdcard_partition_override);
+            if (_volmgr_consider_disk_and_vol(v, v->dev->disk) < 0) {
+                LOGE("failed to restart volume after format '%s'", v->mount_point);
+            }
+        }
+        pthread_mutex_unlock(&v->lock);
+        return rc;
     } else {
         if ((rc = initialize_mbr(v->dev->disk)) < 0) {
             LOGE("MBR init failed for %s (%d)", mount_point, rc);
@@ -777,12 +793,25 @@ static int _volmgr_consider_disk_and_vol(volume_t *vol, blkdev_t *dev)
         /*
          * Device has multiple partitions
          * This is where interesting partition policies could be implemented.
-         * For now just try them in sequence until one succeeds
+         * For now just try them in sequence until one succeeds; or if
+         * user specified the partition to mount in property
+         * "emmc.sdcard.partition".
          */
-   
+        int scan_start = 0;
+        int scan_end = dev->nr_parts;
+
+        if (vol->media_type == media_mmc) {
+            if (sdcard_partition_override > 0) {
+                LOGI("Override SD card partition scan (partition #%d)",
+                     sdcard_partition_override);
+                scan_start = sdcard_partition_override - 1;
+                scan_end   = sdcard_partition_override;
+            }
+        }
+
         rc = -ENODEV;
         int i;
-        for (i = 0; i < dev->nr_parts; i++) {
+        for (i = scan_start; i < scan_end; i++) {
             blkdev_t *part;
             if (vol->media_type == media_mmc)
                 part = blkdev_lookup_by_devno(dev->major, ALIGN_MMC_MINOR(dev->minor) + (i+1));
@@ -1056,7 +1085,17 @@ static void _cb_volstopped_for_ums_enable(volume_t *v, void *arg)
     if(v->dev == NULL) 
         return;
 
-    devdir_path = blkdev_get_devpath(v->dev->disk);
+    if ((v->media_type == media_mmc) && (sdcard_partition_override)) {
+        devdir_path = (char *)malloc(255);
+        if (!devdir_path) {
+            LOGE("Error enabling ums (out of memory)");
+            return;
+        }
+        snprintf(devdir_path, 255, "%s/vold/%d:%d",
+                 DEVPATH, v->dev->major, sdcard_partition_override);
+    } else {
+        devdir_path = blkdev_get_devpath(v->dev->disk);
+    }
 
     if ((rc = ums_enable(devdir_path, v->ums_path)) < 0) {
         free(devdir_path);

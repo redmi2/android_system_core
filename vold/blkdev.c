@@ -131,6 +131,14 @@ int blkdev_refresh(blkdev_t *blk)
             }
             if (part.dp_size != 0 && part.dp_typ != 0)
                 blk->nr_parts++;
+            if ((part.dp_typ == 0x5) && (sdcard_partition_override > 4)) {
+                /* This is an extended partition type and the user specified
+                 * an SD partition override with property "emmc.sdcard.partition"
+                 */
+                LOGI("Override partition scanning to include partition %d",
+                     sdcard_partition_override);
+                blk->nr_parts = sdcard_partition_override;
+            }
         }
     } else if (blk->type == blkdev_partition) {
         struct dos_partition part;
