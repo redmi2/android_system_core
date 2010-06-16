@@ -42,13 +42,13 @@ static GGLFormat const gPixelFormatInfos[] =
     {  0,  0, {{ 0, 0,   0, 0,   0, 0,   0, 0 }},        0 },   // PIXEL_FORMAT_NONE
 
     {  1, 16, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCbCr_422_SP
-    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCbCr_420_SP
+    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCrCb_420_SP
     {  1, 16, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_P }, // PIXEL_FORMAT_YCbCr_422_P
     {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_P }, // PIXEL_FORMAT_YCbCr_420_P
     {  1, 16, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_I }, // PIXEL_FORMAT_YCbCr_422_I
     {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_I }, // PIXEL_FORMAT_YCbCr_420_I
-    {  0,  0, {{ 0, 0,   0, 0,   0, 0,   0, 0 }},        0 },   // PIXEL_FORMAT_NONE
-    {  0,  0, {{ 0, 0,   0, 0,   0, 0,   0, 0 }},        0 },   // PIXEL_FORMAT_NONE
+    {  1, 16, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_I }, // PIXEL_FORMAT_CbYCrY_422_I
+    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_I }, // PIXEL_FORMAT_CbYCrY_420_I
     
     {  2, 16, {{  0, 0, 16, 0,   0, 0,   0, 0 }}, GGL_DEPTH_COMPONENT},
     {  1,  8, {{  8, 0,  0, 0,   0, 0,   0, 0 }}, GGL_STENCIL_INDEX  },
@@ -61,8 +61,10 @@ static GGLFormat const gPixelFormatInfos[] =
     {  0,  0, {{ 0, 0,   0, 0,   0, 0,   0, 0 }},        0 },   // PIXEL_FORMAT_NONE
 
     {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCbCr_420_SP_TILED
-    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCrCb_420_SP
-    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCrCb_420_SP_YAMATO
+    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCbCr_420_SP
+    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCrCb_420_SP_TILED
+    {  1, 16, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCrCb_422_SP
+    {  1, 16, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCrCb_422_P
 };
 
 }; // namespace android
