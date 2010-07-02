@@ -3,18 +3,22 @@ on emmc
 
     mkdir /system
     mkdir /data 0771 system system
+    mkdir /persist 0771 system system
     mount ext3 /dev/block/mmcblk0p12 /system ro
     exec /system/bin/e2fsck -p /dev/block/mmcblk0p13
     mount ext3 /dev/block/mmcblk0p13 /data nosuid nodev
+    mount ext3 /dev/block/mmcblk0p14 /persist nosuid nodev
 
 on nand
 
     mkdir /system
     mkdir /data 0771 system system
+    mkdir /persist 0771 system system
     # Mount /system rw first to give the filesystem a chance to save a checkpoint
     mount yaffs2 mtd@system /system
     #mount yaffs2 mtd@system /system ro remount
     mount yaffs2 mtd@userdata /data nosuid nodev
+    mount yaffs2 mtd@persist /persist nosuid nodev
 
 
 on init
@@ -101,6 +105,11 @@ loglevel 3
     # We chown/chmod /data again so because mount is run as root + defaults
     chown system system /data
     chmod 0771 /data
+
+    # Mounting of persist is moved to 'on emmc' and 'on nand' sections
+    # We chown/chmod /persist again so because mount is run as root + defaults
+      chown system system /persist
+      chmod 0771 /persist
 
     # Create dump dir and collect dumps.
     # Do this before we mount cache so eventually we can use cache for
