@@ -171,7 +171,11 @@ int __android_log_write(int prio, const char *tag, const char *msg)
          vec[1].iov_len =51;
     }
     if(vec[1].iov_len + vec[2].iov_len + 1 > LOGGER_ENTRY_MAX_PAYLOAD)
+    {
+        temptag=msg;
         vec[2].iov_len= LOGGER_ENTRY_MAX_PAYLOAD-vec[1].iov_len-1;
+        temptag[vec[2].iov_len-1]='\0';
+    }
 
     return write_to_log(log_id, vec, 3);
 }
