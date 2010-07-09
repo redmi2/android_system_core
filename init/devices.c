@@ -117,6 +117,7 @@ static struct perms_ devperms[] = {
     { "/dev/tty0",          0660,   AID_ROOT,       AID_SYSTEM,     0 },
     { "/dev/graphics/",     0660,   AID_ROOT,       AID_GRAPHICS,   1 },
     { "/dev/msm_hw3dm",     0660,   AID_SYSTEM,     AID_GRAPHICS,   0 },
+    { "/dev/msm_rotator",   0660,   AID_SYSTEM,     AID_GRAPHICS,   0 },
     { "/dev/input/",        0660,   AID_ROOT,       AID_INPUT,      1 },
     { "/dev/eac",           0660,   AID_ROOT,       AID_AUDIO,      0 },
     { "/dev/cam",           0660,   AID_ROOT,       AID_CAMERA,     0 },
