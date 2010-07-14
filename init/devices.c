@@ -102,7 +102,8 @@ static struct perms_ devperms[] = {
     { "/dev/msm_hw3dc",     0666,   AID_ROOT,       AID_ROOT,       0 },
 
     /* gpu driver for adreno200 is globally accessible */
-    { "/dev/kgsl",          0666,   AID_ROOT,       AID_ROOT,       0 },
+    { "/dev/kgsl-3d0",      0666,   AID_ROOT,       AID_ROOT,       0 },
+    { "/dev/kgsl-2d0",      0666,   AID_ROOT,       AID_ROOT,       0 },
 
         /* these should not be world writable */
     { "/dev/diag",          0660,   AID_RADIO,      AID_RADIO,        0 },
