@@ -24,8 +24,6 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-# Derived from init.qcom.bt.sh - TODO: need to check licensing headers
 
 LOG_TAG="qcom-bt-wlan-coex"
 LOG_NAME="${0}:"
@@ -59,8 +57,6 @@ start_coex ()
 kill_coex ()
 {
   logi "kill_coex: pid = $coex_pid"
-  ## careful not to kill zero or null!
-  ## should we use TERM here? normal kill should allow graceful exit
   kill -TERM $coex_pid
   # this shell doesn't exit now -- wait returns for normal exit
 }
@@ -75,15 +71,18 @@ do
   \?)     echo $USAGE; exit 1;;
   esac
 done
-# shift $(($OPTIND-1))
 
 # init does SIGTERM on ctl.stop for service
 trap "kill_coex" TERM INT
 
-start_coex
-
-wait $coex_pid
-
-logi "Coex stopped"
+# Build settings may not produce the coex executable
+if ls /system/bin/btwlancoex
+then
+    start_coex
+    wait $coex_pid
+    logi "Coex stopped"
+else
+    logi "btwlancoex not available"
+fi
 
 exit 0
