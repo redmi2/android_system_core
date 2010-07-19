@@ -2,7 +2,7 @@ CC = gcc
 SRC = mkbootimg.c
 OBJ = mkbootimg.o
 
-TARGET = msm7630_surf
+TARGET = msm8655_surf
 
 CFLAGS =  -I../include
 CFLAGS += -I../../$(TARGET)
