@@ -52,6 +52,7 @@ enum GGLPixelFormat {
     GGL_PIXEL_FORMAT_S_8        =  0x19,
     GGL_PIXEL_FORMAT_SZ_24      =  0x1A,
     GGL_PIXEL_FORMAT_SZ_8       =  0x1B,
+    GGL_PIXEL_FORMAT_YCrCb_420_SP_INTERLACE = 0x1C,
 };
 
 enum GGLFormatComponents {
