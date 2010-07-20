@@ -53,6 +53,7 @@ static GGLFormat const gPixelFormatInfos[] =
     {  1,  8, {{  8, 0,  0, 0,   0, 0,   0, 0 }}, GGL_STENCIL_INDEX  },
     {  4, 24, {{  0, 0, 24, 0,   0, 0,   0, 0 }}, GGL_DEPTH_COMPONENT},
     {  4,  8, {{ 32,24,  0, 0,   0, 0,   0, 0 }}, GGL_STENCIL_INDEX  },
+    {  1, 12, {{ 0, 8,   0, 8,   0, 8,   0, 0 }}, GGL_Y_CB_CR_SP },// PIXEL_FORMAT_YCrCb_420_SP_INTERLACE
 };
 
 }; // namespace android
