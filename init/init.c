@@ -83,6 +83,7 @@ static time_t process_needs_restart;
 static const char *ENV[32];
 
 static unsigned emmc_boot = 0;
+static unsigned battchg_pause = 0;
 
 /* add_environment - add "key=value" to the current environment */
 int add_environment(const char *key, const char *val)
@@ -591,6 +592,10 @@ static void import_kernel_nv(char *name, int in_qemu)
             if (!strcmp(value,"true")) {
                 emmc_boot = 1;
             }
+        } else if (!strcmp(name,"androidboot.battchg_pause")) {
+            if (!strcmp(value,"true")) {
+                battchg_pause = 1;
+            }
         } else {
             qemu_cmdline(name, value);
         }
@@ -969,6 +974,12 @@ int main(int argc, char **argv)
         (signal_recv_fd < 0)) {
         ERROR("init startup failure\n");
         return 1;
+    }
+
+    /* pause if necessary */
+    if (battchg_pause) {
+        action_for_each_trigger("boot-pause", action_add_queue_tail);
+        drain_action_queue();
     }
 
     /* execute all the boot actions to get us started */
