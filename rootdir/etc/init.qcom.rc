@@ -53,6 +53,10 @@ on boot
     mkdir /data/wpstiles/ 0777 shell
     mkdir /etc/wiper 0777 location qcom_oncrpc
 
+     # Create directories for gpsone_daemon services
+    mkdir /data/gpsone_d 0770 shell
+    mkdir /etc/gpsone_d 0770 gpsone_d qcom_oncrpc
+
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
 
@@ -107,6 +111,11 @@ service wiperiface /system/bin/wiperiface
     user location
     group qcom_oncrpc
     oneshot
+
+service gpsone_daemon /system/bin/gpsone_daemon
+    user gpsone_d
+    group qcom_oncrpc
+    disabled
 
 service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
     user system

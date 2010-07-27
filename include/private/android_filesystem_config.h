@@ -51,6 +51,7 @@
 #define AID_SDCARD_RW     1015  /* external storage write access */
 #define AID_VPN           1016  /* vpn system */
 #define AID_KEYSTORE      1017  /* keystore subsystem */
+#define AID_GPSONE_D      1018  /* gpsone Daemon */
 
 #define AID_SHELL         2000  /* adb and debug shell user */
 #define AID_CACHE         2001  /* cache access */
@@ -106,6 +107,7 @@ static struct android_id_info android_ids[] = {
     { "net_admin", AID_NET_ADMIN, },
     { "qcom_oncrpc", AID_QCOM_ONCRPC, },
     { "misc",      AID_MISC, },
+    { "gpsone_d",  AID_GPSONE_D, },
     { "nobody",    AID_NOBODY, },
 };
 

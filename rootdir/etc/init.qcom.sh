@@ -43,4 +43,7 @@ case "$target" in
              ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
         esac
         ;;
+    "msm7630_fusion")
+#        start gpsone_daemon
+        ;;
 esac
