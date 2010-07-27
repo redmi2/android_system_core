@@ -94,6 +94,7 @@ static struct perms_ devperms[] = {
     { "/dev/urandom",       0666,   AID_ROOT,       AID_ROOT,       0 },
     { "/dev/ashmem",        0666,   AID_ROOT,       AID_ROOT,       0 },
     { "/dev/binder",        0666,   AID_ROOT,       AID_ROOT,       0 },
+    { "/dev/diag",          0666,   AID_ROOT,       AID_ROOT,       0 },
 
 	    /* logger should be world writable (for logging) but not readable */
     { "/dev/log/",          0662,   AID_ROOT,       AID_LOG,        1 },
@@ -106,7 +107,6 @@ static struct perms_ devperms[] = {
     { "/dev/kgsl-2d0",      0666,   AID_ROOT,       AID_ROOT,       0 },
 
         /* these should not be world writable */
-    { "/dev/diag",          0660,   AID_RADIO,      AID_RADIO,        0 },
     { "/dev/diag_arm9",     0660,   AID_RADIO,      AID_RADIO,        0 },
     { "/dev/android_adb",   0660,   AID_ADB,        AID_ADB,        0 },
     { "/dev/android_adb_enable",   0660,   AID_ADB,        AID_ADB,        0 },
