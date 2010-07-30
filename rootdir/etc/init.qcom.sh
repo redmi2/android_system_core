@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -52,5 +52,9 @@ case "$target" in
              ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
 
         esac
+        ;;
+
+    "msm8660_surf")
+        /system/bin/sh /system/etc/init.qcom.load-modem.sh
         ;;
 esac
