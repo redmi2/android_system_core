@@ -28,22 +28,26 @@
 
 target=`getprop ro.product.device`
 case "$target" in
-    "msm7630_surf")
+    "msm7630_surf" | "msm7630_fusion")
         insmod /system/lib/modules/ss_mfcinit.ko
         insmod /system/lib/modules/ss_vencoder.ko
         insmod /system/lib/modules/ss_vdecoder.ko
         chmod 0666 /dev/ss_mfc_reg
         chmod 0666 /dev/ss_vdec
         chmod 0666 /dev/ss_venc
+
+        case "$target" in
+        "msm7630_fusion")
+#       start gpsone_daemon
+        esac
+
         value=`cat /sys/devices/system/soc/soc0/hw_platform`
+
         case "$value" in
-            "FFA")
+            "FFA" | "SVLTE_FFA")
              ln -s  /system/usr/keychars/surf_keypad_numeric.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
             *)
              ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
         esac
-        ;;
-    "msm7630_fusion")
-#        start gpsone_daemon
         ;;
 esac
