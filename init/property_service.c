@@ -91,6 +91,7 @@ struct {
     unsigned int gid;
 } control_perms[] = {
     { "dumpstate",AID_SHELL, AID_LOG },
+    { "fm_dl", AID_FM_RADIO, AID_FM_RADIO},
      {NULL, 0, 0 }
 };
 
