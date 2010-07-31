@@ -60,6 +60,18 @@ on boot
     mkdir /data/gpsone_d 0770 gpsone_d qcom_oncrpc
     mkdir /etc/gpsone_d 0770 gpsone_d qcom_oncrpc
 
+    #Set SUID bit for usbhub
+    chmod 4755 /system/bin/usbhub
+    chmod 755 /system/bin/usbhub_init
+
+# Export GPIO56 for fusion targets to enable/disable hub
+service usbhub_init /system/bin/usbhub_init
+   user root
+   disabled
+
+on property:ro.product.device=msm7630_fusion
+    start usbhub_init
+
 on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
 
