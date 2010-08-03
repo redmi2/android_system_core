@@ -20,7 +20,7 @@ ADB_OBJLIST := $(ADB_SRCLIST:%.c=%.o)
 ADB_CFLAGS := -O2 -g -DADB_HOST=0 -Wall -Wno-unused-parameter
 ADB_CFLAGS += -D_XOPEN_SOURCE -D_GNU_SOURCE -DANDROID_GADGET=1 -DLINUX_ENABLED=1
 ADB_CFLAGS += -I$(SRCDIR) -I$(SRCDIR)/../include
-LIB_FLAGS += -lpthread -L./ -L$(SYSROOTLIB_DIR) -lcutils
+LIB_FLAGS += -lpthread -L./ -L../libcutils -lcutils
 
 all: adbd
 adbd: $(ADB_OBJLIST)
