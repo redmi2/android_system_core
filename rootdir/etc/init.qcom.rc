@@ -70,6 +70,9 @@ on property:init.svc.bluetoothd=running
 on property:init.svc.bluetoothd=stopped
     stop btwlancoex
 
+service cnd /system/bin/cnd
+    socket cnd stream 660 root radio
+
 service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p10 /dev/block/mmcblk0p11
     user root
     disabled
