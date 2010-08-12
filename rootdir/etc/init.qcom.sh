@@ -38,7 +38,7 @@ case "$target" in
 
         case "$target" in
         "msm7630_fusion")
-#       start gpsone_daemon
+        start gpsone_daemon
         esac
 
         value=`cat /sys/devices/system/soc/soc0/hw_platform`
