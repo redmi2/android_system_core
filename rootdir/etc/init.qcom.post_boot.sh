@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -35,6 +35,7 @@ case "$target" in
         echo 245760 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
         ;;
 esac
+
 case "$target" in
     "msm8660_surf")
         echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
@@ -48,3 +49,8 @@ case "$target" in
         ;;
 esac
 
+case "$target" in
+    "qsd8650a_st1x")
+        mount -t debugfs none /sys/kernel/debug
+    ;;
+esac
