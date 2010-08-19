@@ -140,15 +140,26 @@ static int ifc_configure(const char *ifname, dhcp_info *info)
         printerr("failed to set netmask %s: %s\n", ipaddr(info->netmask), strerror(errno));
         return -1;
     }
+
+#if 0
+/*
+ * Removing adding default routes automatically when interface comes up. Connectivity service
+ * in android will determine the interface that needs to be used for default internet connection,
+ * when several interfaces are active simultaneously.
+ */
+
     if (ifc_create_default_route(ifname, info->gateway)) {
         printerr("failed to set default route %s: %s\n", ipaddr(info->gateway), strerror(errno));
         return -1;
     }
+#endif
 
     snprintf(dns_prop_name, sizeof(dns_prop_name), "net.%s.dns1", ifname);
     property_set(dns_prop_name, info->dns1 ? ipaddr(info->dns1) : "");
     snprintf(dns_prop_name, sizeof(dns_prop_name), "net.%s.dns2", ifname);
     property_set(dns_prop_name, info->dns2 ? ipaddr(info->dns2) : "");
+    snprintf(dns_prop_name, sizeof(dns_prop_name), "net.%s.gw", ifname);
+    property_set(dns_prop_name, info->gateway ? ipaddr(info->gateway) : "");
 
     last_good_info = *info;
 
