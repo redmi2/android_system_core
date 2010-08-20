@@ -280,8 +280,7 @@ on boot
     chown system system /sys/devices/platform/msm_sdcc.2/polling
     chown system system /sys/devices/platform/msm_sdcc.3/polling
     chown system system /sys/devices/platform/msm_sdcc.4/polling
-    chown system system /sys/devices/platform/android_usb/composition
-    chown system system /sys/devices/platform/android_usb/remote_wakeup
+    chown system system /sys/devices/platform/msm_hsusb/gadget/wakeup
 
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
@@ -308,7 +307,6 @@ on property:ro.kernel.qemu=1
 
 on property:persist.service.adb.enable=1
     start adbd
-    write /sys/module/g_android/parameters/product_id 9017
 
 on property:persist.service.adb.enable=0
     stop adbd
