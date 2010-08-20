@@ -157,3 +157,6 @@ service hostapd /system/bin/hostapd -dddd /system/lib/modules/hostapd.conf
     oneshot
     disabled
 
+on property:ro.data.large_tcp_window_size=true
+    # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
+    write /proc/sys/net/ipv4/tcp_adv_win_scale  1
