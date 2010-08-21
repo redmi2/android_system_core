@@ -54,6 +54,10 @@ case "$target" in
     "msm7630_surf")
         echo "$arg" > /sys/devices/platform/msm_sdcc.3/polling
         ;;
+
+    "msm7630_fusion")
+        echo "$arg" > /sys/devices/platform/msm_sdcc.3/polling
+        ;;
 esac
 
 exit 0
