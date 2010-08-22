@@ -162,3 +162,10 @@ service hdmid /system/bin/hdmid
 
 on property:ro.hdmi.enable=true
     start hdmid
+
+service hostapd /system/bin/hostapd -dddd /system/lib/modules/hostapd.conf
+    user root
+    group root
+    oneshot
+    disabled
+
