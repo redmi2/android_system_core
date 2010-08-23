@@ -110,8 +110,7 @@ on property:ro.use_data_netmgrd=false
     stop netmgrd
 
 service btwlancoex /system/bin/sh /system/etc/init.qcom.coex.sh
-    user root
-    group qcom_oncrpc bluetooth net_bt_admin
+    group bluetooth net_bt_admin
     disabled
     oneshot
 
