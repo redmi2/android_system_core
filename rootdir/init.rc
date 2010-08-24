@@ -21,6 +21,7 @@ on nand
     #mount yaffs2 mtd@system /system ro remount
     mount yaffs2 mtd@userdata /data nosuid nodev
     mount yaffs2 mtd@persist /persist nosuid nodev
+    mount yaffs2 mtd@cache /cache nosuid nodev
 
 
 on init
@@ -133,7 +134,6 @@ loglevel 3
     write /proc/apanic_console 1
 
     # Same reason as /data above
-    mount yaffs2 mtd@cache /cache nosuid nodev
     chown system cache /cache
     chmod 0770 /cache
 
