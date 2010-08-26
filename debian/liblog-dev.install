@@ -1,0 +1,10 @@
+include/cutils/log.h usr/include/cutils
+include/cutils/logd.h usr/include/cutils
+include/cutils/logprint.h usr/include/cutils
+include/cutils/event_tag_map.h usr/include/cutils
+include/cutils/uio.h usr/include/cutils
+include/cutils/logger.h usr/include/cutils
+include/android/log.h usr/include/android
+usr/lib/liblog.a
+usr/lib/liblog*.so
+usr/lib/liblog*.la

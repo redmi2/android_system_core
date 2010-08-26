@@ -1,0 +1,18 @@
+Source: system-core
+Priority: extra
+Maintainer: . <@>
+Build-Depends: debhelper (>= 7), libtool, autoconf
+Standards-Version: 3.8.1
+Section: libs
+
+Package: liblog-dev
+Section: libdevel
+Architecture: any
+Depends: liblog (= ${binary:Version})
+Description: Logging utility routines - development files
+
+Package: liblog
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Logging utility routines
