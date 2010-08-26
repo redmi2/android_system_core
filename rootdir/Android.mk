@@ -10,7 +10,8 @@ copy_from := \
 	etc/init.qcom.bt.sh \
 	etc/init.qcom.coex.sh \
 	etc/init.qcom.fm.sh \
-	etc/init.qcom.sdio.sh 
+	etc/init.qcom.sdio.sh \
+	etc/init.qcom.wifi.sh
 
 ifeq ($(TARGET_PRODUCT),generic)
 copy_from += etc/vold.fstab
