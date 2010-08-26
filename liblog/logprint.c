@@ -15,6 +15,10 @@
 ** limitations under the License.
 */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #define _GNU_SOURCE /* for asprintf */
 
 #include <ctype.h>
