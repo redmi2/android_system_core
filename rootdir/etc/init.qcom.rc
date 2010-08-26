@@ -150,8 +150,14 @@ service qcom-post-boot /system/bin/sh /system/etc/init.qcom.post_boot.sh
     disabled
     oneshot
 
+service qcom-wifi /system/bin/sh /system/etc/init.qcom.wifi.sh
+    user root
+    disabled
+    oneshot
+
 on property:init.svc.bootanim=stopped
     start qcom-post-boot
+    start qcom-wifi
 
 service ckpd /system/bin/CKPD-daemon
     onrestart /system/bin/log -t RIL-CKPD -p w "CKPD daemon restarted"
