@@ -35,15 +35,7 @@ AC_ARG_ENABLE(liblog,
         [LIBLOG=yes])
 AM_CONDITIONAL(USELIBLOG, [test x$LIBLOG = xyes])
 
-AC_ARG_ENABLE(libcutils,
-        AC_HELP_STRING([--disable-libcutils], [Disable libcutils]),
-        [LIBCUTILS=no],
-        [LIBCUTILS=yes])
-AM_CONDITIONAL(USELIBCUTILS, [test x$LIBCUTILS = xyes])
-
-
 AC_OUTPUT([ \
 	Makefile \
-	liblog/Makefile \
-	libcutils/Makefile
+	liblog/Makefile
 	])
