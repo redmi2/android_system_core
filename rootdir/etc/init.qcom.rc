@@ -64,6 +64,9 @@ on boot
     chmod 4755 /system/bin/usbhub
     chmod 755 /system/bin/usbhub_init
 
+    #Set SUID bit for diag_mdlog
+    chmod 4755 /system/bin/diag_mdlog
+
 # Export GPIO56 for fusion targets to enable/disable hub
 service usbhub_init /system/bin/usbhub_init
    user root
