@@ -127,8 +127,4 @@ case "$target" in
             ;;
         esac
         ;;
-
-    "msm8660_surf")
-        /system/bin/sh /system/etc/init.qcom.load-modem.sh
-        ;;
 esac

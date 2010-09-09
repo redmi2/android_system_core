@@ -873,6 +873,12 @@ int main(int argc, char **argv)
     snprintf(tmp, sizeof(tmp), "/init.%s.rc", hardware);
     parse_config_file(tmp);
 
+    /* Check for a target specific initialisation file and read if present */
+    if (access("/init.target.rc", R_OK) == 0) {
+        INFO("Reading target specific config file");
+        parse_config_file("/init.target.rc");
+    }
+
     action_for_each_trigger("early-init", action_add_queue_tail);
     drain_action_queue();
 
