@@ -60,6 +60,10 @@ on boot
     mkdir /data/gpsone_d 0770 gpsone_d qcom_oncrpc
     mkdir /etc/gpsone_d 0770 gpsone_d qcom_oncrpc
 
+     # Create directory from IMS services
+    mkdir /data/shared 0777
+
+
     #Set SUID bit for usbhub
     chmod 4755 /system/bin/usbhub
     chmod 755 /system/bin/usbhub_init
@@ -193,3 +197,10 @@ service ds_fmc_appd /system/bin/ds_fmc_appd -p "rmnet0" -D
 on property:persist.data.ds_fmc_app.mode=1
     start ds_fmc_appd
 
+service ims_regmanager /system/bin/exe-ims-regmanagerprocessnative
+    user system
+    group qcom_oncrpc net_bt_admin inet radio wifi
+    disabled
+
+on property:persist.ims.regmanager.mode=1
+    start ims_regmanager
