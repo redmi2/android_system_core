@@ -46,7 +46,7 @@ case "$wifishd" in
        insmod /system/lib/modules/libra.ko
        rmmod libra.ko
        rmmod librasdioif.ko
-       sh init.qcom.sdio.sh 0
+       sh /system/etc/init.qcom.sdio.sh 0
        ;;
 esac
 
