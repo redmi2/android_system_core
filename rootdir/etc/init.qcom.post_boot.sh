@@ -38,14 +38,14 @@ esac
 
 case "$target" in
     "msm8660_surf")
-#        echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-#        echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
-#        echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
-#        echo 245760 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-#        echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-#        echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
-#        echo 500000 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
-#        echo 245760 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+        echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+        echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
+        echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+        echo 245760 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+        echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+        echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
+        echo 500000 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
+        echo 245760 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
         ;;
 esac
 
