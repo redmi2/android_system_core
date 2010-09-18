@@ -170,6 +170,7 @@ static struct perms_ devperms[] = {
     { "/dev/tpa2018d1",     0660,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/msm_audpre",    0660,   AID_SYSTEM,     AID_AUDIO,      0 },
     { "/dev/msm_audio_ctl", 0660,   AID_SYSTEM,     AID_AUDIO,      0 },
+    { "/dev/msm_acdb",      0666,   AID_SYSTEM,     AID_AUDIO,      0 },
     { "/dev/htc-acoustic",  0660,   AID_SYSTEM,     AID_AUDIO,      0 },
     { "/dev/vdec",          0660,   AID_SYSTEM,     AID_AUDIO,      0 },
     { "/dev/q6venc",        0660,   AID_SYSTEM,     AID_AUDIO,      0 },
