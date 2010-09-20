@@ -53,6 +53,7 @@
 #define AID_KEYSTORE      1017  /* keystore subsystem */
 #define AID_GPSONE_D      1018  /* gpsone Daemon */
 #define AID_FM_RADIO      1019  /* FM radio */
+#define AID_WIRELESS      1020  /* RFKILL clients */
 
 #define AID_SHELL         2000  /* adb and debug shell user */
 #define AID_CACHE         2001  /* cache access */
@@ -110,6 +111,7 @@ static struct android_id_info android_ids[] = {
     { "misc",      AID_MISC, },
     { "gpsone_d",  AID_GPSONE_D, },
     { "fm_radio",   AID_FM_RADIO, },
+    { "wireless",   AID_WIRELESS, },
     { "nobody",    AID_NOBODY, },
 };
 
