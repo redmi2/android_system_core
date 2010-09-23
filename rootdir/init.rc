@@ -326,8 +326,6 @@ service netd /system/bin/netd
 
 service debuggerd /system/bin/debuggerd
 
-service qmuxd /system/bin/qmuxd
-
 service ril-daemon /system/bin/rild
     socket rild stream 660 root radio
     socket rild-debug stream 660 radio system
