@@ -185,3 +185,11 @@ service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
     oneshot
     disabled
 
+service ds_fmc_appd /system/bin/ds_fmc_appd -p "rmnet0" -D
+    group radio
+    disabled
+    oneshot
+
+on property:persist.data.ds_fmc_app.mode=1
+    start ds_fmc_appd
+
