@@ -48,7 +48,7 @@ case "$target" in
              ln -s  /system/usr/keychars/surf_keypad_numeric.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
             "Fluid")
              setprop ro.sf.lcd_density 240
-             /system/bin/profiler_daemon;;
+             /system/bin/profiler_daemon&;;
             *)
              ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
 
