@@ -137,7 +137,7 @@ service wiperiface /system/bin/wiperiface
     oneshot
 
 service gpsone_daemon /system/bin/gpsone_daemon
-    user gpsone_d
+    user root
     group qcom_oncrpc
     disabled
 
