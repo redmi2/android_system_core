@@ -137,3 +137,17 @@ on property:init.svc.bootanim=stopped
 
 service ckpd /system/bin/CKPD-daemon
     onrestart /system/bin/log -t RIL-CKPD -p w "CKPD daemon restarted"
+
+service hdmid /system/bin/hdmid
+    socket hdmid stream 0660 root system graphics
+    disabled
+
+on property:ro.hdmi.enable=true
+    start hdmid
+
+service hostapd /system/bin/hostapd -dddd /system/lib/modules/hostapd.conf
+    user root
+    group root
+    oneshot
+    disabled
+
