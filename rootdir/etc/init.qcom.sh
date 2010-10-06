@@ -26,6 +26,18 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#
+# Allow unique persistent serial numbers for devices connected via usb
+# User needs to set unique usb serial number to persist.usb.serialno
+#
+serialno=`getprop persist.usb.serialno`
+case "$serialno" in
+    "") ;; #Do nothing here
+    * )
+    mount -t debugfs none /sys/kernel/debug
+    echo "$serialno" > /sys/kernel/debug/android/serial_number
+esac
+
 target=`getprop ro.product.device`
 case "$target" in
     "msm7630_surf" | "msm7630_fusion")
