@@ -28,6 +28,8 @@
 
 setprop hw.fm.init 0
 
+wcmenable=`getprop hw.fm.wcm`
+
 LOG_TAG="qcom-fm"
 LOG_NAME="${0}:"
 
@@ -47,12 +49,41 @@ failed ()
   exit $2
 }
 
-/system/bin/fm_qsoc_patches
+logi "In FM shell Script"
+logi "wcmenable: $wcmenable"
+
+case $wcmenable in
+  "enable")
+     /system/bin/fm_qsoc_patches 1
+     ;;
+  "disable")
+     /system/bin/fm_qsoc_patches 0
+     ;;
+   *)
+    logi "Shell: Default case"
+    /system/bin/fm_qsoc_patches 1
+    ;;
+esac
+
 exit_code_fm_qsoc_patches=$?
 
 case $exit_code_fm_qsoc_patches in
-  0) logi "FM QSoC calibration and firmware download succeeded";;
-  *) failed "FM QSoC firmware download and/or calibration failed" $exit_code_fm_qsoc_patches;;
+   0)
+	logi "FM QSoC calibration and firmware download succeeded"
+	case $wcmenable in
+	"enable")
+		setprop hw.fm.wcm disable
+	;;
+	"disable")
+		setprop hw.fm.wcm enable
+	;;
+	*)
+		setprop hw.fm.wcm disable
+	;;
+	esac
+   ;;
+  *)
+	failed "FM QSoC firmware download and/or calibration failed" $exit_code_fm_qsoc_patches
 esac
 
 setprop hw.fm.init 1
