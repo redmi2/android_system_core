@@ -28,7 +28,7 @@
 
 target=`getprop ro.product.device`
 case "$target" in
-    "msm7630_surf" | "msm7630_fusion")
+    "msm7630_surf" | "msm7630_1x" | "msm7630_fusion")
         insmod /system/lib/modules/ss_mfcinit.ko
         insmod /system/lib/modules/ss_vencoder.ko
         insmod /system/lib/modules/ss_vdecoder.ko
