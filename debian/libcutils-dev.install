@@ -1,0 +1,30 @@
+include/cutils/abort_socket.h   usr/include/cutils
+include/cutils/adb_networking.h usr/include/cutils
+include/cutils/array.h          usr/include/cutils
+include/cutils/ashmem.h         usr/include/cutils
+include/cutils/atomic.h         usr/include/cutils
+include/cutils/compiler.h       usr/include/cutils
+include/cutils/config_utils.h   usr/include/cutils
+include/cutils/cpu_info.h       usr/include/cutils
+include/cutils/dir_hash.h       usr/include/cutils
+include/cutils/fdevent.h        usr/include/cutils
+include/cutils/hashmap.h        usr/include/cutils
+include/cutils/jstring.h        usr/include/cutils
+include/cutils/memory.h         usr/include/cutils
+include/cutils/misc.h           usr/include/cutils
+include/cutils/mq.h             usr/include/cutils
+include/cutils/mspace.h         usr/include/cutils
+include/cutils/native_handle.h  usr/include/cutils
+include/cutils/process_name.h   usr/include/cutils
+include/cutils/properties.h     usr/include/cutils
+include/cutils/record_stream.h  usr/include/cutils
+include/cutils/sched_policy.h   usr/include/cutils
+include/cutils/selector.h       usr/include/cutils
+include/cutils/sockets.h        usr/include/cutils
+include/cutils/threads.h        usr/include/cutils
+include/cutils/tztime.h         usr/include/cutils
+include/cutils/zygote.h         usr/include/cutils
+
+usr/lib/libcutils.a
+usr/lib/libcutils*.so
+usr/lib/libcutils*.la

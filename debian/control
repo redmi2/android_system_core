@@ -5,6 +5,18 @@ Build-Depends: debhelper (>= 7), libtool, autoconf
 Standards-Version: 3.8.1
 Section: libs
 
+Package: libcutils-dev
+Section: libdevel
+Architecture: any
+Depends: libcutils (= ${binary:Version})
+Description: libc utility routines - development files
+
+Package: libcutils
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libc utility routines
+
 Package: liblog-dev
 Section: libdevel
 Architecture: any
