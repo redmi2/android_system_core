@@ -35,8 +35,14 @@ case "$target" in
 esac
 
 case "$target" in
-    "msm7201a_ffa" | "msm7201a_surf" | "msm7630_surf" |"msm7630_fusion" | "qsd8650a_st1x")
+    "msm7201a_ffa" | "msm7201a_surf" | "qsd8650a_st1x")
         echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+        ;;
+esac
+
+case "$target" in
+    "msm7630_surf" |"msm7630_fusion")
+        echo 75000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
         ;;
 esac
 
