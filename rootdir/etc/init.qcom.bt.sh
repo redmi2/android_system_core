@@ -85,7 +85,7 @@ shift $(($OPTIND-1))
 BOARD=`getprop ro.product.device`
 
 case $BOARD in
-  msm8660_surf) IBS="-H";;
+  msm8660_surf | msm8660_csfb ) IBS="-H";;
   *) IBS="";;
 esac
 
