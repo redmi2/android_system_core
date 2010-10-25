@@ -54,7 +54,7 @@ case "$target" in
 esac
 
 case "$target" in
-    "msm8660_surf")
+    "msm8660_surf" | "msm8660_csfb")
          mount -t debugfs none /sys/kernel/debug
          echo 165000000 > /sys/kernel/debug/clk/mmfab_clk/rate
 #        echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
