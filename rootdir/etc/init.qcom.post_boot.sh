@@ -48,7 +48,7 @@ case "$target" in
 esac
 
 case "$target" in
-     "msm7201a_ffa" | "msm7201a_surf" | "msm7627_ffa" | "msm7627_surf" | "msm7627_7x_ffa" | "msm7627_7x_surf")
+     "msm7201a_ffa" | "msm7201a_surf" | "msm7627_ffa" | "msm7627_surf" | "msm7627_7x_ffa" | "msm7627_7x_surf" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" )
         echo 245760 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
         ;;
 esac
