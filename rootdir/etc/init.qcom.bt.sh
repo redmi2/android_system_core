@@ -82,14 +82,7 @@ shift $(($OPTIND-1))
 # Note that "hci_qcomm_init -e" prints expressions to set the shell variables
 # BTS_DEVICE, BTS_TYPE, BTS_BAUD, and BTS_ADDRESS.
 
-BOARD=`getprop ro.product.device`
-
-case $BOARD in
-  msm8660_surf | msm8660_csfb ) IBS="-H";;
-  *) IBS="";;
-esac
-
-eval $(/system/bin/hci_qcomm_init -e $IBS && echo "exit_code_hci_qcomm_init=0" || echo "exit_code_hci_qcomm_init=1")
+eval $(/system/bin/hci_qcomm_init -e && echo "exit_code_hci_qcomm_init=0" || echo "exit_code_hci_qcomm_init=1")
 
 case $exit_code_hci_qcomm_init in
   0) logi "Bluetooth QSoC firmware download succeeded, $BTS_DEVICE $BTS_TYPE $BTS_BAUD $BTS_ADDRESS";;
