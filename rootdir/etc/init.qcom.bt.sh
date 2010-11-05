@@ -82,7 +82,21 @@ shift $(($OPTIND-1))
 # Note that "hci_qcomm_init -e" prints expressions to set the shell variables
 # BTS_DEVICE, BTS_TYPE, BTS_BAUD, and BTS_ADDRESS.
 
-eval $(/system/bin/hci_qcomm_init -e && echo "exit_code_hci_qcomm_init=0" || echo "exit_code_hci_qcomm_init=1")
+POWER_CLASS=`getprop qcom.bt.dev_power_class`
+
+case $POWER_CLASS in
+  1) PWR_CLASS="-p 0" ;
+     logi "Power Class: 1";;
+  2) PWR_CLASS="-p 1" ;
+     logi "Power Class: 2";;
+  3) PWR_CLASS="-p 2" ;
+     logi "Power Class: CUSTOM";;
+  *) PWR_CLASS="";
+     logi "Power Class: Ignored. Default(1) used (1-CLASS1/2-CLASS2/3-CUSTOM)";
+     logi "Power Class: To override, Before turning BT ON; setprop qcom.bt.dev_power_class <1 or 2 or 3>";;
+esac
+
+eval $(/system/bin/hci_qcomm_init -e $PWR_CLASS && echo "exit_code_hci_qcomm_init=0" || echo "exit_code_hci_qcomm_init=1")
 
 case $exit_code_hci_qcomm_init in
   0) logi "Bluetooth QSoC firmware download succeeded, $BTS_DEVICE $BTS_TYPE $BTS_BAUD $BTS_ADDRESS";;
