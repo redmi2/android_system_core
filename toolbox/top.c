@@ -87,6 +87,11 @@ static int max_procs, delay, iterations, threads;
 
 static struct cpu_info old_cpu, new_cpu;
 
+#define MAX_SUPPORTED_CPUS 4
+static int smp_num_cpus;
+static struct cpu_info **new_cpu_list, **old_cpu_list;
+
+
 static struct proc_info *alloc_proc(void);
 static void free_proc(struct proc_info *proc);
 static void read_procs(void);
@@ -177,16 +182,40 @@ int top_main(int argc, char *argv[]) {
     num_new_procs = num_old_procs = 0;
     new_procs = old_procs = NULL;
 
+    //Allocate memory for max supported CPUs
+    new_cpu_list = (struct cpu_info**) malloc(MAX_SUPPORTED_CPUS*sizeof(struct cpu_info*));
+    old_cpu_list = (struct cpu_info**) malloc(MAX_SUPPORTED_CPUS*sizeof(struct cpu_info*));
+    for (i = 0; i < MAX_SUPPORTED_CPUS; i++) {
+        new_cpu_list[i] = (struct cpu_info*) malloc(sizeof(struct cpu_info));
+        old_cpu_list[i] = (struct cpu_info*) malloc(sizeof(struct cpu_info));
+    }
+
     read_procs();
     while ((iterations == -1) || (iterations-- > 0)) {
         old_procs = new_procs;
         num_old_procs = num_new_procs;
         memcpy(&old_cpu, &new_cpu, sizeof(old_cpu));
+        //copy new data into older data
+        for(i = 0; i < smp_num_cpus; i++) {
+            memcpy(old_cpu_list[i],new_cpu_list[i],sizeof(struct cpu_info));
+        }
         sleep(delay);
         read_procs();
         print_procs();
         free_old_procs();
     }
+
+    //freeing the memory reserved.
+    for (i = 0; i < MAX_SUPPORTED_CPUS; i++) {
+        if (new_cpu_list != NULL && new_cpu_list[i] != NULL)
+            free(new_cpu_list[i]);
+    if (old_cpu_list != NULL && old_cpu_list[i] != NULL)
+        free(old_cpu_list[i]);
+    }
+    if (new_cpu_list != NULL)
+        free(new_cpu_list);
+    if (old_cpu_list != NULL)
+        free(old_cpu_list);
 
     return 0;
 }
@@ -228,6 +257,7 @@ static void read_procs(void) {
     pid_t pid, tid;
 
     int i;
+    int ret;
 
     proc_dir = opendir("/proc");
     if (!proc_dir) die("Could not open /proc.\n");
@@ -239,6 +269,24 @@ static void read_procs(void) {
     if (!file) die("Could not open /proc/stat.\n");
     fscanf(file, "cpu  %lu %lu %lu %lu %lu %lu %lu", &new_cpu.utime, &new_cpu.ntime, &new_cpu.stime,
             &new_cpu.itime, &new_cpu.iowtime, &new_cpu.irqtime, &new_cpu.sirqtime);
+
+    //read individual cpus. will read only currently online cpus
+    smp_num_cpus = 0;
+    for (i = 0; i < MAX_SUPPORTED_CPUS; i++) {
+        while(fgetc(file) != '\n') {
+            //skip to next line. Using this method since
+            //length of statistics line seems to differ among kernels
+        }
+        ret = fscanf(file, "cpu %*d %lu %lu %lu %lu %lu %lu %lu", &(new_cpu_list[i]->utime), &(new_cpu_list[i]->ntime), &(new_cpu_list[i]->stime),
+              &(new_cpu_list[i]->itime), &(new_cpu_list[i]->iowtime), &(new_cpu_list[i]->irqtime), &(new_cpu_list[i]->sirqtime));
+
+        if (ret == 0)
+            //no match. no more cpus
+        break;
+
+        smp_num_cpus++;
+    }
+
     fclose(file);
 
     proc_num = 0;
@@ -410,6 +458,9 @@ static void print_procs(void) {
     int i;
     struct proc_info *old_proc, *proc;
     long unsigned total_delta_time;
+
+    long unsigned total_deltacpu_time[MAX_SUPPORTED_CPUS];
+
     struct passwd *user;
     struct group *group;
     char *user_str, user_buf[20];
@@ -453,6 +504,39 @@ static void print_procs(void) {
             new_cpu.sirqtime - old_cpu.sirqtime,
             total_delta_time);
     printf("\n");
+
+    if (smp_num_cpus > 1) {
+      //print per cpu details
+      for (i = 0; i < smp_num_cpus; i++) {
+
+        //compute delta times on each cpu
+        total_deltacpu_time[i] = (new_cpu_list[i]->utime + new_cpu_list[i]->ntime + new_cpu_list[i]->stime + new_cpu_list[i]->itime
+                                 + new_cpu_list[i]->iowtime + new_cpu_list[i]->irqtime + new_cpu_list[i]->sirqtime) -
+                                (old_cpu_list[i]->utime + old_cpu_list[i]->ntime + old_cpu_list[i]->stime + old_cpu_list[i]->itime
+                                 + old_cpu_list[i]->iowtime + old_cpu_list[i]->irqtime + old_cpu_list[i]->sirqtime);
+
+        //print percentage usages in each mode
+        printf("CPU%d User %ld%%, System %ld%%, IOW %ld%%, IRQ %ld%%\n",i,
+            ((new_cpu_list[i]->utime + new_cpu_list[i]->ntime) - (old_cpu_list[i]->utime + old_cpu_list[i]->ntime)) * 100  / total_deltacpu_time[i],
+            ((new_cpu_list[i]->stime ) - (old_cpu_list[i]->stime)) * 100 / total_deltacpu_time[i],
+            ((new_cpu_list[i]->iowtime) - (old_cpu_list[i]->iowtime)) * 100 / total_deltacpu_time[i],
+            ((new_cpu_list[i]->irqtime + new_cpu_list[i]->sirqtime)
+            - (old_cpu_list[i]->irqtime + old_cpu_list[i]->sirqtime)) * 100 / total_deltacpu_time[i]);
+
+        //print absolute deltas
+        printf("User %ld + Nice %ld + Sys %ld + Idle %ld + IOW %ld + IRQ %ld + SIRQ %ld = %ld\n",
+            new_cpu_list[i]->utime - old_cpu_list[i]->utime,
+            new_cpu_list[i]->ntime - old_cpu_list[i]->ntime,
+            new_cpu_list[i]->stime - old_cpu_list[i]->stime,
+            new_cpu_list[i]->itime - old_cpu_list[i]->itime,
+            new_cpu_list[i]->iowtime - old_cpu_list[i]->iowtime,
+            new_cpu_list[i]->irqtime - old_cpu_list[i]->irqtime,
+            new_cpu_list[i]->sirqtime - old_cpu_list[i]->sirqtime,
+            total_deltacpu_time[i]);
+      }
+    }
+
+    printf("\n");
     if (!threads) 
         printf("%5s %4s %1s %5s %7s %7s %3s %-8s %s\n", "PID", "CPU%", "S", "#THR", "VSS", "RSS", "PCY", "UID", "Name");
     else
@@ -479,10 +563,10 @@ static void print_procs(void) {
         }
         if (!threads) 
             printf("%5d %3ld%% %c %5d %6ldK %6ldK %3s %-8.8s %s\n", proc->pid, proc->delta_time * 100 / total_delta_time, proc->state, proc->num_threads,
-                proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->name[0] != 0 ? proc->name : proc->tname);
+                   proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->name[0] != 0 ? proc->name : proc->tname);
         else
             printf("%5d %5d %3ld%% %c %6ldK %6ldK %3s %-8.8s %-15s %s\n", proc->pid, proc->tid, proc->delta_time * 100 / total_delta_time, proc->state,
-                proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->tname, proc->name);
+                   proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->tname, proc->name);
     }
 }
 
