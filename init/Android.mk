@@ -27,6 +27,10 @@ LOCAL_UNSTRIPPED_PATH := $(TARGET_ROOT_OUT_UNSTRIPPED)
 
 LOCAL_STATIC_LIBRARIES := libcutils libc
 
+ifeq ($(QCOM_TARGET_PRODUCT),msm8660_surf)
+LOCAL_CFLAGS += -DSLAVE4_IS_FM
+endif
+
 #LOCAL_STATIC_LIBRARIES := libcutils libc libminui libpixelflinger_static
 #LOCAL_STATIC_LIBRARIES += libminzip libunz libamend libmtdutils libmincrypt
 #LOCAL_STATIC_LIBRARIES += libstdc++_static
