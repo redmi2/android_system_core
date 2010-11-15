@@ -29,6 +29,7 @@
 setprop hw.fm.init 0
 
 wcmenable=`getprop hw.fm.wcm`
+version=`getprop hw.fm.version`
 
 LOG_TAG="qcom-fm"
 LOG_NAME="${0}:"
@@ -52,16 +53,18 @@ failed ()
 logi "In FM shell Script"
 logi "wcmenable: $wcmenable"
 
+#$fm_qsoc_patches <fm_chipVersion> <enable/disable WCM>
+#
 case $wcmenable in
   "enable")
-     /system/bin/fm_qsoc_patches 1
+     /system/bin/fm_qsoc_patches $version 1
      ;;
   "disable")
-     /system/bin/fm_qsoc_patches 0
+     /system/bin/fm_qsoc_patches $version 0
      ;;
    *)
     logi "Shell: Default case"
-    /system/bin/fm_qsoc_patches 1
+    /system/bin/fm_qsoc_patches $version 1
     ;;
 esac
 
