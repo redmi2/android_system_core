@@ -6,11 +6,11 @@ on emmc
     mkdir /persist 0771 system system
     mkdir /cache 0770 system cache
     devwait /dev/block/mmcblk0p12
-    mount ext3 /dev/block/mmcblk0p12 /system ro
+    mount ext4 /dev/block/mmcblk0p12 /system ro barrier=0
     devwait /dev/block/mmcblk0p13
     exec /system/bin/e2fsck -p /dev/block/mmcblk0p13
-    mount ext3 /dev/block/mmcblk0p13 /data nosuid nodev
-    mount ext3 /dev/block/mmcblk0p14 /persist nosuid nodev
+    mount ext4 /dev/block/mmcblk0p13 /data nosuid nodev barrier=0
+    mount ext4 /dev/block/mmcblk0p14 /persist nosuid nodev barrier=0
 
 on nand
 
