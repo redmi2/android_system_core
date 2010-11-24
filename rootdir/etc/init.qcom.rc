@@ -226,3 +226,9 @@ service time_daemon /system/bin/time_daemon
 on property:persist.timed.enable=true
     mkdir /data/time/ 0700
     start time_daemon
+
+service ftp /system/bin/sdptool add --channel=20 FTP
+    user bluetooth
+    group bluetooth net_bt_admin
+    disabled
+    oneshot
