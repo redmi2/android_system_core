@@ -148,7 +148,14 @@ static struct perms_ devperms[] = {
 #ifdef AUDIOV2
     { "/dev/msm_pcm_lp_dec",   0666,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/snd/controlC0", 0666,   AID_SYSTEM,     AID_AUDIO,      1 },
-    { "/dev/i2c-2",         0664,   AID_ROOT,       AID_SYSTEM,     1 },
+#ifdef SLAVE4_IS_FM
+    /*Give permission to /dev/i2c-4 only for MSM8x60*/
+    { "/dev/i2c-4",         0660,   AID_ROOT,       AID_SYSTEM,     1 },
+#else
+    /*in 7x30, Fm is 2nd i2c slave*/
+    { "/dev/i2c-2",         0660,   AID_ROOT,       AID_SYSTEM,     1 },
+#endif /*SLAVE4_IS_FM*/
+
 #endif
 
     { "/dev/msm_pcm_out",   0660,   AID_SYSTEM,     AID_AUDIO,      1 },
