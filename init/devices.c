@@ -143,7 +143,7 @@ static struct perms_ devperms[] = {
     { "/dev/cm3602",        0640,   AID_COMPASS,    AID_SYSTEM,     0 },
     { "/dev/akm8976_pffd",  0640,   AID_COMPASS,    AID_SYSTEM,     0 },
     { "/dev/lightsensor",   0640,   AID_SYSTEM,     AID_SYSTEM,     0 },
-    { "/dev/radio0",        0644,   AID_FM_RADIO,   AID_FM_RADIO,   1 },
+    { "/dev/radio0",        0640,   AID_FM_RADIO,   AID_FM_RADIO,   1 },
 #ifdef AUDIOV2
     { "/dev/msm_pcm_lp_dec",   0666,   AID_SYSTEM,     AID_AUDIO,      1 },
     { "/dev/snd/controlC0", 0666,   AID_SYSTEM,     AID_AUDIO,      1 },
