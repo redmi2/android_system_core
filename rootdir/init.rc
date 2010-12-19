@@ -97,6 +97,15 @@ on fs
     mount yaffs2 mtd@userdata /data nosuid nodev
     mount yaffs2 mtd@cache /cache nosuid nodev
 
+on emmc-fs
+# mount mmc partitions
+    wait /dev/block/mmcblk0p12
+    mount ext4 /dev/block/mmcblk0p12 /system ro barrier=0
+    wait /dev/block/mmcblk0p13
+    exec /system/bin/e2fsck -p /dev/block/mmcblk0p13
+    mount ext4 /dev/block/mmcblk0p13 /data nosuid nodev barrier=0
+    mount ext4 /dev/block/mmcblk0p14 /persist nosuid nodev barrier=0
+
 on post-fs
     # once everything is setup, no need to modify /
     mount rootfs rootfs / ro remount

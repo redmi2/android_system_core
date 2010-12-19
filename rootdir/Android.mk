@@ -5,7 +5,13 @@ include $(CLEAR_VARS)
 
 copy_from := \
 	etc/dbus.conf \
-	etc/hosts
+	etc/hosts \
+	etc/init.qcom.post_boot.sh \
+	etc/init.qcom.bt.sh \
+	etc/init.qcom.coex.sh \
+	etc/init.qcom.fm.sh \
+	etc/init.qcom.sdio.sh \
+	etc/init.qcom.wifi.sh
 
 ifeq ($(TARGET_PRODUCT),generic)
 copy_from += etc/vold.fstab
@@ -60,6 +66,16 @@ $(file) : $(LOCAL_PATH)/etc/ueventd.goldfish.rc | $(ACP)
 	$(transform-prebuilt-to-target)
 ALL_PREBUILT += $(file)
 $(INSTALLED_RAMDISK_TARGET): $(file)
+
+file := $(TARGET_ROOT_OUT)/init.qcom.rc
+$(file) : $(LOCAL_PATH)/etc/init.qcom.rc | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
+
+file := $(TARGET_ROOT_OUT)/init.qcom.sh
+$(file) : $(LOCAL_PATH)/etc/init.qcom.sh | $(ACP)
+	$(transform-prebuilt-to-target)
+ALL_PREBUILT += $(file)
 
 # create some directories (some are mount points)
 DIRS := $(addprefix $(TARGET_ROOT_OUT)/, \
