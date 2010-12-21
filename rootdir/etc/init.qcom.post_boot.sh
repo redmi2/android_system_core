@@ -61,18 +61,18 @@ case "$target" in
 #        echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
 #        echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
 #        echo 500000 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
-	 echo 1 > /sys/module/rpm_resources/enable_low_power/L2_cache
-	 echo 1 > /sys/module/rpm_resources/enable_low_power/pxo
-	 echo 1 > /sys/module/rpm_resources/enable_low_power/vdd_dig
-	 echo 1 > /sys/module/rpm_resources/enable_low_power/vdd_mem
-	 echo 1 > /sys/module/pm_8x60/modes/cpu0/power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8x60/modes/cpu1/power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8x60/modes/cpu0/power_collapse/idle_enabled
-	 echo 1 > /sys/module/pm_8x60/modes/cpu1/power_collapse/idle_enabled
-	 echo 1 > /sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/idle_enabled
-	 echo 1 > /sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/idle_enabled
+#	 echo 1 > /sys/module/rpm_resources/enable_low_power/L2_cache
+#	 echo 1 > /sys/module/rpm_resources/enable_low_power/pxo
+#	 echo 1 > /sys/module/rpm_resources/enable_low_power/vdd_dig
+#	 echo 1 > /sys/module/rpm_resources/enable_low_power/vdd_mem
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu0/power_collapse/suspend_enabled
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu1/power_collapse/suspend_enabled
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/suspend_enabled
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/suspend_enabled
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu0/power_collapse/idle_enabled
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu1/power_collapse/idle_enabled
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/idle_enabled
+#	 echo 1 > /sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/idle_enabled
         ;;
 esac
 
