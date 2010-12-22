@@ -37,6 +37,7 @@
 /dev/eac                  0660   root       audio
 /dev/cam                  0660   root       camera
 /dev/pmem                 0660   system     graphics
+/dev/pmem_audio           0660   system     audio
 /dev/pmem_adsp*           0660   system     audio
 /dev/pmem_smipool*        0660   system     camera
 /dev/pmem_camera*         0660   system     camera
@@ -91,4 +92,7 @@
 /dev/msm_vidc_reg         0660  system       audio
 /dev/msm_vidc_dec         0660  system       audio
 /dev/msm_vidc_enc         0660  system       audio
-
+#permissions for audio
+/dev/msm_amrnb            0660  system       audio
+/dev/msm_amrwb            0660  system       audio
+/dev/msm_aac              0660  system       audio
