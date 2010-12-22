@@ -52,6 +52,7 @@
 #define AID_VPN           1016  /* vpn system */
 #define AID_KEYSTORE      1017  /* keystore subsystem */
 #define AID_USB           1018  /* USB devices */
+#define AID_FM_RADIO      1019  /* FM radio */
 #define AID_GPS           1021  /* GPS daemon */
 #define AID_NFC           1022  /* nfc subsystem */
 
@@ -112,6 +113,7 @@ static const struct android_id_info android_ids[] = {
     { "net_admin", AID_NET_ADMIN, },
     { "qcom_oncrpc", AID_QCOM_ONCRPC, },
     { "misc",      AID_MISC, },
+    { "fm_radio",   AID_FM_RADIO, },
     { "nobody",    AID_NOBODY, },
 };
 

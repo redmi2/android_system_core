@@ -82,6 +82,7 @@ struct {
     { "persist.sys.",     AID_SYSTEM,   0 },
     { "persist.service.", AID_SYSTEM,   0 },
     { "persist.security.", AID_SYSTEM,   0 },
+    { "hw.fm.",           AID_FM_RADIO,  0 },
     { NULL, 0, 0 }
 };
 
@@ -95,6 +96,7 @@ struct {
     unsigned int gid;
 } control_perms[] = {
     { "dumpstate",AID_SHELL, AID_LOG },
+    { "fm_dl", AID_FM_RADIO, AID_FM_RADIO},
      {NULL, 0, 0 }
 };
 
