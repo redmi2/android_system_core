@@ -41,6 +41,7 @@ loglevel 3
 
     mkdir /system
     mkdir /data 0771 system system
+    mkdir /persist 0771 system system
     mkdir /cache 0770 system cache
     mkdir /config 0500 root root
 
@@ -95,6 +96,7 @@ on fs
     mount yaffs2 mtd@system /system
     mount yaffs2 mtd@system /system ro remount
     mount yaffs2 mtd@userdata /data nosuid nodev
+    mount yaffs2 mtd@persist /persist nosuid nodev
     mount yaffs2 mtd@cache /cache nosuid nodev
 
 on emmc-fs
