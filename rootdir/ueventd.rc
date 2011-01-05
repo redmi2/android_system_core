@@ -102,3 +102,5 @@
 /dev/msm_evrc             0660  system       audio
 /dev/msm_fm               0660  system       audio
 /dev/msm_acdb             0660  system       audio
+/dev/msm_wma              0660  system       audio
+/dev/msm_wmapro           0660  system       audio
