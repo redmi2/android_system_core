@@ -1,5 +1,6 @@
 /*
  * Copyright 2008, The Android Open Source Project
+ * Copyright (C) 2011, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -31,5 +32,7 @@ int ifc_set_mask(const char *name, unsigned mask);
 int ifc_create_default_route(const char *name, unsigned addr);
 
 int ifc_get_info(const char *name, unsigned *addr, unsigned *mask, unsigned *flags);
+
+int ifc_get_mtu(const char *name, int *mtuSz);
 
 #endif
