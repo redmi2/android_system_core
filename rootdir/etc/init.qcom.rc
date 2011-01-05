@@ -96,7 +96,7 @@ on property:init.svc.bluetoothd=stopped
 service cnd /system/bin/cnd
     socket cnd stream 660 root radio
 
-service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p10 /dev/block/mmcblk0p11
+service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p10 /dev/block/mmcblk0p11 /dev/block/mmcblk0p17
     user root
     disabled
 
