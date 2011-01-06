@@ -1,5 +1,6 @@
 /*
  * Copyright 2008, The Android Open Source Project
+ * Copyright (C) 2011, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); 
  * you may not use this file except in compliance with the License. 
@@ -211,6 +212,23 @@ int ifc_get_info(const char *name, in_addr_t *addr, in_addr_t *mask, unsigned *f
     return 0;
 }
 
+int ifc_get_mtu(const char *name, int *mtuSz)
+{
+    struct ifreq ifr;
+    ifc_init_ifr(name, &ifr);
+
+    if (mtuSz != NULL) {
+        if(ioctl(ifc_ctl_sock, SIOCGIFMTU, &ifr) < 0) {
+            *mtuSz = 0;
+            return -2;
+        } else {
+            *mtuSz = ifr.ifr_mtu;
+            return 0;
+        }
+    }
+
+    return -1;
+}
 
 int ifc_create_default_route(const char *name, in_addr_t gateway)
 {
