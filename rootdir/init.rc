@@ -123,8 +123,10 @@ on post-fs
     # We chown/chmod /persist again so because mount is run as root + defaults
     chown system system /persist
     chmod 0771 /persist
-    chmod 0666 /sys/devices/platform/msm_sdcc.3/polling
+    chmod 0666 /sys/devices/platform/msm_sdcc.1/polling
     chmod 0666 /sys/devices/platform/msm_sdcc.2/polling
+    chmod 0666 /sys/devices/platform/msm_sdcc.3/polling
+    chmod 0666 /sys/devices/platform/msm_sdcc.4/polling
 
 
     # Create dump dir and collect dumps.
