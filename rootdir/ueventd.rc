@@ -104,3 +104,5 @@
 /dev/msm_acdb             0660  system       audio
 /dev/msm_wma              0660  system       audio
 /dev/msm_wmapro           0660  system       audio
+/dev/msm_qcelp_in         0660  system       audio
+/dev/msm_evrc_in          0660  system       audio
