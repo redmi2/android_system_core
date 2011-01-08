@@ -109,6 +109,7 @@ on emmc-fs
     exec /system/bin/e2fsck -p /dev/block/mmcblk0p13
     mount ext4 /dev/block/mmcblk0p13 /data nosuid nodev barrier=0
     mount ext4 /dev/block/mmcblk0p14 /persist nosuid nodev barrier=0
+    mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev barrier=0
 
 on post-fs
     # once everything is setup, no need to modify /
