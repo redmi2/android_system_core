@@ -108,3 +108,4 @@
 /dev/msm_qcelp_in         0660  system       audio
 /dev/msm_evrc_in          0660  system       audio
 /dev/msm_preproc_ctl      0660  system       audio
+/dev/msm_a2dp_in          0640  system       audio
