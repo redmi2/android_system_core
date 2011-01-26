@@ -67,8 +67,12 @@ case "$target" in
 	 echo 1 > /sys/module/pm_8x60/modes/cpu1/power_collapse/idle_enabled
 	 echo 1 > /sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/idle_enabled
 	 echo 1 > /sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/idle_enabled
-	 echo "userspace" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-	 echo "userspace" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+	 echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+	 echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+	 echo 50000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+	 echo 50000 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
+	 echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
+	 echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
         ;;
 esac
 
