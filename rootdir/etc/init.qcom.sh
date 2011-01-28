@@ -165,4 +165,11 @@ case "$target" in
             ;;
         esac
         ;;
+    "msm8660_surf")
+        platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
+        case "$platformvalue" in
+         "Fluid")
+         setprop ro.sf.lcd_density 240;;
+         esac
+
 esac
