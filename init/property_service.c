@@ -83,6 +83,7 @@ struct {
     { "persist.service.", AID_SYSTEM,   0 },
     { "persist.security.", AID_SYSTEM,   0 },
     { "hw.fm.",           AID_FM_RADIO,  0 },
+    { "crypto.",          AID_MEDIA,     0 },
     { NULL, 0, 0 }
 };
 
