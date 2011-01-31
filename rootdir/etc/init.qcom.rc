@@ -146,7 +146,7 @@ service gpsone_daemon /system/bin/gpsone_daemon
     disabled
 
 service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
-    user system
+    user root
     group system qcom_oncrpc
     disabled
     oneshot
