@@ -75,6 +75,8 @@ case "$target" in
 	 echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
 	 echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
 	 echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
+	 chown system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+	 chown system /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
         ;;
 esac
 
