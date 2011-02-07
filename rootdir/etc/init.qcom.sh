@@ -30,9 +30,18 @@
 # start ril-daemon only for targets on which radio is present
 #
 baseband=`getprop ro.baseband`
+multirild=`getprop ro.multi.rild`
+dsds=`getprop persist.dsds.enabled`
 case "$baseband" in
     "msm" | "csfb" | "svlte2a" | "unknown")
     start ril-daemon
+    case "$multirild" in
+        "true")
+         case "$dsds" in
+             "true")
+             start ril-daemon1
+         esac
+    esac
 esac
 
 #
