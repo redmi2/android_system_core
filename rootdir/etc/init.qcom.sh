@@ -27,6 +27,15 @@
 #
 
 #
+# start ril-daemon only for targets on which radio is present
+#
+baseband=`getprop ro.baseband`
+case "$baseband" in
+    "msm" | "csfb" | "svlte2a" | "unknown")
+    start ril-daemon
+esac
+
+#
 # Allow unique persistent serial numbers for devices connected via usb
 # User needs to set unique usb serial number to persist.usb.serialno
 #
