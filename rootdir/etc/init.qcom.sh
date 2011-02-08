@@ -50,6 +50,7 @@ case "$usbchgdisabled" in
     case $target in
         "msm8660_surf" | "msm8660_csfb")
         echo "$usbchgdisabled" > /sys/module/pmic8058_charger/parameters/disabled
+        echo "$usbchgdisabled" > /sys/module/smb137b/parameters/disabled
     esac
 esac
 
