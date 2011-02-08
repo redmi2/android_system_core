@@ -34,6 +34,13 @@
 # the script won't do anything. Otherwise (GUI is not going to Turn On
 # the Wifi) the script will load/unload the driver
 # This script will get called after post bootup.
+target=`getprop ro.product.device`
+case "$target" in
+    msm8660*)
+    exit 0
+    ;;
+esac
+
 wifishd=`getprop wlan.driver.status`
 case "$wifishd" in
     "ok")
