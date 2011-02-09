@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2008-2010, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -74,6 +74,8 @@ case "$target" in
 	 echo 50000 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
 	 echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
 	 echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
+	 chown system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+	 chown system /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
         ;;
 esac
 
