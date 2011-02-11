@@ -37,6 +37,7 @@ target=`getprop ro.product.device`
 case "$target" in
     "msm7627_surf")
         echo "$arg" > /sys/devices/platform/msm_sdcc.1/polling
+        echo "$arg" > /sys/devices/platform/msm_sdcc.2/polling
         ;;
 
     "msm7627_ffa")
