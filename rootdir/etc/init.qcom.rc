@@ -183,6 +183,8 @@ on property:init.svc.bootanim=stopped
     start qcom-wifi
 
 service ckpd /system/bin/CKPD-daemon
+    user system
+    group system radio
     disabled
     onrestart /system/bin/log -t RIL-CKPD -p w "CKPD daemon restarted"
 
