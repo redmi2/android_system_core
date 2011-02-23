@@ -81,6 +81,8 @@ on boot
     chmod 0660 /dev/ttyGS0
     chown system system /dev/ttyGS0
 
+    chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
+
     #increase dirty_writeback_interval
     write /proc/sys/vm/dirty_writeback_centisecs 60000
     write /proc/sys/vm/dirty_expire_centisecs 60000
