@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2010, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2010-2011, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -67,12 +67,7 @@ case "$target" in
                     ;;
 
                    "WCN1312")
-                        sh /system/etc/init.qcom.sdio.sh 1
-                        insmod /system/lib/modules/librasdioif.ko
-                        insmod /system/lib/modules/wlan.ko
-                        rmmod wlan
-                        rmmod librasdioif
-                        sh /system/etc/init.qcom.sdio.sh 0
+                        /system/bin/amploader -i
                         ;;
                    *)
 	                ;;
@@ -80,18 +75,18 @@ case "$target" in
         esac
     ;;
     msm7627*)
+        wifishd=`getprop wlan.driver.status`
         case "$wifishd" in
             "ok")
              ;;
             "loading")
              ;;
             *)
-                sh /system/etc/init.qcom.sdio.sh 1
-                insmod /system/lib/modules/librasdioif.ko
-                insmod /system/lib/modules/wlan.ko
-                rmmod wlan.ko
-                rmmod librasdioif.ko
-                sh /system/etc/init.qcom.sdio.sh 0
+# For the new .38 kernel for 1312, there was an FFA panic
+# when no 1312/1314 chip was present. Hence this is commented out
+# Will need to reenable this code for 1312.
+#
+#                /system/bin/amploader -i
             ;;
         esac
     ;;

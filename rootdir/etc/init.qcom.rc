@@ -53,6 +53,9 @@ on boot
     symlink /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
     setprop wifi.interface wlan0
 
+    # Enable Bluetooth AMP when Bluetooth is turned on
+    setprop ro.config.bt.amp yes
+
      # Create directories for wiper services
     mkdir /data/wpstiles/ 0777 shell
     mkdir /data/wiper 0777 location qcom_oncrpc
@@ -116,10 +119,11 @@ on property:init.svc.wpa_supplicant=stopped
     stop dhcpcd
 
 on property:init.svc.bluetoothd=running
-    write /sys/devices/virtual/bluetooth/hci0/idle_timeout 7000
     start btwlancoex
+    start amp_load
 
 on property:init.svc.bluetoothd=stopped
+    start amp_unload
     stop btwlancoex
 
 service cnd /system/bin/cnd
@@ -179,6 +183,21 @@ on property:ro.data.large_tcp_window_size=true
 service btwlancoex /system/bin/sh /system/etc/init.qcom.coex.sh
     user shell
     group bluetooth net_bt_admin
+    disabled
+    oneshot
+
+service amp_init /system/bin/amploader -i
+    user root
+    disabled
+    oneshot
+
+service amp_load /system/bin/amploader -l 7000
+    user root
+    disabled
+    oneshot
+
+service amp_unload /system/bin/amploader -u
+    user root
     disabled
     oneshot
 
