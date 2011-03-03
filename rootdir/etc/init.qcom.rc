@@ -50,6 +50,7 @@ on boot
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
     symlink /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
+    symlink /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
     setprop wifi.interface wlan0
 
      # Create directories for wiper services
