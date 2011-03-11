@@ -35,6 +35,8 @@ dsds=`getprop persist.dsds.enabled`
 case "$baseband" in
     "msm" | "csfb" | "svlte2a" | "unknown")
     start ril-daemon
+    start qmuxd
+    start netmgrd
     case "$multirild" in
         "true")
          case "$dsds" in
