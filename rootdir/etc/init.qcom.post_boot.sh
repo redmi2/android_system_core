@@ -45,6 +45,7 @@ esac
 case "$target" in
     "msm7630_surf" | "msm7630_1x" | "msm7630_fusion")
         echo 75000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+        echo 1 > /sys/module/pm2/parameters/idle_sleep_mode
         ;;
 esac
 
