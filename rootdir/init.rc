@@ -400,7 +400,7 @@ service hsag /system/bin/sdptool add --channel=11 HSAG
     disabled
     oneshot
 
-service opush /system/bin/sdptool add --channel=12 OPUSH
+service opush /system/bin/sdptool add --psm=5255 --channel=12 OPUSH
     user bluetooth
     group bluetooth net_bt_admin
     disabled
