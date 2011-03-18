@@ -270,6 +270,9 @@ service hdmid /system/bin/hdmid
 on property:ro.hdmi.enable=true
     start hdmid
 
+service abld /system/bin/mm-abl-daemon
+    disabled
+
 service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
     user root
     group root
