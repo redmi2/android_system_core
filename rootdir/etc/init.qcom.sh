@@ -98,7 +98,7 @@ case "$target" in
             "Fluid")
              setprop ro.sf.lcd_density 240
              setprop qcom.bt.dev_power_class 2
-             /system/bin/profiler_daemon&;;
+             start profiler_daemon;;
             *)
              ln -s  /system/usr/keychars/surf_keypad_qwerty.kcm.bin /system/usr/keychars/surf_keypad.kcm.bin;;
 
@@ -181,7 +181,8 @@ case "$target" in
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
         case "$platformvalue" in
          "Fluid")
-         setprop ro.sf.lcd_density 240;;
+         setprop ro.sf.lcd_density 240
+         start profiler_daemon;;
          esac
 
 esac
