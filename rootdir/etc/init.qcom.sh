@@ -33,6 +33,8 @@ baseband=`getprop ro.baseband`
 case "$baseband" in
     "msm" | "csfb" | "svlte2a" | "unknown")
     start ril-daemon
+    start qmuxd
+    start netmgrd
 esac
 
 #
