@@ -140,6 +140,13 @@ service dund /system/bin/sdptool add --channel=1 DUN
 service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
     user system
     group system inet
+    disabled
+
+on property:ro.baseband="msm"
+    start port-bridge
+
+on property:ro.baseband="unknown"
+    start port-bridge
 
 service qmuxd /system/bin/qmuxd
     user radio
