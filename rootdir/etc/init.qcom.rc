@@ -75,6 +75,14 @@ on boot
     #Provide the access to hostapd.conf only to root and group
     chmod 0660 /data/hostapd/hostapd.conf
 
+    # Remove write permissions to video related nodes
+    chmod 0664 /sys/devices/virtual/graphics/fb1/hpd
+    chmod 0664 /sys/devices/virtual/graphics/fb1/video_mode
+    chmod 0664 /sys/devices/virtual/graphics/fb1/format_3d
+
+    # Change owner and group for media server and surface flinger
+    chown system media /sys/devices/virtual/graphics/fb1/format_3d
+
     #increase dirty_writeback_interval
     write /proc/sys/vm/dirty_writeback_centisecs 60000
     write /proc/sys/vm/dirty_expire_centisecs 60000
