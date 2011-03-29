@@ -92,6 +92,9 @@ on boot
     write /proc/sys/vm/dirty_expire_centisecs 60000
     write /proc/sys/vm/laptop_mode 5
 
+    #For netmgr daemon to inform the USB driver of the correct transport
+    chown radio radio /sys/class/usb_composite/rmnet_smd_sdio/transport
+
 # Export GPIO56 for fusion targets to enable/disable hub
 service usbhub_init /system/bin/usbhub_init
    user root
