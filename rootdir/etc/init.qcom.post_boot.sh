@@ -105,3 +105,6 @@ case "$target" in
         mount -t debugfs none /sys/kernel/debug
     ;;
 esac
+
+chown system /sys/devices/system/cpu/mfreq
+chown system /sys/devices/system/cpu/cpu1/online
