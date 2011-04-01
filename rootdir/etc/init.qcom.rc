@@ -126,6 +126,8 @@ service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
 service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
 
 service qmuxd /system/bin/qmuxd
+    user radio
+    group radio
     disabled
 
 service netmgrd /system/bin/netmgrd
