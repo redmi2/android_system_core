@@ -74,6 +74,18 @@ case "$usbchgdisabled" in
     esac
 esac
 
+#
+# Start gpsone_daemon for SVLTE Type I & II devices
+#
+case "$target" in
+        "msm7630_fusion")
+        start gpsone_daemon
+esac
+case "$baseband" in
+        "svlte2a")
+        start gpsone_daemon
+esac
+
 case "$target" in
     "msm7630_surf" | "msm7630_1x" | "msm7630_fusion")
         insmod /system/lib/modules/ss_mfcinit.ko
@@ -82,11 +94,6 @@ case "$target" in
         chmod 0666 /dev/ss_mfc_reg
         chmod 0666 /dev/ss_vdec
         chmod 0666 /dev/ss_venc
-
-        case "$target" in
-        "msm7630_fusion")
-        start gpsone_daemon
-        esac
 
         value=`cat /sys/devices/system/soc/soc0/hw_platform`
 
