@@ -30,11 +30,16 @@
 # start ril-daemon only for targets on which radio is present
 #
 baseband=`getprop ro.baseband`
+netmgr=`getprop ro.use_data_netmgrd`
+
 case "$baseband" in
     "msm" | "csfb" | "svlte2a" | "unknown")
     start ril-daemon
     start qmuxd
-    start netmgrd
+    case "$netmgr" in
+        "true" | "True" | "TRUE")
+        start netmgrd
+    esac
 esac
 
 #
