@@ -30,6 +30,8 @@ BLUETOOTH_SLEEP_PATH=/proc/bluetooth/sleep/proto
 LOG_TAG="qcom-bluetooth"
 LOG_NAME="${0}:"
 
+baseband=`getprop ro.baseband`
+
 hciattach_pid=""
 
 loge ()
@@ -41,6 +43,14 @@ logi ()
 {
   /system/bin/log -t $LOG_TAG -p i "$LOG_NAME $@"
 }
+
+case "$baseband" in
+    "csfb" | "svlte2a" | "unknown")
+    setprop ro.qualcomm.bluetooth.dun false ;;
+    "msm")
+    setprop ro.qualcomm.bluetooth.dun true
+esac
+
 
 failed ()
 {
