@@ -244,6 +244,15 @@ service ckpd /system/bin/CKPD-daemon
 on property:ro.service.ckpd.enable=1
     start ckpd
 
+service atfwd /system/bin/ATFWD-daemon
+    user system
+    group system radio
+    disabled
+    onrestart /system/bin/log -t RIL-ATFWD -p w "ATFWD daemon restarted"
+
+on property:ro.baseband="csfb"
+    start atfwd
+
 service hdmid /system/bin/hdmid
     socket hdmid stream 0660 root system graphics
     disabled
