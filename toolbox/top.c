@@ -66,6 +66,7 @@ struct proc_info {
     long vss;
     long rss;
     int num_threads;
+    int lcpu;
     char policy[32];
 };
 
@@ -340,8 +341,10 @@ static int read_stat(char *filename, struct proc_info *proc) {
     
     /* Scan rest of string. */
     sscanf(close_paren + 1, " %c %*d %*d %*d %*d %*d %*d %*d %*d %*d %*d "
-                 "%lu %lu %*d %*d %*d %*d %*d %*d %*d %lu %ld",
-                 &proc->state, &proc->utime, &proc->stime, &proc->vss, &proc->rss);
+                 "%lu %lu %*d %*d %*d %*d %*d %*d %*d %lu %ld"
+                 "%*d %*d %*d %*d %*d %*d %*d %*d %*d %*d %*d %*d %*d %*d %d",
+                 &proc->state, &proc->utime, &proc->stime, &proc->vss, &proc->rss,
+                 &proc->lcpu);
 
     return 0;
 }
@@ -453,10 +456,19 @@ static void print_procs(void) {
             new_cpu.sirqtime - old_cpu.sirqtime,
             total_delta_time);
     printf("\n");
-    if (!threads) 
+    if (!threads) {
+#ifndef SMP
         printf("%5s %4s %1s %5s %7s %7s %3s %-8s %s\n", "PID", "CPU%", "S", "#THR", "VSS", "RSS", "PCY", "UID", "Name");
-    else
+#else
+        printf("%5s %1s %4s %1s %5s %7s %7s %3s %-8s %s\n", "PID", "P", "CPU%", "S", "#THR", "VSS", "RSS", "PCY", "UID", "Name");
+#endif
+    } else {
+#ifndef SMP
         printf("%5s %5s %4s %1s %7s %7s %3s %-8s %-15s %s\n", "PID", "TID", "CPU%", "S", "VSS", "RSS", "PCY", "UID", "Thread", "Proc");
+#else
+        printf("%5s %5s %1s %4s %1s %7s %7s %3s %-8s %-15s %s\n", "PID", "TID", "P", "CPU%", "S", "VSS", "RSS", "PCY", "UID", "Thread", "Proc");
+#endif
+    }
 
     for (i = 0; i < num_new_procs; i++) {
         proc = new_procs[i];
@@ -477,12 +489,23 @@ static void print_procs(void) {
             snprintf(group_buf, 20, "%d", proc->gid);
             group_str = group_buf;
         }
-        if (!threads) 
+        if (!threads) {
+#ifndef SMP
             printf("%5d %3ld%% %c %5d %6ldK %6ldK %3s %-8.8s %s\n", proc->pid, proc->delta_time * 100 / total_delta_time, proc->state, proc->num_threads,
                 proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->name[0] != 0 ? proc->name : proc->tname);
-        else
+#else
+            printf("%5d %1d %3ld%% %c %5d %6ldK %6ldK %3s %-8.8s %s\n", proc->pid, proc->lcpu, proc->delta_time * 100 / total_delta_time, proc->state, proc->num_threads,
+                proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->name[0] != 0 ? proc->name : proc->tname);
+#endif
+        } else {
+#ifndef SMP
             printf("%5d %5d %3ld%% %c %6ldK %6ldK %3s %-8.8s %-15s %s\n", proc->pid, proc->tid, proc->delta_time * 100 / total_delta_time, proc->state,
                 proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->tname, proc->name);
+#else
+            printf("%5d %5d %1d %3ld%% %c %6ldK %6ldK %3s %-8.8s %-15s %s\n", proc->pid, proc->tid, proc->lcpu, proc->delta_time * 100 / total_delta_time, proc->state,
+                proc->vss / 1024, proc->rss * getpagesize() / 1024, proc->policy, user_str, proc->tname, proc->name);
+#endif
+        }
     }
 }
 

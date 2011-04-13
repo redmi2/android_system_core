@@ -60,6 +60,10 @@ LOCAL_SRC_FILES:= \
 	toolbox.c \
 	$(patsubst %,%.c,$(TOOLS))
 
+ifeq ($(strip $(TARGET_CPU_SMP)),true)
+  LOCAL_CFLAGS += -DSMP
+endif
+
 LOCAL_SHARED_LIBRARIES := libcutils libc
 
 LOCAL_MODULE:= toolbox
