@@ -86,12 +86,16 @@ case "$target" in
             "loading")
              ;;
             *)
-                sh /system/etc/init.qcom.sdio.sh 1
-                insmod /system/lib/modules/librasdioif.ko
-                insmod /system/lib/modules/wlan.ko
-                rmmod wlan.ko
-                rmmod librasdioif.ko
-                sh /system/etc/init.qcom.sdio.sh 0
+# For the new .38 kernel for 1312, there was an FFA panic
+# when no 1312/1314 chip was present. Hence this is commented out
+# Will need to reenable this code for 1312.
+#
+#                sh /system/etc/init.qcom.sdio.sh 1
+#                insmod /system/lib/modules/librasdioif.ko
+#                insmod /system/lib/modules/wlan.ko
+#                rmmod wlan.ko
+#                rmmod librasdioif.ko
+#                sh /system/etc/init.qcom.sdio.sh 0
             ;;
         esac
     ;;
