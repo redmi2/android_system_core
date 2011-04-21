@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2011, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -92,6 +92,13 @@ shift $(($OPTIND-1))
 # Note that "hci_qcomm_init -e" prints expressions to set the shell variables
 # BTS_DEVICE, BTS_TYPE, BTS_BAUD, and BTS_ADDRESS.
 
+#Selectively Disable sleep
+BOARD=`getprop ro.product.device`
+
+case $BOARD in
+  msm7627a ) IBS="-H";;
+  *) IBS="";;
+esac
 POWER_CLASS=`getprop qcom.bt.dev_power_class`
 
 case $POWER_CLASS in
@@ -106,7 +113,7 @@ case $POWER_CLASS in
      logi "Power Class: To override, Before turning BT ON; setprop qcom.bt.dev_power_class <1 or 2 or 3>";;
 esac
 
-eval $(/system/bin/hci_qcomm_init -e $PWR_CLASS && echo "exit_code_hci_qcomm_init=0" || echo "exit_code_hci_qcomm_init=1")
+eval $(/system/bin/hci_qcomm_init -e $PWR_CLASS $IBS && echo "exit_code_hci_qcomm_init=0" || echo "exit_code_hci_qcomm_init=1")
 
 case $exit_code_hci_qcomm_init in
   0) logi "Bluetooth QSoC firmware download succeeded, $BTS_DEVICE $BTS_TYPE $BTS_BAUD $BTS_ADDRESS";;
