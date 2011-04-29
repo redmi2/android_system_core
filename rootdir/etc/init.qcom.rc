@@ -259,11 +259,7 @@ on property:init.svc.bootanim=stopped
 service atfwd /system/bin/ATFWD-daemon
     user system
     group system radio
-    disabled
     onrestart /system/bin/log -t RIL-ATFWD -p w "ATFWD daemon restarted"
-
-on property:ro.service.atfwd.enable=1
-    start atfwd
 
 service hdmid /system/bin/hdmid
     socket hdmid stream 0660 root system graphics
