@@ -35,12 +35,12 @@
 # the Wifi) the script will load/unload the driver
 # This script will get called after post bootup.
 target=`getprop ro.product.device`
+wifishd=`getprop wlan.driver.status`
 case "$target" in
     msm8660*)
     exit 0
     ;;
     msm7630*)
-        wifishd=`getprop wlan.driver.status`
         wlanchip=`cat /persist/wlan_chip_id`
         echo "The WLAN Chip ID is $wlanchip"
         case "$wlanchip" in
