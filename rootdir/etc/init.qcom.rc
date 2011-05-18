@@ -169,6 +169,11 @@ on property:ro.baseband="msm"
 on property:ro.baseband="unknown"
     start port-bridge
 
+service qmiproxy /system/bin/qmiproxy
+    user radio
+    group radio
+    disabled
+
 service qmuxd /system/bin/qmuxd
     user radio
     group radio
