@@ -328,7 +328,7 @@ on property:persist.timed.enable=true
     mkdir /data/time/ 0700
     start time_daemon
 
-service ftp /system/bin/sdptool add --channel=20 FTP
+service ftp /system/bin/sdptool add --psm=5257 --channel=20 FTP
     user bluetooth
     group bluetooth net_bt_admin
     disabled
