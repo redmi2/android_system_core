@@ -37,6 +37,10 @@ case "$baseband" in
     start ril-daemon
     start qmuxd
     start netmgrd
+    case "$baseband" in
+        "svlte2a" | "csfb")
+        start qmiproxy
+    esac
     case "$multirild" in
         "true")
          case "$dsds" in
