@@ -35,11 +35,61 @@
 # the Wifi) the script will load/unload the driver
 # This script will get called after post bootup.
 target=`getprop ro.product.device`
+wifishd=`getprop wlan.driver.status`
 case "$target" in
     msm8660*)
     exit 0
     ;;
-esac
+    msm7630*)
+        wlanchip=`cat /persist/wlan_chip_id`
+        echo "The WLAN Chip ID is $wlanchip"
+        case "$wlanchip" in
+            "WCN1314")
+             ln -s /system/lib/modules/volans/WCN1314_rf.ko /system/lib/modules/wlan.ko
+             ;;
+            "WCN1312")
+             ln -s /system/lib/modules/libra/libra.ko /system/lib/modules/wlan.ko
+	      ;;
+           *)
+            echo "********************************************************************"
+	     echo "*** Error:WI-FI chip ID is not specified in /persist/wlan_chip_id **"
+            echo "*******    WI-FI may not work    ***********************************"
+            ;;
+        esac
+        case "$wifishd" in
+            "ok")
+             ;;
+            "loading")
+            ;;
+           *)
+               case "$wlanchip" in
+                   "WCN1314")
+                    ;;
+
+                   "WCN1312")
+                        /system/bin/amploader -i
+                        ;;
+                   *)
+	                ;;
+               esac
+        esac
+    ;;
+    msm7627*)
+        wifishd=`getprop wlan.driver.status`
+        case "$wifishd" in
+            "ok")
+             ;;
+            "loading")
+             ;;
+            *)
+# For the new .38 kernel for 1312, there was an FFA panic
+# when no 1312/1314 chip was present. Hence this is commented out
+# Will need to reenable this code for 1312.
+#
+#                /system/bin/amploader -i
+            ;;
+        esac
+    ;;
 
 wifishd=`getprop wlan.driver.status`
 case "$wifishd" in
