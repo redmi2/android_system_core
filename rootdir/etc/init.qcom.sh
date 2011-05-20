@@ -84,6 +84,7 @@ esac
 case "$baseband" in
         "svlte2a")
         start gpsone_daemon
+        start bridgemgrd
 esac
 
 case "$target" in
