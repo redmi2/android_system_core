@@ -154,6 +154,11 @@ service dund /system/bin/sdptool add --channel=1 DUN
     disabled
     oneshot
 
+service bridgemgrd /system/bin/bridgemgrd
+    user radio
+    group radio
+    disabled
+
 service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
     user system
     group system inet
