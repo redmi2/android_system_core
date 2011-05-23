@@ -36,6 +36,10 @@
 # This script will get called after post bootup.
 target=`getprop ro.product.device`
 case "$target" in
+    msm8960*)
+    insmod /system/lib/modules/wcnsswlan.ko
+    exit 0
+    ;;
     msm8660*)
     exit 0
     ;;
