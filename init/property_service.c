@@ -86,6 +86,7 @@ struct {
     { "hw.fm.",           AID_FM_RADIO,  0 },
     { "crypto.",          AID_MEDIA,     0 },
     { "bluetooth.",       AID_SYSTEM,    0 },
+    { "wifi.",            AID_WIFI,     0 },
     { NULL, 0, 0 }
 };
 
