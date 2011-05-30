@@ -189,6 +189,9 @@ case "$target" in
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
         case "$platformvalue" in
          "Fluid")
+         echo 1 > /data/system/sensors/settings
+         start sensors
+
          setprop ro.sf.lcd_density 240
          start profiler_daemon;;
          esac
