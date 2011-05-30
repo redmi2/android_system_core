@@ -196,6 +196,7 @@ static struct fs_path_config android_files[] = {
 		/* the following file is INTENTIONALLY set-uid, and IS included
 		 * in user builds. */
     { 06750, AID_ROOT,      AID_SHELL,     "system/bin/run-as" },
+    { 04755, AID_ROOT,      AID_SHELL,     "system/bin/btwlancoex" },
     { 00755, AID_ROOT,      AID_SHELL,     "system/bin/*" },
     { 00755, AID_ROOT,      AID_SHELL,     "system/xbin/*" },
     { 00755, AID_ROOT,      AID_SHELL,     "system/vendor/bin/*" },
