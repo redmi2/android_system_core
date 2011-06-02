@@ -43,6 +43,23 @@ case "$target" in
     msm8660*)
     exit 0
     ;;
+    msm7627a*)
+        wlanchip=`cat /persist/wlan_chip_id`
+        echo "The WLAN Chip ID is $wlanchip"
+        case "$wlanchip" in
+            "AR6003")
+             rm  /system/lib/modules/wlan.ko
+             ln -s /system/wifi/ar6000.ko /system/lib/modules/wlan.ko
+             mv /system/bin/wpa_supplicant /system/bin/wpa_supplicant_wcn
+             ln -s /system/others/wpa_supplicant /system/bin/wpa_supplicant
+             ;;
+            *)
+             echo "********************************************************************"
+              echo "*** Error:WI-FI chip ID is not specified in /persist/wlan_chip_id **"
+             echo "*******    WI-FI may not work    ***********************************"
+             ;;
+        esac
+    ;;
     msm7630*)
         wifishd=`getprop wlan.driver.status`
         wlanchip=`cat /persist/wlan_chip_id`
@@ -53,6 +70,8 @@ case "$target" in
              ;;
             "WCN1312")
              ln -s /system/lib/modules/libra/libra.ko /system/lib/modules/wlan.ko
+	      ln -s /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
+             ln -s /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
 	      ;;
            *)
             echo "********************************************************************"
@@ -79,6 +98,8 @@ case "$target" in
         esac
     ;;
     msm7627*)
+        ln -s /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
+        ln -s /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
         wifishd=`getprop wlan.driver.status`
         case "$wifishd" in
             "ok")
