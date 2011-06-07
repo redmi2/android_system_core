@@ -197,6 +197,9 @@ static struct fs_path_config android_files[] = {
 		 * in user builds. */
     { 06750, AID_ROOT,      AID_SHELL,     "system/bin/run-as" },
     { 04755, AID_ROOT,      AID_SHELL,     "system/bin/btwlancoex" },
+    { 04750, AID_ROOT,      AID_SYSTEM,    "system/bin/tc" },
+    { 04750, AID_ROOT,      AID_SYSTEM,    "system/bin/iptables" },
+
     { 00755, AID_ROOT,      AID_SHELL,     "system/bin/*" },
     { 00755, AID_ROOT,      AID_SHELL,     "system/xbin/*" },
     { 00755, AID_ROOT,      AID_SHELL,     "system/vendor/bin/*" },
