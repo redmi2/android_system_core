@@ -32,11 +32,11 @@
 baseband=`getprop ro.baseband`
 multirild=`getprop ro.multi.rild`
 dsds=`getprop persist.dsds.enabled`
+netmgr=`getprop ro.use_data_netmgrd`
 case "$baseband" in
     "msm" | "csfb" | "svlte2a" | "unknown")
     start ril-daemon
     start qmuxd
-    start netmgrd
     case "$baseband" in
         "svlte2a" | "csfb")
         start qmiproxy
@@ -47,6 +47,10 @@ case "$baseband" in
              "true")
              start ril-daemon1
          esac
+    esac
+    case "$netmgr" in
+        "true")
+        start netmgrd
     esac
 esac
 
