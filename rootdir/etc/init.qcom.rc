@@ -143,6 +143,12 @@ service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     disabled
     oneshot
 
+on property:bt.hci_smd.driver.load=1
+    insmod /system/lib/modules/hci_smd.ko
+
+on property:bt.hci_smd.driver.load=0
+    exec /system/bin/rmmod hci_smd.ko
+
 service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
     disabled
     oneshot
