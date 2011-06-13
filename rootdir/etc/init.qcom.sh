@@ -199,9 +199,11 @@ case "$target" in
          "Fluid")
          echo 1 > /data/system/sensors/settings
          start sensors
-
          setprop ro.sf.lcd_density 240
          start profiler_daemon;;
          esac
-
+	;;
+    "msm8960")
+	echo 1 > /data/system/sensors/settings
+	start sensors
 esac
