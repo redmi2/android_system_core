@@ -269,6 +269,10 @@ on property:crypto.driver.load=0
      exec /system/bin/rmmod qcedev.ko
      exec /system/bin/rmmod qce.ko
 
+service drmdiag /system/bin/drmdiagapp
+     user root
+     oneshot
+
 service qcom-sh /system/bin/sh /init.qcom.sh
     user root
     oneshot
