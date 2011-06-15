@@ -53,8 +53,8 @@ on boot
     symlink /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
     setprop wifi.interface wlan0
 
-    # Enable Bluetooth AMP when Bluetooth is turned on
-    setprop ro.config.bt.amp yes
+    # Enable Bluetooth 802.11 PAL when Bluetooth is turned on
+    setprop ro.config.bt.amp no
 
      # Create directories for wiper services
     mkdir /data/wpstiles/ 0777 shell
