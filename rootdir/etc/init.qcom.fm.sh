@@ -31,6 +31,9 @@ setprop hw.fm.init 0
 mode=`getprop hw.fm.mode`
 version=`getprop hw.fm.version`
 
+#find the transport type
+TRANSPORT=`getprop ro.qualcomm.bt.hci_transport`
+
 LOG_TAG="qcom-fm"
 LOG_NAME="${0}:"
 
@@ -52,6 +55,20 @@ failed ()
 
 logi "In FM shell Script"
 logi "mode: $mode"
+logi "Transport : $TRANSPORT"
+
+#if it is smd transport insert the transport module and exit from the script
+case $TRANSPORT in
+    "smd")
+        echo "inserting the radio transport module"
+        insmod /system/lib/modules/radio-iris-transport.ko
+        setprop hw.fm.init 1
+        exit 0
+     ;;
+     *)
+        logi "not a smd transport case, need patch download"
+     ;;
+esac
 
 #$fm_qsoc_patches <fm_chipVersion> <enable/disable WCM>
 #
