@@ -95,6 +95,10 @@ esac
 
 case "$target" in
     "msm8960")
+     echo 1 > /sys/module/rpm_resources/enable_low_power/L2_cache
+     echo 1 > /sys/module/rpm_resources/enable_low_power/pxo
+     echo 1 > /sys/module/pm_8x60/modes/cpu0/power_collapse/suspend_enabled
+     echo 1 > /sys/module/pm_8x60/modes/cpu1/power_collapse/suspend_enabled
      echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
      echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
      echo 50000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
