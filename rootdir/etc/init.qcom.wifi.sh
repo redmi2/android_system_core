@@ -37,9 +37,43 @@
 target=`getprop ro.product.device`
 case "$target" in
     msm8960*)
-    insmod /system/lib/modules/wcnsswlan.ko
-    exit 0
-    ;;
+        # We need to make sure the WCNSS platform driver is running.
+        # The WCNSS platform driver can either be built as a loadable
+        # module or it can be built-in to the kernel.  If it is built
+        # as a loadable module it can have one of several names.  So
+        # look to see if an appropriately named kernel module is
+        # present
+        wcnssmod=`ls /system/lib/modules/wcnss*.ko`
+        case "$wcnssmod" in
+            *wcnss*)
+                # A kernel module is present, so load it
+                insmod $wcnssmod
+                ;;
+            *)
+                # A kernel module is not present so we assume the
+                # driver is built-in to the kernel.  If that is the
+                # case then the driver will export a file which we
+                # must touch so that the driver knows that userspace
+                # is ready to handle firmware download requests.  See
+                # if an appropriately named device file is present
+                wcnssnode=`ls /dev/wcnss*`
+                case "$wcnssnode" in
+                    *wcnss*)
+                        # There is a device file.  Write to the file
+                        # so that the driver knows userspace is
+                        # available for firmware download requests
+                        echo 1 > $wcnssnode
+                        ;;
+                    *)
+                        # There is not a kernel module present and
+                        # there is not a device file present, so
+                        # the driver must not be available
+                        echo "No WCNSS module or device node detected"
+                        ;;
+                esac
+                ;;
+        esac
+        ;;
     msm8660*)
     exit 0
     ;;
