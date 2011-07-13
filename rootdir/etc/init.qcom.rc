@@ -367,13 +367,7 @@ service ftp /system/bin/sdptool add --psm=5257 --channel=20 FTP
     disabled
     oneshot
 
-service mapZero /system/bin/sdptool add --channel=16 MASZERO
-    user bluetooth
-    group bluetooth net_bt_admin
-    disabled
-    oneshot
-
-service mapOne /system/bin/sdptool add --channel=17 MASONE
+service map /system/bin/sdptool add --channel=16 MAS
     user bluetooth
     group bluetooth net_bt_admin
     disabled
