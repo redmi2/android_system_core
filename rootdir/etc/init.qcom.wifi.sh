@@ -80,6 +80,7 @@ case "$target" in
         esac
     ;;
     msm7627*)
+        wifishd=`getprop wlan.driver.status`
         case "$wifishd" in
             "ok")
              ;;
