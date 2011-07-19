@@ -30,6 +30,7 @@ setprop hw.fm.init 0
 
 mode=`getprop hw.fm.mode`
 version=`getprop hw.fm.version`
+isAnalog=`getprop hw.fm.isAnalog`
 
 #find the transport type
 TRANSPORT=`getprop ro.qualcomm.bt.hci_transport`
@@ -55,6 +56,7 @@ failed ()
 
 logi "In FM shell Script"
 logi "mode: $mode"
+logi "isAnalog: $isAnalog"
 logi "Transport : $TRANSPORT"
 
 #if it is smd transport insert the transport module and exit from the script
@@ -81,6 +83,9 @@ case $mode in
      ;;
   "wa_disable")
    /system/bin/fm_qsoc_patches $version 2
+     ;;
+  "config_dac")
+   /system/bin/fm_qsoc_patches $version 3 $isAnalog
      ;;
    *)
     logi "Shell: Default case"
