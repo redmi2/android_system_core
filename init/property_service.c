@@ -278,6 +278,7 @@ static void write_persistent_property(const char *name, const char *value)
         return;
     }
     write(fd, value, strlen(value));
+    fsync(fd);
     close(fd);
 
     if (rename(tempPath, path)) {
