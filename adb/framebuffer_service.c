@@ -71,14 +71,28 @@ void framebuffer_service(int fd, void *cookie)
     fbinfo.size = vinfo.xres * vinfo.yres * bytespp;
     fbinfo.width = vinfo.xres;
     fbinfo.height = vinfo.yres;
-    fbinfo.red_offset = vinfo.red.offset;
-    fbinfo.red_length = vinfo.red.length;
-    fbinfo.green_offset = vinfo.green.offset;
-    fbinfo.green_length = vinfo.green.length;
-    fbinfo.blue_offset = vinfo.blue.offset;
-    fbinfo.blue_length = vinfo.blue.length;
-    fbinfo.alpha_offset = vinfo.transp.offset;
-    fbinfo.alpha_length = vinfo.transp.length;
+    //DDMS expects 32 bpp buffers to be little endian, but our 32bpp buffers might not be.
+    //Check for that, and if not, reverse RGBA to ABGR
+    if (vinfo.red.msb_right == 0 && vinfo.bits_per_pixel == 32){
+        fbinfo.red_offset = vinfo.transp.offset;
+        fbinfo.red_length = vinfo.transp.length;
+        fbinfo.green_offset = vinfo.blue.offset;
+        fbinfo.green_length = vinfo.blue.length;
+        fbinfo.blue_offset = vinfo.green.offset;
+        fbinfo.blue_length = vinfo.green.length;
+        fbinfo.alpha_offset = vinfo.red.offset;
+        fbinfo.alpha_length = vinfo.red.length;
+    }
+    else{
+        fbinfo.red_offset = vinfo.red.offset;
+        fbinfo.red_length = vinfo.red.length;
+        fbinfo.green_offset = vinfo.green.offset;
+        fbinfo.green_length = vinfo.green.length;
+        fbinfo.blue_offset = vinfo.blue.offset;
+        fbinfo.blue_length = vinfo.blue.length;
+        fbinfo.alpha_offset = vinfo.transp.offset;
+        fbinfo.alpha_length = vinfo.transp.length;
+    }
 
     /* HACK: for several of our 3d cores a specific alignment
      * is required so the start of the fb may not be an integer number of lines
