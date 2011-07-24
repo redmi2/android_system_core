@@ -72,7 +72,7 @@ struct {
     { "sys.",             AID_SYSTEM,   0 },
     { "service.",         AID_SYSTEM,   0 },
     { "wlan.",            AID_SYSTEM,   0 },
-    { "bt.",              AID_SYSTEM,   0 },
+    { "bt.",              AID_BLUETOOTH, 0 },
     { "dhcp.",            AID_SYSTEM,   0 },
     { "dhcp.",            AID_DHCP,     0 },
     { "vpn.",             AID_SYSTEM,   0 },

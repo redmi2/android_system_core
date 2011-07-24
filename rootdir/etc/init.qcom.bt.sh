@@ -87,6 +87,10 @@ BOARD=`getprop ro.product.device`
 
 POWER_CLASS=`getprop qcom.bt.dev_power_class`
 
+#find the transport type
+TRANSPORT=`getprop ro.qualcomm.bt.hci_transport`
+logi "Transport : $TRANSPORT"
+
 case $POWER_CLASS in
   1) PWR_CLASS="-p 0" ;
      logi "Power Class: 1";;
@@ -109,10 +113,18 @@ esac
 # init does SIGTERM on ctl.stop for service
 trap "kill_hciattach" TERM INT
 
-start_hciattach
+case $TRANSPORT in
+    "smd")
+        logi "Seting property to insert the hci smd transport module"
+        setprop bt.hci_smd.driver.load 1
+     ;;
+     *)
+        logi "start hciattach"
+        start_hciattach
 
-wait $hciattach_pid
-
-logi "Bluetooth stopped"
+        wait $hciattach_pid
+        logi "Bluetooth stopped"
+     ;;
+esac
 
 exit 0
