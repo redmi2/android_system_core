@@ -144,12 +144,12 @@ do_mount(char *dev, char *dir, char *type, unsigned long rwflag, void *data, int
         
         // FIXME - only one loop mount supported at a time
         file_fd = open(dev, flags);
-        if (file_fd < -1) {
+        if (file_fd < 0) {
             perror("open backing file failed");
             return 1;
         }
         device_fd = open(LOOP_DEVICE, flags);
-        if (device_fd < -1) {
+        if (device_fd < 0) {
             perror("open loop device failed");
             close(file_fd);
             return 1;
