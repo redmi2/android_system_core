@@ -98,10 +98,6 @@ on boot
     # Change owner and group for media server and surface flinger
     chown media system /sys/devices/virtual/graphics/fb1/format_3d
 
-    #increase dirty_writeback_interval
-    write /proc/sys/vm/dirty_writeback_centisecs 60000
-    write /proc/sys/vm/dirty_expire_centisecs 60000
-
     #For netmgr daemon to inform the USB driver of the correct transport
     chown radio radio /sys/class/usb_composite/rmnet_smd_sdio/transport
 
