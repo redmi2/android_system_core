@@ -58,7 +58,7 @@ int umount_main(int argc, char *argv[])
     if (loop) {
         // free the loop device
         loop_fd = open(LOOP_DEVICE, O_RDONLY);
-        if (loop_fd < -1) {
+        if (loop_fd < 0) {
             perror("open loop device failed");
             return 1;
         }
