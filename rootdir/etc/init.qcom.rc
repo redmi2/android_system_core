@@ -51,6 +51,10 @@ on boot
     chown dhcp dhcp /data/misc/dhcp
     setprop wifi.interface wlan0
 
+    # Create the symlink to qcn wpa_supplicant folder for ar6000 wpa_supplicant
+    mkdir /data/system 0775 system system
+    symlink /data/misc/wifi/wpa_supplicant /data/system/wpa_supplicant
+
     # Enable Bluetooth 802.11 PAL when Bluetooth is turned on
     setprop ro.config.bt.amp no
 
