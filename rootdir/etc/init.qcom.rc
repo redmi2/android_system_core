@@ -140,6 +140,9 @@ on property:init.svc.bluetoothd=stopped
     start amp_unload
     stop btwlancoex
 
+on property:persist.cne.UseCne=none
+    stop cnd
+
 service cnd /system/bin/cnd
     socket cnd stream 660 root radio
 
