@@ -462,8 +462,7 @@ static void import_kernel_cmdline(int in_qemu)
         ptr = x;
     }
 
-        /* don't expose the raw commandline to nonpriv processes */
-    chmod("/proc/cmdline", 0440);
+    chmod("/proc/cmdline", 0444);
 }
 
 static struct command *get_first_command(struct action *act)
