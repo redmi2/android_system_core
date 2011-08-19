@@ -157,8 +157,13 @@ esac
 
 # Post-setup services
 case "$target" in
-    "msm8660_surf" | "msm8660_csfb")
+    "msm8660_surf" | "msm8660_csfb" | "msm8960")
         start mpdecision
+	;;
+esac
+
+case "$target" in
+    "msm8660_surf" | "msm8660_csfb")
         start thermald
     ;;
 esac
