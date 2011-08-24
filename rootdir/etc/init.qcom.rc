@@ -56,7 +56,7 @@ on boot
     symlink /data/misc/wifi/wpa_supplicant /data/system/wpa_supplicant
 
     # Enable Bluetooth 802.11 PAL when Bluetooth is turned on
-    setprop ro.config.bt.amp no
+    setprop ro.config.bt.amp yes
 
      # Create directories for wiper services
     mkdir /data/wpstiles/ 0777 shell
