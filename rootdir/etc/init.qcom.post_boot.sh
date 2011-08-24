@@ -37,6 +37,12 @@ case "$target" in
 esac
 
 case "$target" in
+    "msm7627a")
+        echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
+        ;;
+esac
+
+case "$target" in
     "msm7201a_ffa" | "msm7201a_surf")
         echo 500000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
         ;;
