@@ -153,3 +153,7 @@
 /sys/devices/virtual/smdpkt/smdcntl*       open_timeout   0664 radio radio
 #permissions for sensors
 /dev/msm_dsps             0660  system       system
+/sys/module/pm_8x60/parameters/modem_port_timeout      0664  root  system
+/sys/module/pm_8x60/parameters/modem_port_status      0664  root  system
+/sys/module/pm2/parameters/modem_port_timeout      0664  root  system
+/sys/module/pm2/parameters/modem_port_status      0664  root  system
