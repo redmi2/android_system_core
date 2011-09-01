@@ -18,6 +18,9 @@ on boot
 
     setprop ro.setupwizard.mode EMULATOR
 
+# start the daemons that were disabled in init.rc
+    start ril-daemon
+
 # enable Google-specific location features,
 # like NetworkLocationProvider and LocationCollector
     setprop ro.com.google.locationfeatures 1
