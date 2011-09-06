@@ -32,7 +32,12 @@
 #    include <netdb.h>
 #  endif
 #else
-#  include <sys/reboot.h>
+#  include <linux/reboot.h>
+#endif
+
+#if LINUX_ENABLED
+#include <termios.h>
+#include <sys/ioctl.h>
 #endif
 
 typedef struct stinfo stinfo;
@@ -193,6 +198,10 @@ void reboot_service(int fd, void *arg)
         waitpid(pid, &ret, 0);
     }
 
+#if LINUX_ENABLED
+#define __reboot reboot
+#endif
+
     ret = __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
                     LINUX_REBOOT_CMD_RESTART2, (char *)arg);
     if (ret < 0) {
@@ -268,15 +277,41 @@ static int create_service_thread(void (*func)(int, void *), void *cookie)
     return s[0];
 }
 
+#if LINUX_ENABLED
+static int  adb_unlockpt( int  fd )
+{
+    int  unlock = 0;
+
+    return ioctl( fd, TIOCSPTLCK, &unlock );
+}
+
+static char* adb_ptsname( int fd )
+{
+    unsigned int  pty_num;
+    static char   buff[64];
+
+    if ( ioctl( fd, TIOCGPTN, &pty_num ) != 0 )
+        return NULL;
+
+    snprintf( buff, sizeof(buff), "/dev/pts/%u", pty_num );
+    return buff;
+}
+#else
+#define adb_unlockpt(x) unlockpt(x)
+#define adb_ptsname(x) ptsname(x)
+#endif
+
 static int create_subprocess(const char *cmd, const char *arg0, const char *arg1)
 {
 #ifdef HAVE_WIN32_PROC
 	fprintf(stderr, "error: create_subprocess not implemented on Win32 (%s %s %s)\n", cmd, arg0, arg1);
 	return -1;
 #else /* !HAVE_WIN32_PROC */
-    char *devname;
+    char *devname = NULL;
     int ptm;
     pid_t pid;
+    int res1 = 0;
+    int res2 = 0;
 
     ptm = unix_open("/dev/ptmx", O_RDWR); // | O_NOCTTY);
     if(ptm < 0){
@@ -285,9 +320,10 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
     }
     fcntl(ptm, F_SETFD, FD_CLOEXEC);
 
-    if(grantpt(ptm) || unlockpt(ptm) ||
-       ((devname = (char*) ptsname(ptm)) == 0)){
-        printf("[ trouble with /dev/ptmx - %s ]\n", strerror(errno));
+    //if((res1 = grantpt(ptm)) || (res2 = unlockpt(ptm)) ||
+    if((res2 = adb_unlockpt(ptm)) ||
+       ((devname = (char*) adb_ptsname(ptm)) == 0)){
+        printf("[ trouble with /dev/ptmx - %s res1=%d, res2=%d, devname=%p]\n", strerror(errno), res1, res2, devname);
         return -1;
     }
 
@@ -322,7 +358,11 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
 #if !ADB_HOST
         // set child's OOM adjustment to zero
         char text[64];
+#if LINUX_ENABLED
+        snprintf(text, sizeof text, "/proc/%d/oom_score_adj", pid);
+#else
         snprintf(text, sizeof text, "/proc/%d/oom_adj", pid);
+#endif
         int fd = adb_open(text, O_WRONLY);
         if (fd >= 0) {
             adb_write(fd, "0", 1);
@@ -339,7 +379,7 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
 #if ADB_HOST
 #define SHELL_COMMAND "/bin/sh"
 #else
-#define SHELL_COMMAND "/system/bin/sh"
+#define SHELL_COMMAND "/bin/sh"
 #endif
 
 int service_to_fd(const char *name)
