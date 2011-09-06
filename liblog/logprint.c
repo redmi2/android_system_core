@@ -101,7 +101,7 @@ static android_LogPriority filterCharToPri (char c)
     return pri;
 }
 
-static char filterPriToChar (android_LogPriority pri)
+char filterPriToChar (android_LogPriority pri)
 {
     switch (pri) {
         case ANDROID_LOG_VERBOSE:       return 'V';

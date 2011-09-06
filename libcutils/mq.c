@@ -52,6 +52,26 @@ typedef struct {
     gid_t gid;
 } Credentials;
 
+#if LINUX_ENABLED
+
+#include <linux/types.h>
+
+enum {
+    PTHREAD_MUTEX_NORMAL = 0,
+    PTHREAD_MUTEX_RECURSIVE = 1,
+    PTHREAD_MUTEX_ERRORCHECK = 2,
+    PTHREAD_MUTEX_DEFAULT = PTHREAD_MUTEX_NORMAL
+};
+
+struct ucred
+{
+  pid_t pid;                    /* PID of sending process.  */
+  uid_t uid;                    /* UID of sending process.  */
+  gid_t gid;                    /* GID of sending process.  */
+};
+
+#endif	/* LINUX_ENABLED */
+
 /** Listens for bytes coming from remote peers. */
 typedef void BytesListener(Credentials credentials, char* bytes, size_t size);
 

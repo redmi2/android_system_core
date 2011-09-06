@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +32,28 @@
 #include "usb_vendors.h"
 
 #define  DBG   D
+
+#define ADB_SUBCLASS           0x42
+#define ADB_PROTOCOL           0x1
+
+typedef struct {
+    int vid;
+    int pid;
+} VendorProduct;
+
+int vendorIds[] = {
+    VENDOR_ID_GOOGLE,
+    VENDOR_ID_HTC,
+
+#define kSupportedDeviceCount   5
+VendorProduct kSupportedDevices[kSupportedDeviceCount] = {
+    { VENDOR_ID_GOOGLE, PRODUCT_ID_SOONER },
+    { VENDOR_ID_GOOGLE, PRODUCT_ID_SOONER_COMP },
+    { VENDOR_ID_HTC, PRODUCT_ID_DREAM },
+    { VENDOR_ID_HTC, PRODUCT_ID_DREAM_COMP },
+    { VENDOR_ID_QUALCOMM, PRODUCT_ID_QUALCOMM },
+};
+#define NUM_VENDORS             (sizeof(vendorIds)/sizeof(vendorIds[0]))
 
 static IONotificationPortRef    notificationPort = 0;
 static io_iterator_t*           notificationIterators;

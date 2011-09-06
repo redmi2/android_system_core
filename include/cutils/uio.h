@@ -30,6 +30,7 @@ extern "C" {
 
 #include <stddef.h>
 
+#if !LINUX_ENABLED
 struct iovec {
     const void*  iov_base;
     size_t       iov_len;
@@ -37,6 +38,7 @@ struct iovec {
 
 extern int  readv( int  fd, struct iovec*  vecs, int  count );
 extern int  writev( int  fd, const struct iovec*  vecs, int  count );
+#endif	/* !LINUX_ENABLED */
 
 #ifdef __cplusplus
 }

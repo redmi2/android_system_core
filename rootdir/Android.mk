@@ -4,6 +4,7 @@ include $(CLEAR_VARS)
 # files that live under /system/etc/...
 
 copy_from := \
+	etc/vold.conf \
 	etc/dbus.conf \
 	etc/hosts \
 	etc/init.qcom.post_boot.sh \

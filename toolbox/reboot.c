@@ -46,7 +46,8 @@ int reboot_main(int argc, char *argv[])
     else if(argc > optind)
         ret = __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART2, argv[optind]);
     else
-        ret = reboot(RB_AUTOBOOT);
+        ret = __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, LINUX_REBOOT_CMD_RESTART, NULL);
+
     if(ret < 0) {
         perror("reboot");
         exit(EXIT_FAILURE);

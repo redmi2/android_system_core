@@ -1,4 +1,19 @@
 // Copyright 2006 The Android Open Source Project
+/* Copyright (c) 2009, Code Aurora Forum.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <cutils/logger.h>
 #include <cutils/logd.h>
@@ -21,6 +36,12 @@
 #include <arpa/inet.h>
 #ifdef USE_DIAG
 #include <diag_os.h>
+#endif
+
+#ifdef USE_DIAG
+#include <msgcfg.h>
+#include <msg.h>
+#include <diag_lsm.h>
 #endif
 
 #define DEFAULT_LOG_ROTATE_SIZE_KBYTES 16
@@ -495,6 +516,13 @@ int main(int argc, char **argv)
         bInit_Success = Diag_LSM_Init(NULL);
 #endif
 
+#ifdef USE_DIAG
+    /* Initialise Diag */
+    boolean bInit_Success = FALSE;
+
+    bInit_Success = Diag_LSM_Init(NULL);//, FALSE);
+#endif
+     
     g_logformat = android_log_format_new();
 
     if (argc == 2 && 0 == strcmp(argv[1], "--test")) {
@@ -818,6 +846,11 @@ int main(int argc, char **argv)
     /* De-intialize Diag, but only if we initialised it */
     if (bInit_Success)
         Diag_LSM_DeInit();
+#endif
+
+#ifdef USE_DIAG
+    /* De-intialize Diag */
+    Diag_LSM_DeInit(); 
 #endif
 
     return 0;

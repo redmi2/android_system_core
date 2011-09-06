@@ -244,6 +244,7 @@ on boot
     setprop ro.HIDDEN_APP_MEM 7168
     setprop ro.EMPTY_APP_MEM 8192
 
+    setprop ro.com.google.location_feature 1
 # Write value must be consistent with the above properties.
 # Note that the driver only supports 6 slots, so we have combined some of
 # the classes into the same memory level; the associated processes of higher
@@ -299,6 +300,14 @@ on boot
     chown system system /sys/kernel/ipv4/tcp_rmem_def
     chown system system /sys/kernel/ipv4/tcp_rmem_max
     chown root radio /proc/cmdline
+    chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
+    chown bluetooth bluetooth /proc/bluetooth/sleep/proto
+    chown system system /sys/module/sco/parameters/disable_esco
+    chmod 0660 /sys/module/bluetooth_power/parameters/power
+    chmod 0660 /proc/bluetooth/sleep/proto
+    chown bluetooth bluetooth /dev/ttyHS0
+    chmod 0660 /dev/ttyHS0
+    chmod 0666 /dev/msm_snd
 
 # Define TCP buffer sizes for various networks
 #   ReadMin, ReadInitial, ReadMax, WriteMin, WriteInitial, WriteMax,
@@ -348,6 +357,8 @@ on property:persist.service.adb.enable=1
 on property:persist.service.adb.enable=0
     stop adbd
 
+#ln -s /dev/oncrpc/30000002:00010000 /dev/oncrpc/30000002:00010001
+
 service servicemanager /system/bin/servicemanager
     user system
     critical
@@ -369,6 +380,7 @@ service ril-daemon /system/bin/rild
     user root
     group radio cache inet misc audio sdcard_rw qcom_oncrpc diag
     disabled
+
 
 service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
     socket zygote stream 666
@@ -454,3 +466,5 @@ service dumpstate /system/bin/dumpstate -s
     socket dumpstate stream 0660 shell log
     disabled
     oneshot
+
+busybox --install 

@@ -177,6 +177,7 @@ service sapd /system/bin/sdptool add --channel=15 SAP
     group bluetooth net_bt_admin
     disabled
     oneshot
+
 service dund /system/bin/sdptool add --channel=1 DUN
     user bluetooth
     group bluetooth net_bt_admin

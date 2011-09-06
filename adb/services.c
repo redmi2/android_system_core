@@ -292,6 +292,9 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
     }
 
     pid = fork();
+#if LINUX_ENABLED
+    pid_service = pid;
+#endif
     if(pid < 0) {
         printf("- fork failed: %s -\n", strerror(errno));
         return -1;

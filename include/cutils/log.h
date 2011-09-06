@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2005 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +85,46 @@ extern "C" {
 #define LOG_TAG NULL
 #endif
 
+/* basic log macros for each level
+ */
+
+#ifndef LOGLOG_VERBOSE
+#if LOG_NDEBUG
+#define LOGLOG_VERBOSE(tag, ...) ((void)0)
+#else
+#define LOGLOG_VERBOSE(tag, ...) \
+    (void)android_printLog(ANDROID_LOG_VERBOSE, tag, __VA_ARGS__)
+#endif
+#endif
+
+#ifndef LOGLOG_DEBUG
+#if LOG_NDDEBUG
+#define LOGLOG_DEBUG(tag, ...) ((void)0)
+#else
+#define LOGLOG_DEBUG(tag, ...) \
+    (void)android_printLog(ANDROID_LOG_DEBUG, tag, __VA_ARGS__)
+#endif
+#endif
+
+#ifndef LOGLOG_INFO
+#if LOG_NIDEBUG
+#define LOGLOG_INFO(tag, ...) ((void)0)
+#else
+#define LOGLOG_INFO(tag, ...) \
+    (void)android_printLog(ANDROID_LOG_INFO, tag, __VA_ARGS__)
+#endif
+#endif
+
+#ifndef LOGLOG_WARN
+#define LOGLOG_WARN(tag, ...) \
+    (void)android_printLog(ANDROID_LOG_WARN, tag, __VA_ARGS__)
+#endif
+
+#ifndef LOGLOG_ERROR
+#define LOGLOG_ERROR(tag, ...) \
+    (void)android_printLog(ANDROID_LOG_ERROR, tag, __VA_ARGS__)
+#endif
+
 // ---------------------------------------------------------------------
 
 /*
@@ -118,10 +159,14 @@ extern "C" {
 #endif
 
 #ifndef LOGD_IF
+#if LOG_NDDEBUG
+#define LOGD_IF(cond, ...) ((void)0)
+#else
 #define LOGD_IF(cond, ...) \
     ( (CONDITION(cond)) \
     ? LOG(LOG_DEBUG, LOG_TAG, __VA_ARGS__) \
     : (void)0 )
+#endif
 #endif
 
 /*
@@ -132,10 +177,14 @@ extern "C" {
 #endif
 
 #ifndef LOGI_IF
+#if LOG_NIDEBUG
+#define LOGI_IF(cond, ...) ((void)0)
+#else
 #define LOGI_IF(cond, ...) \
     ( (CONDITION(cond)) \
     ? LOG(LOG_INFO, LOG_TAG, __VA_ARGS__) \
     : (void)0 )
+#endif
 #endif
 
 /*
@@ -348,7 +397,7 @@ extern "C" {
  */
 #ifndef LOG
 #define LOG(priority, tag, ...) \
-    LOG_PRI(ANDROID_##priority, tag, __VA_ARGS__)
+    LOG##priority(tag, __VA_ARGS__)
 #endif
 
 /*

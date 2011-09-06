@@ -56,6 +56,7 @@ static void *contiguous_mspace_morecore(mstate0 m, ssize_t nb);
 
 #define MSPACES 1
 #define ONLY_MSPACES 1
+#if !LINUX_ENABLED
 #include "../../../bionic/libc/bionic/dlmalloc.c"
 
 #ifndef PAGESIZE
@@ -283,4 +284,5 @@ void *contiguous_mspace_sbrk0(mspace msp) {
     assert(cs->m == ms);
     return cs->brk;
 }
+#endif	/* !LINUX_ENABLED */
 #endif

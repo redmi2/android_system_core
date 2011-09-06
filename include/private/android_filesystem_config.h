@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * Copyright (c) 2009, Code Aurora Forum. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,6 +168,7 @@ static struct fs_path_config android_files[] = {
     { 00550, AID_ROOT,      AID_SHELL,     "system/etc/init.goldfish.sh" },
     { 00777, AID_SYSTEM,      AID_SYSTEM,      "system/etc/init.qcom.sdio.sh" },
     { 00440, AID_ROOT,      AID_SHELL,     "system/etc/init.trout.rc" },
+    { 00440, AID_ROOT,      AID_SHELL,     "system/etc/init.qcom.rc" },
     { 00550, AID_ROOT,      AID_SHELL,     "system/etc/init.ril" },
     { 00550, AID_ROOT,      AID_SHELL,     "system/etc/init.testmenu" },
     { 00550, AID_DHCP,      AID_SHELL,     "system/etc/dhcpcd/dhcpcd-run-hooks" },

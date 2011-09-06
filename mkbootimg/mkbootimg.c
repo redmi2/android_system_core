@@ -1,6 +1,7 @@
 /* tools/mkbootimg/mkbootimg.c
 **
 ** Copyright 2007, The Android Open Source Project
+** Copyright (c) 2009, Code Aurora Forum. All rights reserved.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -92,6 +93,24 @@ int write_padding(int fd, unsigned pagesize, unsigned itemsize)
     }
 }
 
+int write_page_padding (int fd, unsigned pagesize, unsigned itemsize)
+{
+    int pagecount = itemsize/pagesize;
+    if (itemsize % pagesize)
+    {
+        pagecount++;
+    }
+    if ((pagecount%2) == 0){
+        return 0;
+    }
+
+    if(write(fd, padding, pagesize) != pagesize) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
 int main(int argc, char **argv)
 {
     boot_img_hdr hdr;
@@ -106,6 +125,7 @@ int main(int argc, char **argv)
     char *bootimg = 0;
     char *board = "";
     unsigned pagesize = 2048;
+    unsigned saddr = 0;
     int fd;
     SHA_CTX ctx;
     uint8_t* sha;
@@ -182,6 +202,52 @@ int main(int argc, char **argv)
 
     strcpy(hdr.name, board);
 
+#if defined(SURF8K)
+    /* QSD 8K */
+    hdr.kernel_addr =  0x24008000;
+    hdr.ramdisk_addr = 0x28000000;
+    if(saddr) {
+        hdr.second_addr =  0x00300000;
+    } else {
+        hdr.second_addr =  0x24F00000;
+    }
+    hdr.tags_addr   =  0x24000100;
+    hdr.page_size = pagesize;
+#elif defined(SURF7X2X)
+    /* MSM 7x25 and 7x27 */
+    hdr.kernel_addr =  0x00208000;
+    hdr.ramdisk_addr = 0x01200000;
+    if(saddr) {
+        hdr.second_addr =  0x00300000;
+    } else {
+        hdr.second_addr =  0x01100000;
+    }
+    hdr.tags_addr   =  0x00200100;
+    hdr.page_size = pagesize;
+#elif defined(SURF7X30)
+    /* MSM 7x30 */
+    hdr.kernel_addr =  0x00208000;
+    hdr.ramdisk_addr = 0x01200000;
+    if(saddr) {
+        hdr.second_addr =  0x00300000;
+    } else {
+        hdr.second_addr =  0x00F00000;
+    }
+    hdr.tags_addr   =  0x00200100;
+    hdr.page_size = pagesize;
+#else
+    /* MSM 7x00 and 7x01 */
+    hdr.kernel_addr =  0x10008000;
+    hdr.ramdisk_addr = 0x11000000;
+    if(saddr) {
+        hdr.second_addr =  0x00300000;
+    } else {
+        hdr.second_addr =  0x10F00000;
+    }
+    hdr.tags_addr   =  0x10000100;
+    hdr.page_size = pagesize;
+#endif
+
     memcpy(hdr.magic, BOOT_MAGIC, BOOT_MAGIC_SIZE);
 
     if(strlen(cmdline) > (BOOT_ARGS_SIZE - 1)) {
@@ -237,16 +303,20 @@ int main(int argc, char **argv)
 
     if(write(fd, &hdr, sizeof(hdr)) != sizeof(hdr)) goto fail;
     if(write_padding(fd, pagesize, sizeof(hdr))) goto fail;
+    if(write_page_padding(fd, pagesize, sizeof(hdr))) goto fail;
 
     if(write(fd, kernel_data, hdr.kernel_size) != hdr.kernel_size) goto fail;
     if(write_padding(fd, pagesize, hdr.kernel_size)) goto fail;
+    if(write_page_padding(fd, pagesize, hdr.kernel_size)) goto fail;
 
     if(write(fd, ramdisk_data, hdr.ramdisk_size) != hdr.ramdisk_size) goto fail;
     if(write_padding(fd, pagesize, hdr.ramdisk_size)) goto fail;
+    if(write_page_padding(fd, pagesize,  hdr.ramdisk_size)) goto fail;
 
     if(second_data) {
         if(write(fd, second_data, hdr.second_size) != hdr.second_size) goto fail;
         if(write_padding(fd, pagesize, hdr.ramdisk_size)) goto fail;
+        if(write_page_padding(fd, pagesize,  hdr.ramdisk_size)) goto fail;
     }
 
     return 0;
