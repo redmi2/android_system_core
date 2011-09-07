@@ -83,6 +83,32 @@ case "$usbchgdisabled" in
 esac
 
 #
+# Allow USB enumeration with default PID/VID
+#
+case $target in
+    "msm8960")
+        echo 0       > /sys/class/android_usb/android0/enable
+        echo 0x9025  > /sys/class/android_usb/android0/idProduct
+        echo 0x05C6  > /sys/class/android_usb/android0/idVendor
+        echo diag    > /sys/class/android_usb/android0/f_diag/clients
+        echo smd,tty > /sys/class/android_usb/android0/f_serial/transports
+        echo 1       > /sys/class/android_usb/android0/f_rmnet/instances
+        echo diag,adb,serial,rmnet,mass_storage    > /sys/class/android_usb/android0/functions
+        echo 1       > /sys/class/android_usb/android0/enable
+    ;;
+    * )
+        echo 0       > /sys/class/android_usb/android0/enable
+        echo 0x9025  > /sys/class/android_usb/android0/idProduct
+        echo 0x05C6  > /sys/class/android_usb/android0/idVendor
+        echo diag    > /sys/class/android_usb/android0/f_diag/clients
+        echo tty,tty > /sys/class/android_usb/android0/f_serial/transports
+        echo diag,adb,serial,rmnet_smd,mass_storage    > /sys/class/android_usb/android0/functions
+        echo 1       > /sys/class/android_usb/android0/enable
+    ;;
+esac
+
+
+#
 # Start gpsone_daemon for SVLTE Type I & II devices
 #
 case "$target" in
