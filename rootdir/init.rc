@@ -315,6 +315,7 @@ on property:persist.service.adb.enable=1
 
 on property:persist.service.adb.enable=0
     stop adbd
+    write /sys/module/g_android/parameters/product_id 9017
 
 service servicemanager /system/bin/servicemanager
     user system
