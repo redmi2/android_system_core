@@ -201,6 +201,8 @@ case "$target" in
                 start sensors
                 setprop ro.sf.lcd_density 240
                 start profiler_daemon;;
+            "Dragon")
+                setprop ro.sound.alsa "WM8903";;
         esac
         chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
         chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
