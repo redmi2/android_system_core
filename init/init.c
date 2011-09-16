@@ -540,11 +540,17 @@ static int keychord_init_action(int nargs, char **args)
 static int console_init_action(int nargs, char **args)
 {
     int fd;
+    int ret;
     char tmp[PROP_VALUE_MAX];
 
     if (console[0]) {
         snprintf(tmp, sizeof(tmp), "/dev/%s", console);
         console_name = strdup(tmp);
+    }
+    ret = wait_for_file(console_name, COMMAND_RETRY_TIMEOUT);
+    if (ret) {
+        ERROR("Timed out waiting for %s\n", console_name);
+        return ret;
     }
 
     fd = open(console_name, O_RDWR);
