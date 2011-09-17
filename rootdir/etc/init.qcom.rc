@@ -71,9 +71,6 @@ on boot
     chmod 4755 /system/bin/usbhub
     chmod 755 /system/bin/usbhub_init
 
-    #Set SUID bit for diag_mdlog
-    chmod 4755 /system/bin/diag_mdlog
-
     #Set SUID bit for btwlancoex
     chmod 4755 /system/bin/btwlancoex
 
