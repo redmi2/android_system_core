@@ -51,6 +51,15 @@ case "$baseband" in
 esac
 
 #
+# Suppress default route installation during RA for IPV6; user space will take
+# care of this
+#
+for file in /proc/sys/net/ipv6/conf/*
+do
+  echo 0 > $file/accept_ra_defrtr
+done
+
+#
 # Allow unique persistent serial numbers for devices connected via usb
 # User needs to set unique usb serial number to persist.usb.serialno
 #
