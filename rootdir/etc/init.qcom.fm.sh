@@ -59,24 +59,22 @@ logi "mode: $mode"
 logi "isAnalog: $isAnalog"
 logi "Transport : $TRANSPORT"
 
-#if it is smd transport insert the transport module and exit from the script
-case $TRANSPORT in
+#$fm_qsoc_patches <fm_chipVersion> <enable/disable WCM>
+#
+case $mode in
+  "normal")
+    case $TRANSPORT in
     "smd")
-        echo "inserting the radio transport module"
+        logi "inserting the radio transport module"
         insmod /system/lib/modules/radio-iris-transport.ko
         setprop hw.fm.init 1
         exit 0
      ;;
      *)
-        logi "not a smd transport case, need patch download"
+        logi "not a smd transport case, doing patch download"
+        /system/bin/fm_qsoc_patches $version 0
      ;;
-esac
-
-#$fm_qsoc_patches <fm_chipVersion> <enable/disable WCM>
-#
-case $mode in
-  "normal")
-     /system/bin/fm_qsoc_patches $version 0
+    esac
      ;;
   "wa_enable")
    /system/bin/fm_qsoc_patches $version 1
