@@ -106,13 +106,35 @@ case $target in
         echo 1       > /sys/class/android_usb/android0/enable
     ;;
     * )
-        echo 0       > /sys/class/android_usb/android0/enable
-        echo 0x9025  > /sys/class/android_usb/android0/idProduct
-        echo 0x05C6  > /sys/class/android_usb/android0/idVendor
-        echo diag    > /sys/class/android_usb/android0/f_diag/clients
-        echo tty,tty > /sys/class/android_usb/android0/f_serial/transports
-        echo diag,adb,serial,rmnet_smd,mass_storage    > /sys/class/android_usb/android0/functions
-        echo 1       > /sys/class/android_usb/android0/enable
+        case "$baseband" in
+            "svlte2a")
+                 echo 0       > /sys/class/android_usb/android0/enable
+                 echo 0x9037  > /sys/class/android_usb/android0/idProduct
+                 echo 0x05C6  > /sys/class/android_usb/android0/idVendor
+                 echo diag,diag_mdm    > /sys/class/android_usb/android0/f_diag/clients
+                 echo sdio,smd > /sys/class/android_usb/android0/f_serial/transports
+                 echo diag,adb,serial,rmnet_smd_sdio,mass_storage    > /sys/class/android_usb/android0/functions
+                 echo 1       > /sys/class/android_usb/android0/enable
+            ;;
+            "csfb")
+                 echo 0       > /sys/class/android_usb/android0/enable
+                 echo 0x9031  > /sys/class/android_usb/android0/idProduct
+                 echo 0x05C6  > /sys/class/android_usb/android0/idVendor
+                 echo diag,diag_mdm    > /sys/class/android_usb/android0/f_diag/clients
+                 echo sdio,tty > /sys/class/android_usb/android0/f_serial/transports
+                 echo diag,adb,serial,rmnet_sdio,mass_storage    > /sys/class/android_usb/android0/functions
+                 echo 1       > /sys/class/android_usb/android0/enable
+            ;;
+            "msm")
+                 echo 0       > /sys/class/android_usb/android0/enable
+                 echo 0x9025  > /sys/class/android_usb/android0/idProduct
+                 echo 0x05C6  > /sys/class/android_usb/android0/idVendor
+                 echo diag    > /sys/class/android_usb/android0/f_diag/clients
+                 echo tty,tty > /sys/class/android_usb/android0/f_serial/transports
+                 echo diag,adb,serial,rmnet_smd,mass_storage    > /sys/class/android_usb/android0/functions
+                 echo 1       > /sys/class/android_usb/android0/enable
+            ;;
+        esac
     ;;
 esac
 
