@@ -29,6 +29,125 @@
 #define   TRACE_TAG  TRACE_USB
 #include "adb.h"
 
+#define USB_FUNCTIONS_PATH     "/sys/class/android_usb/android0/functions"
+#define USB_ENABLE_PATH        "/sys/class/android_usb/android0/enable"
+#define USB_PID_PATH           "/sys/class/android_usb/android0/idProduct"
+
+int function_enabled(char *match)
+{
+    int fd, ret;
+    char c[256];
+
+    fd = unix_open(USB_FUNCTIONS_PATH, O_RDONLY);
+    if(fd < 0) {
+        D("Error while opening the file %s : %s \n",
+             USB_FUNCTIONS_PATH, strerror(errno));
+        return 0;
+    }
+
+    if(unix_read(fd, c, sizeof(c)) < 0) {
+        D("Error while reading the file %s : %s \n",
+             USB_FUNCTIONS_PATH, strerror(errno));
+        ret = 0;
+    }
+
+    if(strstr(c, match)) {
+        ret = 1;
+    } else {
+        ret = 0;
+    }
+
+    unix_close(fd);
+    return ret;
+}
+
+void usb_adb_enable(int enable)
+{
+    int fd, fd_enable;
+    char *pid, *funcs;
+
+    if(enable == function_enabled("adb"))
+        return;
+
+    if(function_enabled("rndis")) {
+        if(enable) {
+            pid = "0x9024";
+            funcs = "rndis,adb";
+        } else {
+            pid = "0xf00e";
+            funcs = "rndis";
+        }
+    } else {
+        if(enable) {
+            pid = "0x9025";
+            funcs = "diag,adb,serial,rmnet,mass_storage";
+        } else {
+            pid = "0x9026";
+            funcs = "diag,serial,rmnet,mass_storage";
+        }
+    }
+    D("Enabling funcs:%s, pid:%s\n", funcs, pid);
+
+    fd_enable = unix_open(USB_ENABLE_PATH, O_WRONLY);
+    if(fd_enable < 0) {
+        D("Error while opening the file %s : %s \n",
+             USB_ENABLE_PATH, strerror(errno));
+        return;
+    }
+    if(unix_write(fd_enable, "0", 2) < 0) {
+        D("Error while reading the file %s : %s \n",
+             USB_ENABLE_PATH, strerror(errno));
+        unix_close(fd_enable);
+        return;
+    }
+
+    fd = unix_open(USB_PID_PATH, O_WRONLY);
+    if(fd < 0) {
+        D("Error while opening the file %s : %s \n",
+             USB_PID_PATH, strerror(errno));
+        unix_close(fd_enable);
+        return;
+    }
+    if(unix_write(fd, pid, strlen(pid) + 1) < 0) {
+        D("Error while reading the file %s : %s \n",
+             USB_PID_PATH, strerror(errno));
+        unix_close(fd);
+        unix_close(fd_enable);
+        return;
+    }
+    unix_close(fd);
+
+    fd = unix_open(USB_FUNCTIONS_PATH, O_WRONLY);
+    if(fd < 0) {
+        D("Error while opening the file %s : %s \n",
+             USB_FUNCTIONS_PATH, strerror(errno));
+        unix_close(fd_enable);
+        return;
+    }
+    if(unix_write(fd, funcs, strlen(funcs) + 1) < 0) {
+        D("Error while reading the file %s : %s \n",
+             USB_PID_PATH, strerror(errno));
+        unix_close(fd);
+        unix_close(fd_enable);
+        return;
+    }
+    unix_close(fd);
+
+    if(unix_write(fd_enable, "1", 2) < 0) {
+        D("Error while reading the file %s : %s \n",
+             USB_ENABLE_PATH, strerror(errno));
+        unix_close(fd_enable);
+        return;
+    }
+
+    unix_close(fd_enable);
+}
+
+static void sigterm_handler(int n)
+{
+    usb_adb_enable(0);
+    exit(EXIT_SUCCESS);
+}
 
 struct usb_handle
 {
@@ -47,6 +166,7 @@ static void *usb_open_thread(void *x)
     struct usb_handle *usb = (struct usb_handle *)x;
     int fd;
 
+    signal(SIGTERM, sigterm_handler);
     while (1) {
         // wait until the USB device needs opening
         adb_mutex_lock(&usb->lock);
@@ -127,6 +247,8 @@ void usb_init()
     fd = unix_open("/dev/android_adb_enable", O_RDWR);
     if (fd < 0) {
        D("failed to open /dev/android_adb_enable\n");
+       //Also check if new framework is supported
+       usb_adb_enable(1);
     } else {
         close_on_exec(fd);
     }
