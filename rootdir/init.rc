@@ -110,8 +110,6 @@ on emmc-fs
     mount ext4 /dev/block/mmcblk0p13 /data nosuid nodev barrier=1 noauto_da_alloc
     mount ext4 /dev/block/mmcblk0p14 /persist nosuid nodev barrier=1
     mount ext4 /dev/block/mmcblk0p15 /cache nosuid nodev barrier=1
-    #Setting permissons for misc partition
-    chmod 0666 /dev/block/mmcblk0p17
 
 on post-fs
     # once everything is setup, no need to modify /
