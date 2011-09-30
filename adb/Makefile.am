@@ -27,8 +27,8 @@ AM_CFLAGS = -O2 \
 	-DANDROID_GADGET=1 \
 	-DLINUX_ENABLED=1  \
 	-I../include \
-	-I../../kernel/include/linux	
+	-I../../kernel/include/linux
 
-adbd_LDFLAGS = -lpthread 
+adbd_LDFLAGS = -lpthread -all-static
 
 adbd_LDADD =  ../libcutils/libcutils.a  
