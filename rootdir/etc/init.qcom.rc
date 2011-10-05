@@ -65,6 +65,9 @@ on boot
      # Create directories for gpsone_daemon services
     mkdir /data/misc/gpsone_d 0770 gpsone_d qcom_oncrpc
 
+     # Create directories for QuIPS
+    mkdir /data/misc/quipc 0770 gps system
+
      # Create directory from IMS services
     mkdir /data/shared 0777
 
@@ -269,6 +272,18 @@ service gpsone_daemon /system/bin/gpsone_daemon
     user root
     group qcom_oncrpc
     disabled
+
+service quipc_igsn /system/bin/quipc_igsn
+    user gps
+    group inet
+    disabled
+    oneshot
+
+service quipc_main /system/bin/quipc_main
+    user gps
+    group net_admin wifi inet
+    disabled
+    oneshot
 
 service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
     user root
