@@ -31,4 +31,4 @@ AM_CFLAGS = -O2 \
 
 adbd_LDFLAGS = -lpthread -all-static
 
-adbd_LDADD =  ../libcutils/libcutils.a  
+adbd_LDADD =  ../libcutils/libcutils.a
