@@ -125,10 +125,8 @@ case "$target" in
      echo 1 > /sys/module/pm_8660/modes/cpu1/power_collapse/idle_enabled
      echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
      echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-     echo 50000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
-     echo 50000 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
-     echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
-     echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
+     echo 90 > /sys/devices/system/cpu/cpufreq/ondemand/up_threshold
+     echo 50000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
      echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
      echo 4 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
      chown system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
