@@ -125,7 +125,7 @@ case $target in
                  echo diag,adb,serial,rmnet_sdio,mass_storage    > /sys/class/android_usb/android0/functions
                  echo 1       > /sys/class/android_usb/android0/enable
             ;;
-            "msm")
+            *)
                  echo 0       > /sys/class/android_usb/android0/enable
                  echo 0x9025  > /sys/class/android_usb/android0/idProduct
                  echo 0x05C6  > /sys/class/android_usb/android0/idVendor
