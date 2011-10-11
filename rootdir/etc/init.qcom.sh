@@ -60,6 +60,16 @@ do
 done
 
 #
+# Update USB serial number if passed from command line
+#
+serialnum=`getprop ro.serialno`
+case "$serialnum" in
+    "") ;; #Do nothing, use default serial number or check for persist one below
+    * )
+    echo "$serialnum" > /sys/class/android_usb/android0/iSerial
+esac
+
+#
 # Allow unique persistent serial numbers for devices connected via usb
 # User needs to set unique usb serial number to persist.usb.serialno
 #
@@ -67,8 +77,7 @@ serialno=`getprop persist.usb.serialno`
 case "$serialno" in
     "") ;; #Do nothing here
     * )
-    mount -t debugfs none /sys/kernel/debug
-    echo "$serialno" > /sys/kernel/debug/android/serial_number
+    echo "$serialno" > /sys/class/android_usb/android0/iSerial
 esac
 
 #
