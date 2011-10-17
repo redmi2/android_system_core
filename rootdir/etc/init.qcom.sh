@@ -290,5 +290,9 @@ case "$target" in
 	start sensors
 	chown root.system /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
 	chmod 220 /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
+    "msm7630_surf" )
+        chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
+        chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
+        ;;
 
 esac
