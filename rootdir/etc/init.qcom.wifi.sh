@@ -34,7 +34,7 @@
 # the script won't do anything. Otherwise (GUI is not going to Turn On
 # the Wifi) the script will load/unload the driver
 # This script will get called after post bootup.
-target=`getprop ro.product.device`
+target=`getprop ro.board.platform`
 case "$target" in
     msm8960*)
         # We need to make sure the WCNSS platform driver is running.

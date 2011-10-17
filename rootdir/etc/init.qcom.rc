@@ -129,7 +129,7 @@ service usbhub_init /system/bin/usbhub_init
    disabled
    oneshot
 
-on property:ro.product.device=msm7630_fusion
+on property:ro.board.platform=msm7630_fusion
     start usbhub_init
 
 on property:init.svc.wpa_supplicant=stopped

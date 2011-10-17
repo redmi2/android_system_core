@@ -26,7 +26,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-target=`getprop ro.product.device`
+target=`getprop ro.board.platform`
 case "$target" in
     "msm7201a_ffa" | "msm7201a_surf" | "msm7627_ffa" | "msm7627_6x" | "msm7627a"  | "msm7627_surf" | \
     "qsd8250_surf" | "qsd8250_ffa" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" | "qsd8650a_st1x")
@@ -55,7 +55,7 @@ case "$target" in
 esac
 
 case "$target" in
-    "msm8660_surf" | "msm8660_csfb")
+    "msm8660" | "msm8660_csfb")
 	 echo 1 > /sys/module/rpm_resources/enable_low_power/L2_cache
 	 echo 1 > /sys/module/rpm_resources/enable_low_power/pxo
 	 echo 2 > /sys/module/rpm_resources/enable_low_power/vdd_dig
@@ -170,13 +170,13 @@ esac
 
 # Post-setup services
 case "$target" in
-    "msm8660_surf" | "msm8660_csfb" | "msm8960")
+    "msm8660" | "msm8660_csfb" | "msm8960")
         start mpdecision
 	;;
 esac
 
 case "$target" in
-    "msm8660_surf" | "msm8660_csfb")
+    "msm8660" | "msm8660_csfb")
         start thermald
     ;;
 esac

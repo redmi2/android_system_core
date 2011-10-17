@@ -88,13 +88,13 @@ esac
 # Allow persistent usb charging disabling
 # User needs to set usb charging disabled in persist.usb.chgdisabled
 #
-target=`getprop ro.product.device`
+target=`getprop ro.board.platform`
 usbchgdisabled=`getprop persist.usb.chgdisabled`
 case "$usbchgdisabled" in
     "") ;; #Do nothing here
     * )
     case $target in
-        "msm8660_surf" | "msm8660_csfb")
+        "msm8660" | "msm8660_csfb")
         echo "$usbchgdisabled" > /sys/module/pmic8058_charger/parameters/disabled
         echo "$usbchgdisabled" > /sys/module/smb137b/parameters/disabled
 	;;
@@ -178,11 +178,11 @@ case "$baseband" in
         start bridgemgrd
 esac
 case "$target" in
-        "msm7630_surf" | "msm8660_surf" | "msm8960")
+        "msm7630_surf" | "msm8660" | "msm8960")
         start quipc_igsn
 esac
 case "$target" in
-        "msm7630_surf" | "msm8660_surf" | "msm8960")
+        "msm7630_surf" | "msm8660" | "msm8960")
         start quipc_main
 esac
 
@@ -284,7 +284,7 @@ case "$target" in
             ;;
         esac
         ;;
-    "msm8660_surf" | "msm8660_csfb" )
+    "msm8660" | "msm8660_csfb" )
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
         case "$platformvalue" in
             "Fluid")
