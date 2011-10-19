@@ -163,6 +163,10 @@ service dhcpcd_wlan0 /system/bin/dhcpcd -BKL wlan0
     disabled
     oneshot
 
+service iprenew_wlan0 /system/bin/dhcpcd -n
+    disabled
+    oneshot
+
 service wiperiface /system/bin/wiperiface
     user location
     group qcom_oncrpc
