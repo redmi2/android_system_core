@@ -107,6 +107,7 @@ esac
 #
 # Allow USB enumeration with default PID/VID
 #
+echo 1  > /sys/class/android_usb/f_mass_storage/lun/nofua
 case $target in
     "msm8960")
         socid=`cat /sys/devices/system/soc/soc0/id`
