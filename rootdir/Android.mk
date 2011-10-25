@@ -3,15 +3,51 @@ include $(CLEAR_VARS)
 
 # files that live under /system/etc/...
 
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.post_boot.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.post_boot.sh
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.bt.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.bt.sh
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.coex.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.coex.sh
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.fm.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.fm.sh
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.sdio.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.sdio.sh
+include $(BUILD_PREBUILT)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.wifi.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.wifi.sh
+include $(BUILD_PREBUILT)
+
 copy_from := \
 	etc/dbus.conf \
-	etc/hosts \
-	etc/init.qcom.post_boot.sh \
-	etc/init.qcom.bt.sh \
-	etc/init.qcom.coex.sh \
-	etc/init.qcom.fm.sh \
-	etc/init.qcom.sdio.sh \
-	etc/init.qcom.wifi.sh
+	etc/hosts
 
 ifeq ($(TARGET_PRODUCT),generic)
 copy_from += etc/vold.fstab
@@ -67,15 +103,21 @@ $(file) : $(LOCAL_PATH)/etc/ueventd.goldfish.rc | $(ACP)
 ALL_PREBUILT += $(file)
 $(INSTALLED_RAMDISK_TARGET): $(file)
 
-file := $(TARGET_ROOT_OUT)/init.qcom.rc
-$(file) : $(LOCAL_PATH)/etc/init.qcom.rc | $(ACP)
-	$(transform-prebuilt-to-target)
-ALL_PREBUILT += $(file)
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.rc
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.rc
+LOCAL_MODULE_PATH  := $(TARGET_ROOT_OUT)
+include $(BUILD_PREBUILT)
 
-file := $(TARGET_ROOT_OUT)/init.qcom.sh
-$(file) : $(LOCAL_PATH)/etc/init.qcom.sh | $(ACP)
-	$(transform-prebuilt-to-target)
-ALL_PREBUILT += $(file)
+include $(CLEAR_VARS)
+LOCAL_MODULE       := init.qcom.sh
+LOCAL_MODULE_TAGS  := optional
+LOCAL_MODULE_CLASS := ETC
+LOCAL_SRC_FILES    := etc/init.qcom.sh
+LOCAL_MODULE_PATH  := $(TARGET_ROOT_OUT)
+include $(BUILD_PREBUILT)
 
 # create some directories (some are mount points)
 DIRS := $(addprefix $(TARGET_ROOT_OUT)/, \
