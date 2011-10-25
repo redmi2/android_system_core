@@ -245,7 +245,7 @@ service dhcpcd_wlan0 /system/bin/dhcpcd -BKLG wlan0
     disabled
     oneshot
 
-service iprenew_wlan0 /system/bin/dhcpcd -n
+service iprenew_wlan0 /system/bin/dhcpcd -n wlan0
     disabled
     oneshot
 
