@@ -61,7 +61,7 @@ on boot
     mkdir /data/wiper 0777 location qcom_oncrpc
 
      # Create directories for gpsone_daemon services
-    mkdir /data/misc/gpsone_d 0770 gpsone_d qcom_oncrpc
+    mkdir /data/misc/gpsone_d 0770 system system
 
      # Create directory from IMS services
     mkdir /data/shared 0777
@@ -251,8 +251,8 @@ service wiperiface /system/bin/wiperiface
     oneshot
 
 service gpsone_daemon /system/bin/gpsone_daemon
-    user root
-    group qcom_oncrpc
+    user system
+    group system qcom_oncrpc inet
     disabled
 
 service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
