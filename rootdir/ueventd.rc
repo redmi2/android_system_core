@@ -80,6 +80,7 @@
 /dev/snd/dsp1             0660   system     audio
 /dev/snd/mixer            0660   system     audio
 /dev/msm_pcm_lp_dec       0660   system     audio
+/dev/smd4                 0660   system     system
 /dev/smd0                 0640   radio      radio
 /dev/smd7                 0640   radio      radio
 /dev/smdcntl0             0640   radio      radio
