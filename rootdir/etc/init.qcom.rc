@@ -89,9 +89,6 @@ on boot
     chmod 0660 /dev/smd0
     chown system system /dev/smd0
 
-    chmod 0660 /dev/ttyGS0
-    chown system system /dev/ttyGS0
-
     chmod 0444 /sys/devices/platform/msm_hsusb/gadget/usb_state
 
     # Remove write permissions to video related nodes
@@ -197,12 +194,8 @@ service port-bridge /system/bin/port-bridge /dev/smd0 /dev/ttyGS0
     disabled
 
 on property:ro.baseband="msm"
-    start port-bridge
     # Enable BT-DUN only for all msms
     setprop ro.qualcomm.bluetooth.dun true
-
-on property:ro.baseband="unknown"
-    start port-bridge
 
 service qmiproxy /system/bin/qmiproxy
     user radio

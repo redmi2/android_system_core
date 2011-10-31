@@ -159,6 +159,10 @@ case $target in
                  echo tty,tty > /sys/class/android_usb/android0/f_serial/transports
                  echo diag,adb,serial,rmnet_smd,mass_storage    > /sys/class/android_usb/android0/functions
                  echo 1       > /sys/class/android_usb/android0/enable
+                 case "$baseband" in
+                     "msm")
+                         start port-bridge
+                 esac
             ;;
         esac
     ;;
