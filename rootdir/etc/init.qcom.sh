@@ -304,12 +304,6 @@ case "$target" in
             "Dragon")
                 setprop ro.sound.alsa "WM8903";;
         esac
-        chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
-        chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
-        ;;
-    "msm7627a" )
-        chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
-        chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
         ;;
     "msm8960")
         if [ ! -s /data/system/sensors/settings ]; then
@@ -318,12 +312,6 @@ case "$target" in
             echo 1 > /data/system/sensors/settings
         fi
         start sensors
-        chown root.system /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
-        chmod 220 /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
-        ;;
-    "msm7630_surf" )
-        chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
-        chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
         ;;
 
 esac
