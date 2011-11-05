@@ -115,8 +115,7 @@ trap "kill_hciattach" TERM INT
 
 case $TRANSPORT in
     "smd")
-        logi "Seting property to insert the hci smd transport module"
-        setprop bt.hci_smd.driver.load 1
+        echo 1 > /sys/module/hci_smd/parameters/hcismd_set
      ;;
      *)
         logi "start hciattach"

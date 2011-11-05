@@ -35,7 +35,9 @@ on boot
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chown bluetooth bluetooth /proc/bluetooth/sleep/proto
     chown system system /sys/module/sco/parameters/disable_esco
+    chown bluetooth bluetooth /sys/module/hci_smd/parameters/hcismd_set
     chmod 0660 /sys/module/bluetooth_power/parameters/power
+    chmod 0660 /sys/module/hci_smd/parameters/hcismd_set
     chmod 0660 /sys/class/rfkill/rfkill0/state
     chmod 0660 /proc/bluetooth/sleep/proto
     chown bluetooth bluetooth /dev/ttyHS0
@@ -158,12 +160,6 @@ service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     group qcom_oncrpc bluetooth net_bt_admin
     disabled
     oneshot
-
-on property:bt.hci_smd.driver.load=1
-    insmod /system/lib/modules/hci_smd.ko
-
-on property:bt.hci_smd.driver.load=0
-    exec /system/bin/rmmod hci_smd.ko
 
 service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
     disabled
