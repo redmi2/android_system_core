@@ -191,7 +191,7 @@ on post-fs
     mkdir /data/property 0700 root root
     mkdir /data/radio 0770 radio radio
     mkdir /data/misc/sensors 0775 root root
-    write /data/system/sensors/settings 0
+    touch /data/system/sensors/settings
     chmod 0664 /data/system/sensors/settings
 
     # create dalvik-cache and double-check the perms
