@@ -148,6 +148,9 @@ on property:init.svc.bluetoothd=stopped
 on property:persist.cne.UseCne=none
     stop cnd
 
+on property:persist.cne.UseCne=None
+    stop cnd
+
 service cnd /system/bin/cnd
     socket cnd stream 660 root radio
 
