@@ -197,17 +197,17 @@ on property:ro.baseband="msm"
     setprop ro.qualcomm.bluetooth.dun true
 
 service qmiproxy /system/bin/qmiproxy
+    class main
     user radio
     group radio
-    disabled
 
 service qmuxd /system/bin/qmuxd
+    class main
     user radio
     group radio
-    disabled
 
 service netmgrd /system/bin/netmgrd
-    disabled
+    class main
 
 service sensors /system/bin/sensors.qcom
     user root
