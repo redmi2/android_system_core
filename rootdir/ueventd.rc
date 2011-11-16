@@ -50,7 +50,7 @@
 /dev/adsp/*               0660   system     audio
 /dev/snd/*                0660   system     audio
 /dev/mt9t013              0660   system     system
-/dev/msm_camera/*         0660   system     system
+/dev/msm_camera/*         0660   system     camera
 /dev/akm8976_daemon       0640   compass    system
 /dev/akm8976_aot          0640   compass    system
 /dev/akm8973_daemon       0640   compass    system
@@ -122,8 +122,8 @@
 /dev/block/mmcblk0p17     0660   system     system
 /dev/block/mmcblk0p18     0660   system     system
 /dev/usb_accessory        0660   root       usb
+/dev/video*	          0660   system     camera 
 /dev/tun                  0660   system     vpn
-/dev/video*               0660   system     system
 #regular apps need to be able to open ion
 /dev/ion                  0664   system     system
 
