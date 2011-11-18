@@ -108,65 +108,41 @@ esac
 # Allow USB enumeration with default PID/VID
 #
 echo 1  > /sys/class/android_usb/f_mass_storage/lun/nofua
-case $target in
-    "msm8960")
-        socid=`cat /sys/devices/system/soc/soc0/id`
-#socid 109: 8064. Revisit later when 8064 target arrives
-        case "$socid" in
-            "109")
-                echo 0       > /sys/class/android_usb/android0/enable
-                echo 0x901D  > /sys/class/android_usb/android0/idProduct
-                echo 0x05C6  > /sys/class/android_usb/android0/idVendor
-                echo diag    > /sys/class/android_usb/android0/f_diag/clients
-                echo diag,adb    > /sys/class/android_usb/android0/functions
-                echo 1       > /sys/class/android_usb/android0/enable
+usb_config=`getprop persist.sys.usb.config`
+case "$usb_config" in
+    "" | "adb") #USB persist config not set, select default configuration
+        case $target in
+            "msm8960")
+                socid=`cat /sys/devices/system/soc/soc0/id`
+                #socid 109: 8064. Revisit later when 8064 target arrives
+                case "$socid" in
+                    "109")
+                         setprop persist.sys.usb.config diag,adb
+                    ;;
+                    *)
+                         setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet,mass_storage,adb
+                esac
             ;;
-            *)
-                echo 0       > /sys/class/android_usb/android0/enable
-                echo 0x9025  > /sys/class/android_usb/android0/idProduct
-                echo 0x05C6  > /sys/class/android_usb/android0/idVendor
-                echo diag    > /sys/class/android_usb/android0/f_diag/clients
-                echo smd,tty > /sys/class/android_usb/android0/f_serial/transports
-                echo 1       > /sys/class/android_usb/android0/f_rmnet/instances
-                echo diag,adb,serial,rmnet,mass_storage    > /sys/class/android_usb/android0/functions
-                echo 1       > /sys/class/android_usb/android0/enable
-        esac
-    ;;
-    * )
-        case "$baseband" in
-            "svlte2a")
-                 echo 0       > /sys/class/android_usb/android0/enable
-                 echo 0x9037  > /sys/class/android_usb/android0/idProduct
-                 echo 0x05C6  > /sys/class/android_usb/android0/idVendor
-                 echo diag,diag_mdm    > /sys/class/android_usb/android0/f_diag/clients
-                 echo sdio,smd > /sys/class/android_usb/android0/f_serial/transports
-                 echo diag,adb,serial,rmnet_smd_sdio,mass_storage    > /sys/class/android_usb/android0/functions
-                 echo 1       > /sys/class/android_usb/android0/enable
-            ;;
-            "csfb")
-                 echo 0       > /sys/class/android_usb/android0/enable
-                 echo 0x9031  > /sys/class/android_usb/android0/idProduct
-                 echo 0x05C6  > /sys/class/android_usb/android0/idVendor
-                 echo diag,diag_mdm    > /sys/class/android_usb/android0/f_diag/clients
-                 echo sdio,tty > /sys/class/android_usb/android0/f_serial/transports
-                 echo diag,adb,serial,rmnet_sdio,mass_storage    > /sys/class/android_usb/android0/functions
-                 echo 1       > /sys/class/android_usb/android0/enable
-            ;;
-            *)
-                 echo 0       > /sys/class/android_usb/android0/enable
-                 echo 0x9025  > /sys/class/android_usb/android0/idProduct
-                 echo 0x05C6  > /sys/class/android_usb/android0/idVendor
-                 echo diag    > /sys/class/android_usb/android0/f_diag/clients
-                 echo tty,tty > /sys/class/android_usb/android0/f_serial/transports
-                 echo diag,adb,serial,rmnet_smd,mass_storage    > /sys/class/android_usb/android0/functions
-                 echo 1       > /sys/class/android_usb/android0/enable
-                 case "$baseband" in
-                     "msm")
-                         start port-bridge
-                 esac
+            * )
+                case "$baseband" in
+                    "svlte2a")
+                         setprop persist.sys.usb.config diag,diag_mdm,serial_sdio,serial_smd,rmnet_smd_sdio,mass_storage,adb
+                    ;;
+                    "csfb")
+                         setprop persist.sys.usb.config diag,diag_mdm,serial_sdio,serial_tty,rmnet_sdio,mass_storage,adb
+                    ;;
+                    *)
+                         setprop persist.sys.usb.config diag,serial_tty,serial_tty,rmnet_smd,mass_storage,adb
+                         case "$baseband" in
+                             "msm")
+                                 start port-bridge
+                         esac
+                    ;;
+                esac
             ;;
         esac
     ;;
+    * ) ;; #USB persist config exists, do nothing
 esac
 
 
