@@ -78,7 +78,7 @@ void powerapp_shutdown(void)
 
 void sys_shutdown_or_reboot(int reboot)
 {
-   int cmd = LINUX_REBOOT_CMD_HALT;
+   int cmd = LINUX_REBOOT_CMD_POWER_OFF;
    int n = 0;
 
    if (reboot)
