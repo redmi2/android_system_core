@@ -27,6 +27,26 @@
 #
 
 #
+# Function to start sensors for DSPS enabled platforms
+#
+start_sensors()
+{
+    mkdir -p /data/system/sensors
+    touch /data/system/sensors/settings
+    chmod 664 /data/system/sensors/settings
+
+    mkdir -p /data/misc/sensors
+    chmod 775 /data/misc/sensors
+
+    if [ ! -s /data/system/sensors/settings ]; then
+        # If the settings file is empty, enable sensors HAL
+        # Otherwise leave the file with it's current contents
+        echo 1 > /data/system/sensors/settings
+    fi
+    start sensors
+}
+
+#
 # start ril-daemon only for targets on which radio is present
 #
 baseband=`getprop ro.baseband`
@@ -273,12 +293,7 @@ case "$target" in
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
         case "$platformvalue" in
             "Fluid")
-                if [ ! -s /data/system/sensors/settings ]; then
-                    # If the settings file is empty, enable sensors
-                    # Otherwise leave the file with it's current contents
-                    echo 1 > /data/system/sensors/settings
-                fi
-                start sensors
+                start_sensors
                 setprop ro.sf.lcd_density 240
                 start profiler_daemon;;
             "Dragon")
@@ -292,12 +307,7 @@ case "$target" in
         chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
         ;;
     "msm8960")
-        if [ ! -s /data/system/sensors/settings ]; then
-            # If the settings file is empty, enable sensors
-            # Otherwise leave the file with it's current contents
-            echo 1 > /data/system/sensors/settings
-        fi
-        start sensors
+        start_sensors
         chown root.system /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
         chmod 220 /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
         ;;
