@@ -94,7 +94,7 @@ case "$usbchgdisabled" in
     "") ;; #Do nothing here
     * )
     case $target in
-        "msm8660" | "msm8660_csfb")
+        "msm8660")
         echo "$usbchgdisabled" > /sys/module/pmic8058_charger/parameters/disabled
         echo "$usbchgdisabled" > /sys/module/smb137b/parameters/disabled
 	;;
@@ -269,7 +269,7 @@ case "$target" in
             ;;
         esac
         ;;
-    "msm8660" | "msm8660_csfb" )
+    "msm8660" )
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
         case "$platformvalue" in
             "Fluid")

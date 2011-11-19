@@ -55,7 +55,7 @@ case "$target" in
 esac
 
 case "$target" in
-    "msm8660" | "msm8660_csfb")
+    "msm8660")
 	 echo 1 > /sys/module/rpm_resources/enable_low_power/L2_cache
 	 echo 1 > /sys/module/rpm_resources/enable_low_power/pxo
 	 echo 2 > /sys/module/rpm_resources/enable_low_power/vdd_dig
@@ -170,13 +170,13 @@ esac
 
 # Post-setup services
 case "$target" in
-    "msm8660" | "msm8660_csfb" | "msm8960")
+    "msm8660" | "msm8960")
         start mpdecision
 	;;
 esac
 
 case "$target" in
-    "msm8660" | "msm8660_csfb")
+    "msm8660")
         start thermald
     ;;
 esac
