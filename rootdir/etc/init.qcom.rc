@@ -25,13 +25,9 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-
 on init
     # Set permissions for persist partition
     mkdir /persist 0771 system system
-
-on boot-pause
-    exec system/bin/battery_charging
 
 on early-boot
     # set RLIMIT_MEMLOCK to 64MB
