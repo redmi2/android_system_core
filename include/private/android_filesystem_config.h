@@ -60,6 +60,7 @@
 #define AID_MTP           1024  /* MTP USB driver access */
 #define AID_NFC           1025  /* nfc subsystem */
 #define AID_DRMRPC        1026  /* group for drm rpc */
+#define AID_FM_RADIO      1027  /* FM radio */
 
 #define AID_SHELL         2000  /* adb and debug shell user */
 #define AID_CACHE         2001  /* cache access */
@@ -127,6 +128,7 @@ static const struct android_id_info android_ids[] = {
     { "net_bw_acct", AID_NET_BW_ACCT, },
     { "qcom_oncrpc", AID_QCOM_ONCRPC, },
     { "misc",      AID_MISC, },
+    { "fm_radio",  AID_FM_RADIO, },
     { "nobody",    AID_NOBODY, },
 };
 
