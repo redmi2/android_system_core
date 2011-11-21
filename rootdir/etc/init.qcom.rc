@@ -141,6 +141,7 @@ on property:init.svc.wpa_supplicant=stopped
 on property:init.svc.bluetoothd=running
     start btwlancoex
     start amp_load
+    write /sys/class/bluetooth/hci0/idle_timeout 7000
 
 on property:init.svc.bluetoothd=stopped
     start amp_unload
