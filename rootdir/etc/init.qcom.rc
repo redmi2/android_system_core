@@ -33,6 +33,10 @@ on init
 on boot-pause
     exec system/bin/battery_charging
 
+on early-boot
+    # set RLIMIT_MEMLOCK to 64MB
+    setrlimit 8 67108864 67108864
+
 on boot
     chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
