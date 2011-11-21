@@ -133,10 +133,6 @@ case "$usb_config" in
                     ;;
                     *)
                          setprop persist.sys.usb.config diag,serial_tty,serial_tty,rmnet_smd,mass_storage,adb
-                         case "$baseband" in
-                             "msm")
-                                 start port-bridge
-                         esac
                     ;;
                 esac
             ;;
@@ -145,6 +141,14 @@ case "$usb_config" in
     * ) ;; #USB persist config exists, do nothing
 esac
 
+case $target in
+    "msm8960") ;;
+    * )
+        case "$baseband" in
+            "msm")
+                start port-bridge
+        esac
+esac
 
 #
 # Start gpsone_daemon for SVLTE Type I & II devices
