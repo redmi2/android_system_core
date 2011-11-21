@@ -141,8 +141,8 @@ typedef enum {
     AUDIO_FORMAT_HE_AAC_V1           = 0x05000000UL,
     AUDIO_FORMAT_HE_AAC_V2           = 0x06000000UL,
     AUDIO_FORMAT_VORBIS              = 0x07000000UL,
-    AUDIO_FORMAT_QCELP               = 0x08000000UL,
-    AUDIO_FORMAT_EVRC                = 0x09000000UL,
+    AUDIO_FORMAT_EVRC                = 0x08000000UL,
+    AUDIO_FORMAT_QCELP               = 0x09000000UL,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
