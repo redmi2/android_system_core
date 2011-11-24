@@ -143,6 +143,9 @@ case "$usb_config" in
                          setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet,mass_storage,adb
                 esac
             ;;
+            "msm7627a")
+                setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet_smd,mass_storage,adb
+            ;;
             * )
                 case "$baseband" in
                     "svlte2a")
@@ -159,15 +162,6 @@ case "$usb_config" in
         esac
     ;;
     * ) ;; #USB persist config exists, do nothing
-esac
-
-case $target in
-    "msm8960") ;;
-    * )
-        case "$baseband" in
-            "msm")
-                start port-bridge
-        esac
 esac
 
 #
