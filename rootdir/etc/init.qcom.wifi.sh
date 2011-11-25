@@ -82,10 +82,12 @@ case "$target" in
         echo "The WLAN Chip ID is $wlanchip"
         case "$wlanchip" in
             "AR6003")
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              rm  /system/lib/modules/wlan.ko
              ln -s /system/wifi/ar6000.ko /system/lib/modules/wlan.ko
              mv /system/bin/wpa_supplicant /system/bin/wpa_supplicant_wcn
              ln -s /system/others/wpa_supplicant /system/bin/wpa_supplicant
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              ;;
             *)
              echo "********************************************************************"
@@ -100,12 +102,16 @@ case "$target" in
         echo "The WLAN Chip ID is $wlanchip"
         case "$wlanchip" in
             "WCN1314")
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              ln -s /system/lib/modules/volans/WCN1314_rf.ko /system/lib/modules/wlan.ko
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              ;;
             "WCN1312")
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              ln -s /system/lib/modules/libra/libra.ko /system/lib/modules/wlan.ko
 	      ln -s /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
              ln -s /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
 	      ;;
            *)
             echo "********************************************************************"
@@ -132,8 +138,10 @@ case "$target" in
         esac
     ;;
     msm7627*)
+        mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
         ln -s /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
         ln -s /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
+        mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
         wifishd=`getprop wlan.driver.status`
         case "$wifishd" in
             "ok")
