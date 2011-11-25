@@ -86,6 +86,7 @@ struct {
     { "persist.service.", AID_SYSTEM,   0 },
     { "persist.security.", AID_SYSTEM,   0 },
     { "wifi.",            AID_WIFI,     0 },
+    { "hw.fm.",           AID_FM_RADIO,  0 },
     { NULL, 0, 0 }
 };
 
@@ -100,6 +101,7 @@ struct {
 } control_perms[] = {
     { "dumpstate",AID_SHELL, AID_LOG },
     { "ril-daemon",AID_RADIO, AID_RADIO },
+    { "fm_dl", AID_FM_RADIO, AID_FM_RADIO},
      {NULL, 0, 0 }
 };
 
