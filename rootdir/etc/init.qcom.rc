@@ -410,7 +410,6 @@ on property:ro.hdmi.enable=true
 
 service abld /system/bin/mm-abl-daemon
     class late_start
-    disabled
 
 service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
     class late_start
