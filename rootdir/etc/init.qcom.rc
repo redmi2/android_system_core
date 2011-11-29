@@ -180,7 +180,7 @@ on property:bluetooth.isEnabled=false
 
 service cnd /system/bin/cnd
     class late_start
-    socket cnd stream 660 root radio
+    socket cnd stream 666 root radio
     disabled
 
 on property:persist.cne.UseCne=vendor
