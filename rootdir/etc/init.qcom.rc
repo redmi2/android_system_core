@@ -330,6 +330,10 @@ service iprenew_p2p /system/bin/dhcpcd -n p2p
     disabled
     oneshot
 
+service dhcpcd_bnep0 /system/bin/dhcpcd -BKLG
+    disabled
+    oneshot
+
 service wiperiface /system/bin/wiperiface
     user location
     group qcom_oncrpc
