@@ -134,13 +134,20 @@ case "$usb_config" in
         case $target in
             "msm8960")
                 socid=`cat /sys/devices/system/soc/soc0/id`
-                #socid 109: 8064. Revisit later when 8064 target arrives
                 case "$socid" in
                     "109")
                          setprop persist.sys.usb.config diag,adb
                     ;;
                     *)
-                         setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet,mass_storage,adb
+                        case "$baseband" in
+                            "mdm")
+                                 setprop persist.sys.usb.config diag,serial_hsic,serial_tty,rmnet_hsic,mass_storage,adb
+                            ;;
+                            *)
+                                 setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb
+                            ;;
+                        esac
+                    ;;
                 esac
             ;;
             "msm7627a")
