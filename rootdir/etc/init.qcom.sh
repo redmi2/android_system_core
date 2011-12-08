@@ -141,7 +141,7 @@ case "$usb_config" in
                     *)
                         case "$baseband" in
                             "mdm")
-                                 setprop persist.sys.usb.config diag,serial_hsic,serial_tty,rmnet_hsic,mass_storage,adb
+                                 setprop persist.sys.usb.config diag,diag_mdm,serial_hsic,serial_tty,rmnet_hsic,mass_storage,adb
                             ;;
                             *)
                                  setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb
