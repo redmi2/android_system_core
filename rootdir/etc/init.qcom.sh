@@ -311,6 +311,43 @@ case "$target" in
         start_sensors
         chown root.system /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
         chmod 220 /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
+
+        # Dynamic Memory Managment (DMM) provides a sys file system to the userspace
+        # that can be used to plug in/out memory that has been configured as 'Movable'.
+        # This unstable memory can be in Active or In-Active State.
+        # Each of which the userspace can request by writing to a sys file.
+
+        # If ro.dev.dmm.dpd.start_address is set here then the target has a memory
+        # configuration that supports DynamicMemoryManagement.
+        mem="/sys/devices/system/memory"
+        op=`cat $mem/movable_start_bytes`
+        case "$op" in
+            "0" )
+                log -p i -t DMM DMM Disabled. movable_start_bytes not set: $op
+            ;;
+
+           "$mem/movable_start_bytes: No such file or directory " )
+                log -p i -t DMM DMM Disabled. movable_start_bytes does not exist: $op
+            ;;
+
+            * )
+                log -p i -t DMM DMM available.
+                movable_start_bytes=0x`cat $mem/movable_start_bytes`
+                log -p i -t DMM movable_start_bytes at $movable_start_bytes
+                block_size_bytes=0x`cat $mem/block_size_bytes`
+                log -p i -t DMM block_size_bytes: $block_size_bytes
+                block=$(($movable_start_bytes/$block_size_bytes))
+                block=11
+
+                chown system.system $mem/memory$block/state
+                chown system.system $mem/probe
+                chown system.system $mem/active
+                chown system.system $mem/remove
+
+                setprop ro.dev.dmm.dpd.start_address $movable_start_bytes
+                setprop ro.dev.dmm.dpd.block $block
+            ;;
+        esac
         ;;
     "msm7630_surf" )
         chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
