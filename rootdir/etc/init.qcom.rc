@@ -79,8 +79,8 @@ on boot
     # Change owner and group for media server and surface flinger
     chown media system /sys/devices/virtual/graphics/fb1/format_3d
 
-    #For netmgr daemon to inform the USB driver of the correct transport
-    chown radio radio /sys/class/usb_composite/rmnet_smd_sdio/transport
+    #For bridgemgr daemon to inform the USB driver of the correct transport
+    chown radio radio /sys/class/android_usb/f_rmnet_smd_sdio/transport
 
     #To allow interfaces to get v6 address when tethering is enabled
     write /proc/sys/net/ipv6/conf/rmnet0/accept_ra 2
