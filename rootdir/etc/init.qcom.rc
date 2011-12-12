@@ -54,15 +54,15 @@ on boot
     setprop wifi.interface wlan0
 
      # Create directories for wiper services
-    mkdir /data/wpstiles/ 0777 shell
-    mkdir /data/wiper 0777 location qcom_oncrpc
+    mkdir /data/wpstiles/ 0755 shell
+    mkdir /data/wiper 0755 location qcom_oncrpc
 
      # Create directories for gpsone_daemon services
     mkdir /data/gpsone_d 0770 gpsone_d qcom_oncrpc
     mkdir /etc/gpsone_d 0770 gpsone_d qcom_oncrpc
 
      # Create directory from IMS services
-    mkdir /data/shared 0777
+    mkdir /data/shared 0755
 
 
     #Set SUID bit for usbhub
