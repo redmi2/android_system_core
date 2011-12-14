@@ -502,3 +502,10 @@ service profiler_daemon /system/bin/profiler_daemon
     group root
     disabled
 
+service sdcard /system/bin/sdcard /data/media 1023 1023
+    class late_start
+    disabled
+
+on property:persist.fuse_sdcard=true
+    start sdcard
+
