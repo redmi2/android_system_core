@@ -76,17 +76,20 @@ void powerapp_shutdown(void)
    for(;;);
 }
 
-void sys_shutdown_or_reboot(int reboot)
+void sys_shutdown_or_reboot(int reboot, char *arg1)
 {
    int cmd = LINUX_REBOOT_CMD_POWER_OFF;
    int n = 0;
 
    if (reboot)
    {
-      cmd = LINUX_REBOOT_CMD_RESTART;
+      if (arg1)
+          cmd = LINUX_REBOOT_CMD_RESTART2;
+      else
+          cmd = LINUX_REBOOT_CMD_RESTART;
    }
 
-   n = syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, cmd, NULL);
+   n = syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, cmd, arg1);
    if (n < 0)
    {
       fprintf(stderr, "reboot system call failed %d (%s)\n", errno, strerror(errno));
@@ -98,7 +101,7 @@ void suspend_or_resume(void)
    int fd = -1;
    char buf[BUFFER_SZ];
    int n = 0;
-  
+
    printf("SUSPEND/RESUME\n");
    return;
    fd = open(POWER_NODE, O_RDWR);
@@ -129,16 +132,19 @@ main(int argc, char *argv[])
    struct timeval now;
    int n = 0;
    int duration = 0;
+   char *arg1 = NULL;
    char *cmd_name = basename(argv[0]);
+   if(argc > 1)
+	   arg1 = argv[1];
 
    if (!strcmp(cmd_name, "sys_reboot"))
    {
-      sys_shutdown_or_reboot(1);
+      sys_shutdown_or_reboot(1, arg1);
       return 1;
    }
    else if (!strcmp(cmd_name, "sys_shutdown"))
    {
-      sys_shutdown_or_reboot(0);
+      sys_shutdown_or_reboot(0, arg1);
       return 2;
    }
    fd = open(KEY_INPUT_DEVICE, O_RDONLY);
