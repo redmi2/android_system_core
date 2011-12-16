@@ -308,7 +308,10 @@ case "$target" in
         chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
         ;;
     "msm8960")
-        start_sensors
+        case "$baseband" in
+            "msm")
+                start_sensors;;
+        esac
         chown root.system /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
         chmod 220 /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
 
