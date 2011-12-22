@@ -111,6 +111,9 @@ on post-fs-data
     mkdir /data/misc/dhcp 0770 dhcp dhcp
     chown dhcp dhcp /data/misc/dhcp
 
+    # Create directory used by audio subsystem
+    mkdir /data/misc/audio 0770 audio audio
+
     # Mounting of persist is moved to 'on emmc-fs' and 'on fs' sections
     # We chown/chmod /persist again so because mount is run as root + defaults
     chown system system /persist
