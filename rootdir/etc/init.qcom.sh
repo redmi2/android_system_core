@@ -33,7 +33,7 @@ start_sensors()
 {
     mkdir -p /data/system/sensors
     touch /data/system/sensors/settings
-    chmod 664 /data/system/sensors/settings
+    chmod 665 /data/system/sensors
 
     mkdir -p /data/misc/sensors
     chmod 775 /data/misc/sensors
