@@ -68,14 +68,12 @@ case $mode in
     "smd")
         logi "inserting the radio transport module"
         insmod /system/lib/modules/radio-iris-transport.ko
-        setprop hw.fm.init 1
-        exit 0
      ;;
      *)
-        logi "not a smd transport case, doing patch download"
-        /system/bin/fm_qsoc_patches $version 0
+        logi "default transport case "
      ;;
     esac
+      /system/bin/fm_qsoc_patches $version 0
      ;;
   "wa_enable")
    /system/bin/fm_qsoc_patches $version 1
