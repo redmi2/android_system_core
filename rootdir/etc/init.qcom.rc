@@ -59,14 +59,14 @@ on boot
     setprop ro.config.bt.amp no
 
      # Create directories for wiper services
-    mkdir /data/wpstiles/ 0777 shell
-    mkdir /data/wiper 0777 location qcom_oncrpc
+    mkdir /data/wpstiles/ 0755 shell
+    mkdir /data/wiper 0755 location qcom_oncrpc
 
      # Create directories for gpsone_daemon services
     mkdir /data/misc/gpsone_d 0770 system system
 
      # Create directory from IMS services
-    mkdir /data/shared 0777
+    mkdir /data/shared 0755
 
     # Create directory for FOTA
     mkdir /data/fota 0771
