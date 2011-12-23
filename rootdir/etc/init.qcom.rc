@@ -511,3 +511,8 @@ service sdcard /system/bin/sdcard /data/media 1023 1023
 on property:persist.fuse_sdcard=true
     start sdcard
 
+service hcidump /system/bin/sh /system/etc/hcidump.sh
+    user bluetooth
+    group bluetooth system net_bt_admin net_admin
+    disabled
+    oneshot
