@@ -28,6 +28,11 @@
 on init
     write /sys/class/android_usb/android0/f_rndis/wceis 1
 
+service qcom-usb-sh /system/bin/sh /init.qcom.usb.sh
+    class core
+    user root
+    oneshot
+
 # USB compositions
 on property:sys.usb.config=diag,adb
     write /sys/class/android_usb/android0/enable 0
