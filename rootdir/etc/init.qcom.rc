@@ -350,16 +350,14 @@ service gpsone_daemon /system/bin/gpsone_daemon
 service quipc_igsn /system/bin/quipc_igsn
     class late_start
     user gps
-    group inet
+    group inet gps
     disabled
-    oneshot
 
 service quipc_main /system/bin/quipc_main
     class late_start
     user gps
-    group net_admin wifi inet
+    group net_admin wifi inet gps
     disabled
-    oneshot
 
 service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
     class late_start
