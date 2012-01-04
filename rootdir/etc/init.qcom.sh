@@ -54,7 +54,7 @@ multirild=`getprop ro.multi.rild`
 dsds=`getprop persist.dsds.enabled`
 netmgr=`getprop ro.use_data_netmgrd`
 case "$baseband" in
-    "msm" | "csfb" | "svlte2a" | "unknown")
+    "msm" | "csfb" | "svlte2a" | "mdm" | "unknown")
     start ril-daemon
     start qmuxd
     case "$baseband" in
