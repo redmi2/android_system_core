@@ -56,7 +56,7 @@ typedef struct {
 
 #include <linux/types.h>
 
-#if ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5)))
+#if !defined(__USE_UNIX98) && !defined(__USE_XOPEN2K8)
 enum {
     PTHREAD_MUTEX_NORMAL = 0,
     PTHREAD_MUTEX_RECURSIVE = 1,
