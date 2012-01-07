@@ -86,6 +86,7 @@ done
 #
 # Start gpsone_daemon for SVLTE Type I & II devices
 #
+target=`getprop ro.board.platform`
 case "$target" in
         "msm7630_fusion")
         start gpsone_daemon
