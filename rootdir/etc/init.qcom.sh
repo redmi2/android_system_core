@@ -236,6 +236,12 @@ case "$target" in
                 start_sensors;;
         esac
 
+        platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
+        case "$platformvalue" in
+             "Fluid")
+              start profiler_daemon;;
+        esac
+
         # Dynamic Memory Managment (DMM) provides a sys file system to the userspace
         # that can be used to plug in/out memory that has been configured as 'Movable'.
         # This unstable memory can be in Active or In-Active State.
