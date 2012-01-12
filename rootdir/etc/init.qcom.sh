@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009-2011, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2012, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -26,6 +26,33 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#
+# For controlling console and shell on console on 8960 - perist.serial.enable 8960
+# On other target use default ro.debuggable property.
+#
+target=`getprop ro.board.platform`
+serial=`getprop persist.serial.enable`
+dserial=`getprop ro.debuggable`
+case "$target" in
+    "msm8960")
+        case "$serial" in
+            "0")
+                echo 0 > /sys/devices/platform/msm_serial_hsl.0/console
+                ;;
+            *)
+                echo 1 > /sys/devices/platform/msm_serial_hsl.0/console
+                start console
+                ;;
+        esac
+        ;;
+    *)
+        case "$dserial" in
+            "1")
+                start console
+                ;;
+	esac
+	;;
+esac
 #
 # Function to start sensors for DSPS enabled platforms
 #
@@ -60,7 +87,6 @@ start_battery_monitor()
 # Allow persistent faking of bms
 # User needs to set fake bms charge in persist.bms.fake_batt_capacity
 #
-target=`getprop ro.board.platform`
 fake_batt_capacity=`getprop persist.bms.fake_batt_capacity`
 case "$fake_batt_capacity" in
     "") ;; #Do nothing here
@@ -112,7 +138,6 @@ done
 #
 # Start gpsone_daemon for SVLTE Type I & II devices
 #
-target=`getprop ro.board.platform`
 case "$target" in
         "msm7630_fusion")
         start gpsone_daemon
