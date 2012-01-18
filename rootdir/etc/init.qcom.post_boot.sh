@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2009-2011, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2009-2012, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -85,6 +85,7 @@ case "$target" in
 	 echo 4 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
 	 echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
 	 echo 384000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+	 chown system /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
 	 chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
 	 chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
 	 chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
@@ -126,6 +127,7 @@ case "$target" in
      echo 4 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
      echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
      echo 384000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+     chown system /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
      chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
      chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
      chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
