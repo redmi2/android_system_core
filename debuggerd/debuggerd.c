@@ -335,7 +335,7 @@ void dump_crash_report(int tfd, unsigned pid, unsigned tid, bool at_fault)
  * form tombstone_XX where XX is 00 to MAX_TOMBSTONES-1, inclusive. If no
  * file is available, we reuse the least-recently-modified file.
  */
-static int find_and_open_tombstone(void)
+static int find_and_open_tombstone(bool isAnr)
 {
     unsigned long mtime = ULONG_MAX;
     struct stat sb;
@@ -353,7 +353,7 @@ static int find_and_open_tombstone(void)
      * exist, find and record the least-recently-modified file.
      */
     for (i = 0; i < MAX_TOMBSTONES; i++) {
-        snprintf(path, sizeof(path), TOMBSTONE_DIR"/tombstone_%02d", i);
+        snprintf(path, sizeof(path), TOMBSTONE_DIR"/tombstone%s_%02d", isAnr == true? "NoCrash":"", i);
 
         if (!stat(path, &sb)) {
             if (sb.st_mtime < mtime) {
@@ -374,7 +374,7 @@ static int find_and_open_tombstone(void)
     }
 
     /* we didn't find an available file, so we clobber the oldest one */
-    snprintf(path, sizeof(path), TOMBSTONE_DIR"/tombstone_%02d", oldest);
+    snprintf(path, sizeof(path), TOMBSTONE_DIR"/tombstone%s_%02d", isAnr == true? "NoCrash":"", oldest);
     fd = open(path, O_CREAT | O_TRUNC | O_WRONLY, 0600);
     fchown(fd, AID_SYSTEM, AID_SYSTEM);
 
@@ -569,7 +569,7 @@ static void dump_logs(int tfd, unsigned pid, bool tailOnly)
 
 /* Return true if some thread is not detached cleanly */
 static bool engrave_tombstone(unsigned pid, unsigned tid, int debug_uid,
-                              int signal)
+                              int signal, bool isAnr)
 {
     int fd;
     bool need_cleanup = false;
@@ -582,7 +582,7 @@ static bool engrave_tombstone(unsigned pid, unsigned tid, int debug_uid,
     mkdir(TOMBSTONE_DIR, 0755);
     chown(TOMBSTONE_DIR, AID_SYSTEM, AID_SYSTEM);
 
-    fd = find_and_open_tombstone();
+    fd = find_and_open_tombstone(isAnr);
     if (fd < 0)
         return need_cleanup;
 
@@ -795,6 +795,7 @@ static void handle_crashing_process(int fd)
     const int sleep_time_usec = 200000;         /* 0.2 seconds */
     const int max_total_sleep_usec = 3000000;   /* 3 seconds */
     int loop_limit = max_total_sleep_usec / sleep_time_usec;
+    bool isAnr = false;
     for(;;) {
         if (loop_limit-- == 0) {
             LOG("timed out waiting for pid=%d tid=%d uid=%d to die\n",
@@ -830,14 +831,15 @@ static void handle_crashing_process(int fd)
                 }
                 continue;
 
-            case SIGILL:
             case SIGABRT:
+                isAnr = true;
+            case SIGILL:
             case SIGBUS:
             case SIGFPE:
             case SIGSEGV:
             case SIGSTKFLT: {
                 XLOG("stopped -- fatal signal\n");
-                need_cleanup = engrave_tombstone(cr.pid, tid, debug_uid, n);
+                need_cleanup = engrave_tombstone(cr.pid, tid, debug_uid, n, isAnr);
                 kill(tid, SIGSTOP);
                 goto done;
             }
