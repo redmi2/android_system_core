@@ -410,6 +410,9 @@ service hdmid /system/bin/hdmid
 
 service abld /system/bin/mm-abl-daemon
     class late_start
+    user system
+    socket cscd stream 660 system system graphics
+    group system graphics
     disabled
 
 service hostapd /system/bin/hostapd -dddd /data/hostapd/hostapd.conf
