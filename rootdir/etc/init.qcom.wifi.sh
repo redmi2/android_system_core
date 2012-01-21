@@ -87,15 +87,32 @@ case "$target" in
         wlanchip=`cat /persist/wlan_chip_id`
         echo "The WLAN Chip ID is $wlanchip"
         case "$wlanchip" in
-            "AR6003")
+            "ATH6KL")
+             setprop wlan.driver.ath 1
              mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              rm  /system/lib/modules/wlan.ko
-             ln -s /system/wifi/ar6000.ko /system/lib/modules/wlan.ko
-             mv /system/bin/wpa_supplicant /system/bin/wpa_supplicant_wcn
-             ln -s /system/others/wpa_supplicant /system/bin/wpa_supplicant
+             rm  /system/lib/modules/cfg80211.ko
+             ln -s /system/lib/modules/ath6kl/ath6kl_sdio.ko /system/lib/modules/wlan.ko
+             ln -s /system/lib/modules/ath6kl/cfg80211.ko /system/lib/modules/cfg80211.ko
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
+             ;;
+            "WCN1314")
+             setprop wlan.driver.ath 0
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
+             rm  /system/lib/modules/wlan.ko
+             rm  /system/lib/modules/cfg80211.ko
+             ln -s /system/lib/modules/volans/WCN1314_rf.ko /system/lib/modules/wlan.ko
+             ln -s /system/lib/modules/volans/cfg80211.ko /system/lib/modules/cfg80211.ko
              mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              ;;
             *)
+             setprop wlan.driver.ath 0
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
+             rm  /system/lib/modules/wlan.ko
+             rm  /system/lib/modules/cfg80211.ko
+             ln -s /system/lib/modules/volans/WCN1314_rf.ko /system/lib/modules/wlan.ko
+             ln -s /system/lib/modules/volans/cfg80211.ko /system/lib/modules/cfg80211.ko
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              echo "********************************************************************"
               echo "*** Error:WI-FI chip ID is not specified in /persist/wlan_chip_id **"
              echo "*******    WI-FI may not work    ***********************************"
