@@ -27,17 +27,19 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# Allow unique persistent serial numbers for devices connected via usb
-# User needs to set unique usb serial number to persist.usb.serialno and
-# if persistent serial number is not set then Update USB serial number if
-# passed from command line
+# Update USB serial number passed from kernel command line, if it is not
+# then use unique persistent serial number for device connected via usb.
+# User needs to set unique usb serial number to persist.usb.serialno
 #
-serialno=`getprop persist.usb.serialno`
+serialno=`getprop ro.serialno`
 case "$serialno" in
     "")
-    serialnum=`getprop ro.serialno`
-    echo "$serialnum" > /sys/class/android_usb/android0/iSerial
-    ;;
+    serialnum=`getprop persist.usb.serialno`
+    case "$serialnum" in
+        "");; #Do nothing, use default serial number
+        *)
+        echo "$serialnum" > /sys/class/android_usb/android0/iSerial
+    esac
     * )
     echo "$serialno" > /sys/class/android_usb/android0/iSerial
 esac
