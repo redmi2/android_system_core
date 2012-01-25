@@ -169,6 +169,13 @@ case "$emmc_boot"
     ;;
 esac
 
+case "$target" in
+    "msm8960")
+        echo 1 > /sys/devices/system/cpu/cpu1/online
+        echo "0\0" > /dev/msm_ptm
+        echo 0 > /sys/devices/system/cpu/cpu1/online
+        ;;
+esac
 
 # Post-setup services
 case "$target" in
