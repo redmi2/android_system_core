@@ -81,6 +81,7 @@
 /dev/htc-acoustic         0660   system     audio
 /dev/vdec                 0660   system     audio
 /dev/tzcom                0660   system     audio
+/dev/qseecom              0660   system     audio
 /dev/qce                  0660   system     audio
 /dev/q6venc               0660   system     audio
 /dev/snd/dsp              0660   system     audio
