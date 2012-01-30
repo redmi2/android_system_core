@@ -17,6 +17,7 @@
   AC_PROG_LIBTOOL
   AC_PROG_AWK
   AC_PROG_CPP
+  AC_PROG_CXX
   AC_PROG_INSTALL
   AC_PROG_LN_S
   AC_PROG_MAKE_SET
@@ -48,5 +49,7 @@
   AC_OUTPUT([ \
           Makefile \
           libcutils/Makefile \
+          liblog/Makefile \
+          logcat/Makefile \
           adb/Makefile
   ])

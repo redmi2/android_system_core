@@ -48,32 +48,15 @@ requiredlibs = -lpthread
 libcutils_a_SOURCES := $(common_sources)
 libcutils_a_SOURCES += ashmem-dev.c
 libcutils_a_SOURCES += mq.c
+libcutils_a_SOURCES += memory.c
 
 if ARM
+libcutils_a_CPPFLAGS += -DHAVE_ASM_MEMSET
 libcutils_a_SOURCES += memset32.S
-
-if !HAVE_STRLCPY
-libcutils_a_SOURCES += memory.c
-
- # If both memset32.S and memory.c are compiled and linked, there's going to be
- # multiple definition erros when linking libcutils.so because both files define
- # 'android_memset16' and 'android_memset32'. Therefore, strip out the symbols
- # from memory.o before linking libcutils.so
-libcutils_a_DEPENDENCIES := strip-libcutils_a-memory.lo
-strip-libcutils_a-memory.lo: symbolnames := android_memset16 android_memset32
-
-strip-%.lo:
-	@echo "Stripping $*.lo's object files..."
-	@if test -n "$(symbolnames)"; then \
-		test ! -e $*.o       || (echo "Stripping '$(symbolnames)' from '$*.o'";       $(STRIP) $(addprefix -N ,$(symbolnames)) $*.o); \
-		test ! -e .libs/$*.o || (echo "Stripping '$(symbolnames)' from '.libs/$*.o'"; $(STRIP) $(addprefix -N ,$(symbolnames)) .libs/$*.o); \
-	else \
-		echo "ERROR: No symbols given to strip from $*.lo's object files!"; \
-		false; \
-	fi
-	@touch $@
-endif # !HAVE_STRLCPY
-
-else  # !ARM
-libcutils_a_SOURCES += memory.c
 endif # !ARM
+
+
+# Build a DSO too
+lib_LTLIBRARIES := libcutils.la
+libcutils_la_SOURCES = $(libcutils_a_SOURCES)
+libcutils_la_CPPFLAGS = $(libcutils_a_CPPFLAGS)
