@@ -68,6 +68,16 @@ case "$usbchgdisabled" in
     esac
 esac
 
+usbcurrentlimit=`getprop persist.usb.currentlimit`
+case "$usbcurrentlimit" in
+    "") ;; #Do nothing here
+    * )
+    case $target in
+        "msm8960")
+        echo "$usbcurrentlimit" > /sys/module/pm8921_charger/parameters/usb_max_current
+	;;
+    esac
+esac
 #
 # Allow USB enumeration with default PID/VID
 #
