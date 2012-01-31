@@ -172,18 +172,9 @@ esac
 
 # Post-setup services
 case "$target" in
-    "msm8660")
+    "msm8660" | "msm8960")
         start mpdecision
-        ;;
-    "msm8960")
-        # Disable ETB tracing and turn off QDSS clocks
-        # must be prior to mpdecision (see below)
-        echo 1 > /sys/devices/system/cpu/cpu1/online
-        echo "1\0" > /dev/msm_ptm
-        echo "0\0" > /dev/msm_ptm
-        echo 0 > /sys/devices/system/cpu/cpu1/online
-        start mpdecision
-        ;;
+    ;;
 esac
 
 case "$target" in
