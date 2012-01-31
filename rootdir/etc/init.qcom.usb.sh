@@ -40,6 +40,7 @@ case "$serialno" in
         *)
         echo "$serialnum" > /sys/class/android_usb/android0/iSerial
     esac
+    ;;
     * )
     echo "$serialno" > /sys/class/android_usb/android0/iSerial
 esac
