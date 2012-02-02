@@ -248,12 +248,17 @@ case "$target" in
         esac
 
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
-        setprop ro.sf.lcd_density 240
         case "$platformvalue" in
              "Fluid")
                  start profiler_daemon;;
-              "Liquid")
+        esac
+
+        # lcd density is write-once. Hence the separate switch case
+        case "$platformvalue" in
+             "Liquid")
                  setprop ro.sf.lcd_density 160;;
+             *)
+                 setprop ro.sf.lcd_density 240;;
         esac
 
         # Dynamic Memory Managment (DMM) provides a sys file system to the userspace
