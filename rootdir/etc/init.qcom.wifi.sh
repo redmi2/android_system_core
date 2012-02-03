@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# Copyright (c) 2010-2011, Code Aurora Forum. All rights reserved.
+# Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -76,6 +76,9 @@ case "$target" in
                 esac
                 ;;
         esac
+        # Plumb down the device serial number
+        serialno=`getprop ro.serialno`
+        echo $serialno > /sys/devices/platform/wcnss_wlan.0/serial_number
         ;;
     msm8660*)
     exit 0
