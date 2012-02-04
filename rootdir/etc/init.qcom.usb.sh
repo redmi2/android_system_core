@@ -88,20 +88,12 @@ case "$usb_config" in
     "" | "adb") #USB persist config not set, select default configuration
         case $target in
             "msm8960")
-                socid=`cat /sys/devices/system/soc/soc0/id`
-                case "$socid" in
-                    "109")
-                         setprop persist.sys.usb.config diag,adb
+                case "$baseband" in
+                    "mdm")
+                         setprop persist.sys.usb.config diag,diag_mdm,serial_hsic,serial_tty,rmnet_hsic,mass_storage,adb
                     ;;
                     *)
-                        case "$baseband" in
-                            "mdm")
-                                 setprop persist.sys.usb.config diag,diag_mdm,serial_hsic,serial_tty,rmnet_hsic,mass_storage,adb
-                            ;;
-                            *)
-                                 setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb
-                            ;;
-                        esac
+                         setprop persist.sys.usb.config diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb
                     ;;
                 esac
             ;;
