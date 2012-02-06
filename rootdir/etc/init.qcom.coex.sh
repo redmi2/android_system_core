@@ -62,8 +62,8 @@ start_coex ()
       ;;
       *)
        echo "NO WLAN Chip ID is enabled, so enabling WCN as default"
-       # Must have -o turned on to avoid daemon (otherwise we cannot get pid)
-       /system/bin/btwlancoex -o $opt_flags &
+       # Must have -d -z -n -v -s -w wlan0 parameters for atheros btfilter.
+       /system/bin/abtfilt -d -z -n -v -s -w wlan0 &
       ;;
   esac
   coex_pid=$!
