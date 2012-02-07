@@ -474,6 +474,11 @@ service time_daemon /system/bin/time_daemon
 on property:persist.timed.enable=true
     start time_daemon
 
+service battery_monitor /system/bin/battery_monitor
+    user system
+    group system
+    disabled
+
 service ftp /system/bin/sdptool add --psm=5257 --channel=20 FTP
     class late_start
     user bluetooth

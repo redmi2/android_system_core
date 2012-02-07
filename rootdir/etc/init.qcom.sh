@@ -46,6 +46,16 @@ start_sensors()
     start sensors
 }
 
+start_battery_monitor()
+{
+	chown root.system /sys/module/pm8921_bms/parameters/*
+	chmod 0660 /sys/module/pm8921_bms/parameters/*
+	mkdir /data/bms
+	chown root.system /data/bms
+	chmod 0770 /data/bms
+	start battery_monitor
+}
+
 #
 # Allow persistent faking of bms
 # User needs to set fake bms charge in persist.bms.fake_batt_capacity
@@ -233,6 +243,7 @@ case "$target" in
     "msm8960")
         case "$baseband" in
             "msm")
+		start_battery_monitor
                 start_sensors;;
         esac
 
@@ -284,3 +295,4 @@ case "$target" in
         ;;
 
 esac
+
