@@ -40,8 +40,7 @@
 #include <linux/reboot.h>
 #include <libgen.h>
 
-#define KEY_INPUT_DEVICE "/dev/input/event3"
-#define POWER_KEY KEY_H
+#define KEY_INPUT_DEVICE "/dev/input/event0"
 #define SHUTDOWN_COMMAND "/sbin/shutdown"
 #define REBOOT_COMMAND "/sbin/reboot"
 #define USEC_IN_SEC 1000000
@@ -101,27 +100,41 @@ void suspend_or_resume(void)
    int fd = -1;
    char buf[BUFFER_SZ];
    int n = 0;
+   static int suspend = 1;
 
-   printf("SUSPEND/RESUME\n");
-   return;
-   fd = open(POWER_NODE, O_RDWR);
+   printf("Power Key Initiated System Suspend or Resume\n");
+
+   fd = open(POWER_NODE, O_WRONLY);
+
    if (fd > 0)
    {
-      n = read(fd, buf, BUFFER_SZ);
-      if (n > 0)
-      {
-	 if (!strcmp(buf, SUSPEND_STRING))
-	 {
-	    write(fd, RESUME_STRING, sizeof(RESUME_STRING));
-	 }
-	 else
-	 {
-	    write(fd, SUSPEND_STRING, sizeof(SUSPEND_STRING));
-	 }
+     if (suspend == 1)
+     {
+       strcpy (buf, SUSPEND_STRING);
+       errno = 0;
+       if (write(fd, buf, strlen(buf)) == -1)
+       {
+           printf("Suspend failed %d (%s)\n", errno, strerror(errno));
+       }
+       suspend = 0;
+       printf("Suspend \n");
       }
-   }
-   close(fd);
+      else
+      {
+        strcpy (buf, RESUME_STRING);
+        errno = 0;
+        if(write(fd, buf, strlen(buf)) == -1)
+        {
+           printf("Resume failed %d (%s)\n", errno, strerror(errno));
+        }
+        suspend = 1;
+        printf("Resume\n");
+      }
+    }
+
+    close(fd);
 }
+
 
 int
 main(int argc, char *argv[])
@@ -164,11 +177,11 @@ main(int argc, char *argv[])
 	 exit(2);
       }
 
-      if (ev.type == EV_KEY && ev.code == POWER_KEY && ev.value == 1)
+      if (ev.type == EV_KEY && ev.code == KEY_POWER && ev.value == 1)
       {
 	 memcpy(&then, &ev.time, sizeof(struct timeval));
       }
-      else if (ev.type == EV_KEY && ev.code == POWER_KEY && ev.value == 0)
+      else if (ev.type == EV_KEY && ev.code == KEY_POWER && ev.value == 0)
       {
 	 memcpy(&now, &ev.time, sizeof(struct timeval));
 	 duration = diff_timestamps(&then, &now);
