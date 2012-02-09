@@ -266,10 +266,10 @@ case "$target" in
         esac
         ;;
     "msm8960")
+        start_sensors
         case "$baseband" in
             "msm")
-		start_battery_monitor
-                start_sensors;;
+		start_battery_monitor;;
         esac
 
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
