@@ -72,6 +72,14 @@ typedef enum {
     AUDIO_SOURCE_MAX                 = AUDIO_SOURCE_CNT - 1,
 } audio_source_t;
 
+typedef enum {
+    QCOM_AUDIO_SOURCE_DEFAULT                       = 0x100,
+    QCOM_AUDIO_SOURCE_DIGITAL_BROADCAST_MAIN_AD     = 0x101,
+    QCOM_AUDIO_SOURCE_DIGITAL_BROADCAST_MAIN_ONLY   = 0x101,
+    QCOM_AUDIO_SOURCE_ANALOG_BROADCAST              = 0x102,
+    QCOM_AUDIO_SOURCE_HDMI_IN                       = 0x103,
+} qcom_audio_source_t;
+
 /* special audio session values
  * (XXX: should this be living in the audio effects land?)
  */
@@ -145,6 +153,10 @@ typedef enum {
     AUDIO_FORMAT_EVRC                = 0x08000000UL,
     AUDIO_FORMAT_QCELP               = 0x09000000UL,
     AUDIO_FORMAT_AC3                 = 0x0a000000UL,
+    AUDIO_FORMAT_AC3_PLUS            = 0x0b000000UL,
+    AUDIO_FORMAT_DTS                 = 0x0c000000UL,
+    AUDIO_FORMAT_WMA                 = 0x0d000000UL,
+    AUDIO_FORMAT_AAC_ADIF            = 0x0f000000UL,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
@@ -425,6 +437,7 @@ static inline bool audio_is_valid_format(uint32_t format)
     case AUDIO_FORMAT_QCELP:
     case AUDIO_FORMAT_EVRC:
     case AUDIO_FORMAT_AC3:
+    case AUDIO_FORMAT_AAC_ADIF:
         return true;
     default:
         return false;
