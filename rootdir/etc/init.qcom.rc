@@ -194,13 +194,6 @@ on property:bluetooth.isEnabled=false
 service cnd /system/bin/cnd
     class late_start
     socket cnd stream 666 root radio
-    disabled
-
-on property:persist.cne.UseCne=vendor
-    start cnd
-
-on property:persist.cne.UseCne=Vendor
-    start cnd
 
 service rmt_storage /system/bin/rmt_storage /dev/block/mmcblk0p10 /dev/block/mmcblk0p11 /dev/block/mmcblk0p17
     class late_start
