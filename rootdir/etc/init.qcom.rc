@@ -394,7 +394,7 @@ service qcom-wifi /system/bin/sh /system/etc/init.qcom.wifi.sh
     class late_start
     oneshot
 
-on property:init.svc.bootanim=stopped
+on property:sys.boot_completed=1
     start qcom-post-boot
 
 service atfwd /system/bin/ATFWD-daemon
