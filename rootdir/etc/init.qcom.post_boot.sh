@@ -218,9 +218,3 @@ case "$target" in
         esac
     ;;
 esac
-
-case "$target" in
-    "msm8660")
-        start thermald
-    ;;
-esac
