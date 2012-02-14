@@ -46,6 +46,8 @@
 void _LOG(int tfd, bool in_tombstone_only, const char *fmt, ...)
     __attribute__ ((format(printf, 3, 4)));
 
+static void dump_dalvik(int tfd, mapinfo *milist, unsigned pid, bool at_fault);
+
 /* Log information onto the tombstone */
 void _LOG(int tfd, bool in_tombstone_only, const char *fmt, ...)
 {
@@ -313,12 +315,15 @@ void dump_crash_report(int tfd, unsigned pid, unsigned tid, bool at_fault)
 #error "Unsupported architecture"
 #endif
 
+    dump_dalvik(tfd, milist, tid, at_fault);
+
     while(milist) {
         mapinfo *next = milist->next;
         symbol_table_free(milist->symbols);
         free(milist);
         milist = next;
     }
+
 }
 
 #define MAX_TOMBSTONES	10
@@ -956,4 +961,291 @@ int main()
         handle_crashing_process(fd);
     }
     return 0;
+}
+
+/**************** dump dalvik information *****************/
+/* Translation layout in the code cache.
+ *
+ *      +----------------------------+
+ *      | Trace Profile Counter addr |  -> 4 bytes (PROF_COUNTER_ADDR_SIZE)
+ *      +----------------------------+
+ *   +--| Offset to chain cell counts|  -> 2 bytes (CHAIN_CELL_OFFSET_SIZE)
+ *   |  +----------------------------+
+ *   |  | Trace profile code         |  <- entry point when profiling
+ *   |  .  -   -   -   -   -   -   - .
+ *   |  | Code body                  |  <- entry point when not profiling
+ *   |  .                            .
+ *   |  |                            |
+ *   |  +----------------------------+
+ *   |  | Chaining Cells             |  -> 12/16 bytes, 4 byte aligned
+ *   |  .                            .
+ *   |  .                            .
+ *   |  |                            |
+ *   |  +----------------------------+
+ *   |  | Gap for large switch stmt  |  -> # cases >= MAX_CHAINED_SWITCH_CASES
+ *   |  +----------------------------+
+ *   +->| Chaining cell counts       |  -> 12 bytes, chain cell counts by type
+ *      +----------------------------+
+ *      | Trace description          |  -> variable sized
+ *      .                            .
+ *      |                            |
+ *      +----------------------------+
+ *      | # Class pointer pool size  |  -> 4 bytes
+ *      +----------------------------+
+ *      | Class pointer pool         |  -> 4-byte aligned, variable size
+ *      .                            .
+ *      .                            .
+ *      |                            |
+ *      +----------------------------+
+ *      | Literal pool               |  -> 4-byte aligned, variable size
+ *      .                            .
+ *      .                            .
+ *      |                            |
+ *      +----------------------------+
+ *
+ */
+/*
+ * Trace profile code (10 bytes)
+ *       ldr   r0, [pc-8]   @ get prof count addr    [4 bytes]
+ *       ldr   r1, [r0]     @ load counter           [2 bytes]
+ *       add   r1, #1       @ increment              [2 bytes]
+ *       str   r1, [r0]     @ store                  [2 bytes]
+ */
+
+#define PROF_COUNTER_ADDR_SIZE 4
+#define CHAIN_CELL_OFFSET_SIZE 2
+#define PROF_CODE_PIECE_SIZE   10
+#define CHAIN_CELL_SIZE        12   /* struct ChainCellCounts */
+
+/*read a word from child process memory */
+#define READ_WORD(pid, addr) ptrace(PTRACE_PEEKTEXT, pid, (void*)(addr), NULL)
+
+extern void dump_memory_region(int tfd, int pid, uintptr_t addr,unsigned size,
+    bool only_in_tombstone);
+
+/* test if the current address points to the trace start address
+ * looking for the following code piece installed at the head of
+ * each trace code:
+ *       ldr   r0, [pc-8]   @ get prof count addr    [4 bytes]
+ *       ldr   r1, [r0]     @ load counter           [2 bytes]
+ *       add   r1, #1       @ increment              [2 bytes]
+ *       str   r1, [r0]     @ store                  [2 bytes]
+ * the encoding of the 4 thumb instructions in memory is:
+ * f85f0000 68010000 60013101
+ */
+static bool test_trace_address(int pid, uintptr_t trace_addr)
+{
+    trace_addr = trace_addr & ~3;
+
+    long data = READ_WORD(pid, (trace_addr-4));
+    if(data != 0x60013101)
+        return false;
+    data = READ_WORD(pid, (trace_addr-8));
+    if(data != 0x68010008)
+        return false;
+    data = READ_WORD(pid, (trace_addr-12));
+    if((data & 0xffff0000) != 0xf85f0000)
+        return false;
+
+    return true;
+}
+
+#define MAX_SEARCH_LENGTH   1024
+/* find the starting address of current trace in code cache from the given PC */
+static uintptr_t find_trace_address(int pid, uintptr_t pc)
+{
+    pc = pc & ~3;
+    int count=0;
+    uintptr_t trace_addr = pc;
+
+    /* search backwards from current PC */
+    while(!test_trace_address(pid, trace_addr) && count < MAX_SEARCH_LENGTH){
+        trace_addr -= 4;
+        count ++;
+    }
+    if(count==MAX_SEARCH_LENGTH)
+        return 0;
+    else
+        return trace_addr;
+
+}
+
+/* get the size of trace */
+static unsigned get_trace_body_size(int pid, uintptr_t trace_addr)
+{
+    trace_addr = trace_addr & ~3;
+
+    uintptr_t chain_cell_offset_addr = trace_addr - (PROF_CODE_PIECE_SIZE + CHAIN_CELL_OFFSET_SIZE);
+
+    long data = READ_WORD(pid, chain_cell_offset_addr);
+
+    return ((data & 0x0000ffff) - (PROF_CODE_PIECE_SIZE + CHAIN_CELL_OFFSET_SIZE));
+
+}
+
+#define MAX_NAME_LEN 97
+/* dump string beginning at "addr" into "buffer" with maximum size of "size" */
+static void dump_string(int pid, uintptr_t addr, char *buffer, int size)
+{
+    int count=0;
+    bool name_end=false;
+    while(count<size-1){
+        unsigned data = (unsigned)READ_WORD(pid, addr+count);
+        int i;
+        for(i=0;i<4;i++){
+            char my_c = (data >> (i*8))&0xff;
+            buffer[count++] = my_c;
+            if(my_c == '\0'){
+                name_end=true;
+                break;
+            }
+        }
+        if(name_end)
+            break;
+    }
+
+    if(count==size-1)
+        buffer[count] = '\0';
+}
+
+/* dump trace information from JitTraceDescription struct */
+static void dump_trace_description(int tfd, int pid, uintptr_t trace_addr, bool at_fault)
+{
+
+    trace_addr = trace_addr & ~3;
+
+    unsigned trace_body_size = get_trace_body_size(pid, trace_addr);
+    if(trace_body_size<=0){
+        _LOG(tfd, !at_fault, "invalid trace_size. Skip dalvik trace dump.\n");
+        return;
+    }
+
+    /* trace_desc_addr = JitTraceDescription * */
+    uintptr_t trace_desc_addr = trace_addr + trace_body_size + CHAIN_CELL_SIZE;
+
+    /* method_addr = JitTraceDescription.method */
+    uintptr_t method_addr = (uintptr_t)READ_WORD(pid,trace_desc_addr);
+    if(method_addr <=0)
+        goto bail;
+
+    /* method_name_addr = Method.name */
+    uintptr_t method_name_addr = (uintptr_t)READ_WORD(pid, (method_addr + offMethod_name));
+    if(method_name_addr <=0)
+        goto bail;
+
+    char method_name[MAX_NAME_LEN];
+
+    dump_string(pid, method_name_addr, method_name, MAX_NAME_LEN);
+
+    /* shorty_name_addr = Method.shorty */
+    uintptr_t shorty_name_addr = (uintptr_t)READ_WORD(pid, (method_addr + offMethod_shorty));
+    if(shorty_name_addr <=0)
+        goto bail;
+
+    char shorty_name[MAX_NAME_LEN];
+
+    dump_string(pid, shorty_name_addr, shorty_name, MAX_NAME_LEN);
+
+    /* class_addr = Method.clazz */
+    uintptr_t class_addr = (uintptr_t)READ_WORD(pid, (method_addr+offMethod_clazz));
+    if(class_addr <=0)
+        goto bail;
+    /*class_descriptor_addr = Class.descriptor */
+    uintptr_t class_descriptor_addr = (uintptr_t)READ_WORD(pid, (class_addr +offClassObject_descriptor));
+    if(class_descriptor_addr <=0)
+        goto bail;
+
+    char class_descriptor[MAX_NAME_LEN];
+
+    dump_string(pid, class_descriptor_addr, class_descriptor, MAX_NAME_LEN);
+
+    _LOG(tfd, !at_fault, "trace description dump\n");
+    _LOG(tfd, !at_fault, "class descriptor: %s\n", class_descriptor);
+    _LOG(tfd, !at_fault, "method name: %s(%s)\n",method_name, shorty_name);
+    _LOG(tfd, !at_fault, "first 4 trace runs:\n");
+    /* trace info */
+    unsigned num_trace_runs=0;
+    bool is_last_run=false;
+    do{
+        /* cur_trace_run = JitTraceDescription.trace[num_trace_runs] */
+        unsigned cur_trace_run = (unsigned)READ_WORD(pid,(trace_desc_addr+4 + num_trace_runs*8));
+        if(cur_trace_run <=0)
+            goto bail;
+
+        unsigned start_offset = (cur_trace_run >> 16)&0xffff;
+        unsigned num_insns = cur_trace_run & 0xff;
+        is_last_run = (cur_trace_run >> 8) & 0x1;
+        _LOG(tfd, !at_fault, "trace %u start offset: 0x%x len: %u\n", num_trace_runs, start_offset, num_insns);
+        num_trace_runs++;
+    }while(!is_last_run && num_trace_runs < 4);
+
+    return;
+
+bail:
+    _LOG(tfd, !at_fault, "read trace information error! erron:%s. Skip dalvik trace dump.\n",strerror(errno));
+
+}
+
+/* dump dalvik crash information */
+static void dump_dalvik(int tfd, mapinfo *milist, unsigned pid, bool at_fault)
+{
+    struct pt_regs r;
+
+    if(ptrace(PTRACE_GETREGS, pid, 0, &r)) {
+        _LOG(tfd, !at_fault, "tid %d not responding!\n", pid);
+        return;
+    }
+
+    const char codecache_name[] = "/dev/ashmem/dalvik-jit-code-cache";
+
+    const char *name = map_to_name(milist,r.ARM_pc, "<unknown>");
+
+    /* only in dalvik code cache */
+    if(strncmp(name, codecache_name, strlen(codecache_name))!=0)
+        return ;
+
+    /* try to recover the starting address of the crashed trace
+     * in case of chaining traces, the code cache address stored
+     * in current thread struct may not point to the current trace,
+     * so we first use current PC to find the trace address
+     */
+    /* thread_self = (Thread *)r6 */
+    uintptr_t thread_self = (uintptr_t)(r.ARM_r6);
+    uintptr_t rPC = (uintptr_t)(r.ARM_pc);
+
+    /* thread_id = thread_self->threadId */
+    unsigned thread_id = (unsigned)READ_WORD(pid,(thread_self + offThread_threadId));
+    uintptr_t jit_code_cache_addr=0;
+
+    uintptr_t trace_address_from_pc = find_trace_address(pid,rPC);
+
+    if(trace_address_from_pc!= 0)
+        jit_code_cache_addr = trace_address_from_pc;
+    else if (thread_id>0){
+        _LOG(tfd, !at_fault, "cannot find trace address from PC, use Thread pointer in r6\n");
+        jit_code_cache_addr = (uintptr_t)READ_WORD(pid, (thread_self + offThread_inJitCodeCache));
+        jit_code_cache_addr = jit_code_cache_addr & ~0x3;
+
+        if(jit_code_cache_addr==0 || !test_trace_address(pid, jit_code_cache_addr)){
+            _LOG(tfd, !at_fault, "address %08x does not look like a trace start address\n", jit_code_cache_addr);
+            return;
+        }
+    }else{
+        _LOG(tfd, !at_fault, "both PC and r6 in stale. Skip dalvik trace dump.\n");
+        return;
+    }
+
+    unsigned trace_size = get_trace_body_size(pid, jit_code_cache_addr);
+
+    if(trace_size<=0){
+        _LOG(tfd, !at_fault, "invalid trace_size. Skip dalvik trace dump.\n");
+        return;
+    }
+
+    _LOG(tfd, !at_fault, "crash in thread %d at trace address %08x trace size %u\n", thread_id,
+    jit_code_cache_addr, trace_size);
+
+    _LOG(tfd, !at_fault, "trace content dump\n");
+    dump_memory_region(tfd, pid, jit_code_cache_addr, trace_size, !at_fault);
+    dump_trace_description(tfd, pid, jit_code_cache_addr, at_fault);
 }

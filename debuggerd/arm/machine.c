@@ -127,7 +127,7 @@ static void show_nearby_maps(int tfd, int pid, mapinfo *map)
  * Dumps a few bytes of memory, starting a bit before and ending a bit
  * after the specified address.
  */
-static void dump_memory(int tfd, int pid, uintptr_t addr,
+void dump_memory(int tfd, int pid, uintptr_t addr,
     bool only_in_tombstone)
 {
     char code_buffer[64];       /* actual 8+1+((8+1)*4) + 1 == 45 */
@@ -370,4 +370,63 @@ void dump_registers(int tfd, int pid, bool at_fault)
     }
     _LOG(tfd, only_in_tombstone, " scr %08lx\n\n", vfp_regs.fpscr);
 #endif
+}
+
+/* for dalvik dump */
+/* get the pointer to Thread * in r6 */
+void *get_threadSelf(int tfd, int pid, bool at_fault)
+{
+    struct pt_regs r;
+    bool only_in_tombstone = !at_fault;
+
+    if(ptrace(PTRACE_GETREGS, pid, 0, &r)) {
+        _LOG(tfd, only_in_tombstone,
+             "cannot get registers: %s\n", strerror(errno));
+        return NULL;
+    }
+    return (void *)(r.ARM_r6);
+}
+
+/*
+ * Dumps memory region, starting from a specified address.
+ */
+void dump_memory_region(int tfd, int pid, uintptr_t addr, unsigned size,
+        bool only_in_tombstone)
+{
+    char code_buffer[100];
+    uintptr_t start ,end;
+    int count=0;
+    char *buf=code_buffer;
+
+    start = addr & ~3;
+    end = start + size;
+
+    _LOG(tfd, only_in_tombstone, "memory dump: %08x -> %08x\n", start, end);
+
+    while (start < end) {
+        if (count%4==0){
+            buf = code_buffer;
+            sprintf(buf, "%08x: ", start);
+            buf += 10;
+        }
+        /*
+         * If we see (data == -1 && errno != 0), we know that the ptrace
+         * call failed, probably because we're dumping memory in an
+         * unmapped or inaccessible page.  I don't know if there's
+         * value in making that explicit in the output -- it likely
+         * just complicates parsing and clarifies nothing for the
+         * enlightened reader.
+         */
+        long data = ptrace(PTRACE_PEEKTEXT, pid, (void*)start, NULL);
+        sprintf(buf, "%08lx ", data);
+        start += 4;
+        buf += 9;
+        if(count%4==3)
+            _LOG(tfd, only_in_tombstone, "%s\n", code_buffer);
+        count++;
+    }
+
+    if(count%4!=0)
+        _LOG(tfd, only_in_tombstone, "%s\n", code_buffer);
+
 }
