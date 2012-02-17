@@ -534,9 +534,7 @@ static void handle_generic_device_event(struct uevent *uevent)
               */
              int bus_id = uevent->minor / 128 + 1;
              int device_id = uevent->minor % 128 + 1;
-             /* build directories */
-             mkdir("/dev/bus", 0755);
-             mkdir("/dev/bus/usb", 0755);
+             /* build bus directory */
              snprintf(devpath, sizeof(devpath), "/dev/bus/usb/%03d", bus_id);
              mkdir(devpath, 0755);
              snprintf(devpath, sizeof(devpath), "/dev/bus/usb/%03d/%03d", bus_id, device_id);

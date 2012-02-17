@@ -37,6 +37,11 @@ loglevel 3
     mkdir /mnt 0775 root system
     mkdir /mnt/sdcard 0000 system system
 
+# create USB host bus directory here so that libusbhost
+# can start monitoring.
+    mkdir /dev/bus 0755 root root
+    mkdir /dev/bus/usb 0755 root root
+
 # Create cgroup mount point for cpu accounting
     mkdir /acct
     mount cgroup none /acct cpuacct
