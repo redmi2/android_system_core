@@ -229,6 +229,12 @@ typedef struct camera_face {
      */
     int32_t mouth[2];
 
+	/* ###QOALCOMM_CAMERA_ADDS_ON_START### */
+    int32_t smile_degree;
+    int32_t smile_score;
+    int32_t blink_detected;
+    int32_t face_recognised;
+	/* ###QOALCOMM_CAMERA_ADDS_ON_END### */
 } camera_face_t;
 
 /**
