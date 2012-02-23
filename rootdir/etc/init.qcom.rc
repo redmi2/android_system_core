@@ -30,6 +30,7 @@ on boot-pause
 
 on boot
     mkdir /data/misc/bluetooth 0770 bluetooth bluetooth
+    exec system/bin/btnvtool -O
     chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
