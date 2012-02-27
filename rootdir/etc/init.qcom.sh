@@ -39,9 +39,16 @@ case "$target" in
             "0")
                 echo 0 > /sys/devices/platform/msm_serial_hsl.0/console
                 ;;
-            *)
+            "1")
                 echo 1 > /sys/devices/platform/msm_serial_hsl.0/console
                 start console
+                ;;
+            *)
+                case "$dserial" in
+                     "1")
+                         start console
+                         ;;
+                esac
                 ;;
         esac
         ;;
