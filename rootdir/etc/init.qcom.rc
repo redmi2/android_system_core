@@ -173,6 +173,10 @@ on post-fs-data
     # Enable the setgid bit on the directory
     chmod 2770 /data/audio
 
+    mkdir /data/bluetooth 0770 bluetooth bluetooth
+    # Enable the setgid bit on the directory
+    chmod 2770 /data/bluetooth
+
     setprop vold.post_fs_data_done 1
 
 # Export GPIO56 for fusion targets to enable/disable hub
@@ -219,6 +223,8 @@ service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
     oneshot
 
 service bt-sap /system/bin/sapd 15
+    user bluetooth
+    group bluetooth net_bt_admin
     class late_start
     disabled
     oneshot
@@ -249,7 +255,7 @@ service qmiproxy /system/bin/qmiproxy
 service qmuxd /system/bin/qmuxd
     class late_start
     user radio
-    group radio audio
+    group radio audio bluetooth
     disabled
 
 service netmgrd /system/bin/netmgrd
