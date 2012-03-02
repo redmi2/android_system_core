@@ -358,7 +358,7 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
 #if !ADB_HOST
         // set child's OOM adjustment to zero
         char text[64];
-#if LINUX_ENABLED
+#ifdef HAVE_OOM_SCORE_ADJ
         snprintf(text, sizeof text, "/proc/%d/oom_score_adj", pid);
 #else
         snprintf(text, sizeof text, "/proc/%d/oom_adj", pid);

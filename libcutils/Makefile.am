@@ -40,6 +40,7 @@ libcutils_a_CPPFLAGS += -I../liblog
 libcutils_a_CPPFLAGS += -DHAVE_PTHREADS
 libcutils_a_CPPFLAGS += -DLINUX_ENABLED
 libcutils_a_CPPFLAGS += -DANDROID_SMP=0
+libcutils_a_CPPFLAGS += -include ../include/arch/linux-arm/OEConfig.h
 
 # libcutils_a_LDFLAGS := -version-info 1:0:0
 # libcutils_a_LIBADD  := -lpthread

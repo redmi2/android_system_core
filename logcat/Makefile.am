@@ -11,6 +11,7 @@ logcat_CPPFLAGS = -O2 \
 	-D_GNU_SOURCE \
 	-DHAVE_IOCTL \
 	-DHAVE_SYS_UIO_H \
-	-I../include
+	-I../include \
+	-include ../include/arch/linux-arm/OEConfig.h
 
 logcat_LDADD =  ../liblog/liblog.a
