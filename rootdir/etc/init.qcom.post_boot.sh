@@ -176,3 +176,9 @@ case "$target" in
         start mpdecision
     ;;
 esac
+
+case "$target" in
+    "msm8660")
+        start thermald
+    ;;
+esac
