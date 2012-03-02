@@ -37,3 +37,37 @@ void dump_pc_and_lr(int tfd, int pid, mapinfo *map, int unwound_level, bool at_f
 void dump_stack_and_code(int tfd, int pid, mapinfo *map,
                          int unwind_depth, unsigned int sp_list[],
                          bool at_fault);
+
+/* dalvik constatnts */
+/* copied from /dalvik/vm/mterp/common/asm-constants.h */
+# define MTERP_OFFSET(name, type, field, offset)    int name = offset;
+# define MTERP_SIZEOF(name, type, size)             int name = size;
+# define MTERP_CONSTANT(name, value)                int name = value;
+
+/* struct Thread */
+MTERP_OFFSET(offThread_pc,                Thread, interpSave.pc, 0)
+MTERP_OFFSET(offThread_curFrame,          Thread, interpSave.curFrame, 4)
+MTERP_OFFSET(offThread_method,            Thread, interpSave.method, 8)
+MTERP_OFFSET(offThread_methodClassDex,    Thread, interpSave.methodClassDex, 12)
+MTERP_OFFSET(offThread_threadId,          Thread, threadId, 36)
+MTERP_OFFSET(offThread_inJitCodeCache,    Thread, inJitCodeCache, 124)
+
+/* struct Method */
+MTERP_OFFSET(offMethod_clazz,           Method, clazz, 0)
+MTERP_OFFSET(offMethod_accessFlags,     Method, accessFlags, 4)
+MTERP_OFFSET(offMethod_methodIndex,     Method, methodIndex, 8)
+MTERP_OFFSET(offMethod_registersSize,   Method, registersSize, 10)
+MTERP_OFFSET(offMethod_outsSize,        Method, outsSize, 12)
+MTERP_OFFSET(offMethod_name,            Method, name, 16)
+MTERP_OFFSET(offMethod_shorty,          Method, shorty, 28)
+MTERP_OFFSET(offMethod_insns,           Method, insns, 32)
+MTERP_OFFSET(offMethod_nativeFunc,      Method, nativeFunc, 40)
+
+/* ClassObject fields */
+MTERP_OFFSET(offClassObject_descriptor, ClassObject, descriptor, 24)
+MTERP_OFFSET(offClassObject_accessFlags, ClassObject, accessFlags, 32)
+MTERP_OFFSET(offClassObject_pDvmDex,    ClassObject, pDvmDex, 40)
+MTERP_OFFSET(offClassObject_status,     ClassObject, status, 44)
+MTERP_OFFSET(offClassObject_super,      ClassObject, super, 72)
+MTERP_OFFSET(offClassObject_vtableCount, ClassObject, vtableCount, 112)
+MTERP_OFFSET(offClassObject_vtable,     ClassObject, vtable, 116)
