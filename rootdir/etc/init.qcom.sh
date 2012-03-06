@@ -273,6 +273,7 @@ case "$target" in
         esac
 
         platformvalue=`cat /sys/devices/system/soc/soc0/hw_platform`
+        hw_ver=`cat /sys/devices/system/soc/soc0/platform_version`
         case "$platformvalue" in
              "Fluid")
                  start profiler_daemon;;
@@ -282,6 +283,10 @@ case "$target" in
         platformid=`cat /sys/devices/system/soc/soc0/id`
         case "$platformvalue" in
              "Liquid")
+                  if [ "$hw_ver" == "196608" ]; then # version 0x30000 is 3D sku
+                     setprop ro.sf.hwrotation 90
+                  fi
+
                 setprop ro.sf.lcd_density 160;;
              "MTP")
                 setprop ro.sf.lcd_density 240;;
