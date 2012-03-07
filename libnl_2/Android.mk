@@ -17,10 +17,11 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES += \
         external/libnl-headers
 
+LOCAL_SHARED_LIBRARIES := liblog
 # Static Library
 LOCAL_MODULE := libnl_2
 LOCAL_MODULE_TAGS := optional
-include $(BUILD_STATIC_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)
 
 #######################################
 # Shared library currently unavailiable
