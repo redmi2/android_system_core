@@ -60,6 +60,7 @@ int usage(void)
     fprintf(stderr,"usage: mkbootimg\n"
             "       --kernel <filename>\n"
             "       --ramdisk <filename>\n"
+            "       [ --ramdisk_offset <offset> ]\n"
             "       [ --second <2ndbootloader-filename> ]\n"
             "       [ --cmdline <kernel-commandline> ]\n"
             "       [ --board <boardname> ]\n"
@@ -109,17 +110,13 @@ int main(int argc, char **argv)
     int fd;
     SHA_CTX ctx;
     uint8_t* sha;
+    unsigned base = 0x10000000;
+    unsigned ramdisk_offset = 0x01300000;
 
     argc--;
     argv++;
 
     memset(&hdr, 0, sizeof(hdr));
-
-        /* default load addresses */
-    hdr.kernel_addr =  0x10008000;
-    hdr.ramdisk_addr = 0x11000000;
-    hdr.second_addr =  0x10F00000;
-    hdr.tags_addr =    0x10000100;
 
     while(argc > 0){
         char *arg = argv[0];
@@ -140,11 +137,7 @@ int main(int argc, char **argv)
         } else if(!strcmp(arg, "--cmdline")) {
             cmdline = val;
         } else if(!strcmp(arg, "--base")) {
-            unsigned base = strtoul(val, 0, 16);
-            hdr.kernel_addr =  base + 0x00008000;
-            hdr.ramdisk_addr = base + 0x01300000;
-            hdr.second_addr =  base + 0x00F00000;
-            hdr.tags_addr =    base + 0x00000100;
+            base = strtoul(val, 0, 16);
         } else if(!strcmp(arg, "--board")) {
             board = val;
         } else if(!strcmp(arg,"--pagesize")) {
@@ -153,6 +146,8 @@ int main(int argc, char **argv)
                 fprintf(stderr,"error: unsupported page size %d\n", pagesize);
                 return -1;
             }
+        } else if (!strcmp(arg, "--ramdisk_offset")) {
+            ramdisk_offset = strtoul(val, 0, 16);
         } else {
             return usage();
         }
@@ -179,6 +174,11 @@ int main(int argc, char **argv)
         fprintf(stderr,"error: board name too large\n");
         return usage();
     }
+
+    hdr.kernel_addr =  base + 0x00008000;
+    hdr.second_addr =  base + 0x00F00000;
+    hdr.tags_addr =    base + 0x00000100;
+    hdr.ramdisk_addr = base + 0x00008000 + ramdisk_offset;
 
     strcpy(hdr.name, board);
 
