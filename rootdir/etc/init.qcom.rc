@@ -496,3 +496,6 @@ service hcidump /system/bin/sh /system/etc/hcidump.sh
     group bluetooth system net_bt_admin net_admin
     disabled
     oneshot
+
+service charger /charger
+    class charger
