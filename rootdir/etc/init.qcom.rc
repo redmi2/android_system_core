@@ -156,7 +156,7 @@ on post-fs-data
 
     #Create directories for wiper services
     mkdir /data/wpstiles/ 0755 shell
-    mkdir /data/wiper 0755 location qcom_oncrpc
+    mkdir /data/wiper 0755 gps qcom_oncrpc
 
     #Create directories for gpsone_daemon services
     mkdir /data/misc/gpsone_d 0770 system gps
@@ -343,8 +343,9 @@ service dhcpcd_bnep0 /system/bin/dhcpcd -BKLG
     oneshot
 
 service wiperiface /system/bin/wiperiface
-    user location
-    group qcom_oncrpc
+    class late_start
+    user gps
+    group gps qcom_oncrpc
     oneshot
 
 service gpsone_daemon /system/bin/gpsone_daemon
