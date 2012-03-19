@@ -1,0 +1,51 @@
+#!/bin/sh
+# Starts the USB Android Gadget.
+
+export KERNEL=`uname -r`
+
+case "$1" in
+  start)
+
+        case $KERNEL in
+          3.*)
+                if [ -f /usr/lib/modules/$KERNEL/kernel/drivers/usb/gadget/ci13xxx_msm.ko ]; then
+                        insmod /usr/lib/modules/$KERNEL/kernel/drivers/usb/gadget/ci13xxx_msm.ko
+                        echo android_usb > /sys/bus/platform/drivers/android_usb/bind
+                fi
+
+                if [ -d /sys/class/android_usb/android0 ]
+                then
+                        echo "Starting USB Android Gadget"
+                        echo 0 > /sys/class/android_usb/android0/enable
+                        echo 0x9025 > /sys/class/android_usb/android0/idProduct
+                        echo 0x05C6 > /sys/class/android_usb/android0/idVendor
+                        echo diag > /sys/class/android_usb/android0/f_diag/clients
+                        echo smd,tty > /sys/class/android_usb/android0/f_serial/transports
+                        echo smd,bam2bam > /sys/class/android_usb/android0/f_rmnet/transports
+                        echo diag,adb,serial,rmnet,mass_storage > /sys/class/android_usb/android0/functions
+                        echo 1 > /sys/class/android_usb/android0/enable
+                fi
+                ;;
+          2.*)
+                # Nothing to do for 2.x kernels
+                ;;
+          *)
+                # Some other version of kernel?
+                ;;
+        esac
+        ;;
+
+  stop)
+        echo "Stopping USB Android Gadget"
+        ;;
+
+  restart)
+        $0 stop
+        $0 start
+        ;;
+  *)
+        echo "Usage usb { start | stop | restart}" >&2
+        exit 1
+        ;;
+esac
+
