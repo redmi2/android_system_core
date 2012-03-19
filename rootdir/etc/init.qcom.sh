@@ -112,9 +112,15 @@ baseband=`getprop ro.baseband`
 multirild=`getprop ro.multi.rild`
 dsds=`getprop persist.dsds.enabled`
 netmgr=`getprop ro.use_data_netmgrd`
+
 case "$baseband" in
-    "msm" | "csfb" | "svlte2a" | "mdm" | "unknown")
-    start ril-daemon
+    "apq")
+    setprop ro.radio.noril yes
+    stop ril-daemon
+esac
+
+case "$baseband" in
+    "msm" | "csfb" | "svlte2a" | "mdm"| "unknown")
     start qmuxd
     case "$baseband" in
         "svlte2a" | "csfb")
