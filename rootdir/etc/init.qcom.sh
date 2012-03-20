@@ -290,6 +290,8 @@ case "$target" in
         case "$platformvalue" in
              "Fluid")
                  start profiler_daemon;;
+             "Liquid")
+                 start profiler_daemon;;
         esac
 
         # lcd density is write-once. Hence the separate switch case
