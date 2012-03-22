@@ -353,3 +353,23 @@ case "$target" in
 
 esac
 
+#Set up composition type based on the target
+case "$target" in
+    "msm8960")
+        platformid=`cat /sys/devices/system/soc/soc0/id`
+        case "$platformid" in
+            109)
+                #APQ8064
+                setprop debug.composition.type gpu
+            ;;
+            *)
+                #8960
+                setprop debug.composition.type dyn
+            ;;
+        esac
+    ;;
+    *)
+        setprop debug.composition.type dyn
+    ;;
+esac
+
