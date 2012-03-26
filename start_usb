@@ -16,6 +16,7 @@ case "$1" in
                 if [ -d /sys/class/android_usb/android0 ]
                 then
                         echo "Starting USB Android Gadget"
+                        echo hsusb > /sys/devices/platform/usb_bam/enable
                         echo 0 > /sys/class/android_usb/android0/enable
                         echo 0x9025 > /sys/class/android_usb/android0/idProduct
                         echo 0x05C6 > /sys/class/android_usb/android0/idVendor
