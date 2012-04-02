@@ -372,7 +372,5 @@ case "$target" in
         esac
     ;;
     *)
-        setprop debug.composition.type dyn
-    ;;
 esac
 
