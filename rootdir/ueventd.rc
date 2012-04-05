@@ -135,6 +135,8 @@
 /dev/media*	          0660   system     camera
 /dev/v4l-subdev*          0660   system     camera
 /dev/tun                  0660   system     vpn
+/dev/oncrpc/300000ba:00010000  0660   system     drmrpc
+
 #regular apps need to be able to open ion
 /dev/ion                  0664   system     system
 #rfcomm device for Bluetooth DUN
