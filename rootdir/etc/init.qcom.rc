@@ -52,6 +52,14 @@ on boot
     chown bluetooth bluetooth /sys/devices/platform/msm_serial_hs.0/clock
     chmod 0660 /sys/devices/platform/msm_serial_hs.0/clock
 
+    #Create QMUX deamon socket area
+    mkdir /dev/socket/qmux_radio 0770 radio radio
+    chmod 2770 /dev/socket/qmux_radio
+    mkdir /dev/socket/qmux_audio 0770 media audio
+    chmod 2770 /dev/socket/qmux_audio
+    mkdir /dev/socket/qmux_bluetooth 0770 bluetooth bluetooth
+    chmod 2770 /dev/socket/qmux_bluetooth
+
     setprop wifi.interface wlan0
 
     #Set SUID bit for usbhub
@@ -168,14 +176,6 @@ on post-fs-data
 
     # Create /data/time folder for time-services
     mkdir /data/time/ 0700 system system
-
-    mkdir /data/audio 0770 media audio
-    # Enable the setgid bit on the directory
-    chmod 2770 /data/audio
-
-    mkdir /data/bluetooth 0770 bluetooth bluetooth
-    # Enable the setgid bit on the directory
-    chmod 2770 /data/bluetooth
 
     setprop vold.post_fs_data_done 1
 
