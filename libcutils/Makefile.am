@@ -59,5 +59,9 @@ endif # !ARM
 
 # Build a DSO too
 lib_LTLIBRARIES := libcutils.la
-libcutils_la_SOURCES = $(libcutils_a_SOURCES)
-libcutils_la_CPPFLAGS = $(libcutils_a_CPPFLAGS)
+libcutils_la_SOURCES := $(libcutils_a_SOURCES)
+libcutils_la_CPPFLAGS := $(libcutils_a_CPPFLAGS)
+
+pkgconfigdir := $(libdir)/pkgconfig
+pkgconfig_DATA := libcutils.pc
+EXTRA_DIST := $(pkgconfig_DATA)
