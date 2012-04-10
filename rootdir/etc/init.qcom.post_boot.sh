@@ -155,7 +155,7 @@ case "$target" in
 esac
 
 case "$target" in
-    "msm7627_ffa" | "msm7627_surf" | "msm7627a" | "msm7627_6x")
+    "msm7627_ffa" | "msm7627_surf" | "msm7627_6x")
         echo 25000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
         ;;
 esac
@@ -188,5 +188,20 @@ esac
 case "$target" in
     "msm8660" | "msm8960" | "msm7627a")
         start mpdecision
+    ;;
+esac
+
+# Enable Power modes and set the CPU Freq Sampling rates
+case "$target" in
+     "msm7627a")
+	echo 1 > /sys/module/pm2/modes/cpu0/standalone_power_collapse/idle_enabled
+	echo 1 > /sys/module/pm2/modes/cpu1/standalone_power_collapse/idle_enabled
+	echo 1 > /sys/module/pm2/modes/cpu0/standalone_power_collapse/suspend_enabled
+	echo 1 > /sys/module/pm2/modes/cpu1/standalone_power_collapse/suspend_enabled
+	#SuspendPC:
+	echo 1 > /sys/module/pm2/modes/cpu0/power_collapse/suspend_enabled
+	#IdlePC:
+	echo 1 > /sys/module/pm2/modes/cpu0/power_collapse/idle_enabled
+	echo 25000 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
     ;;
 esac
