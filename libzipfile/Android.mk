@@ -32,6 +32,22 @@ LOCAL_C_INCLUDES += external/zlib
 
 include $(BUILD_STATIC_LIBRARY)
 
+#build device dynamic library
+include $(CLEAR_VARS)
+
+LOCAL_MODULE:= libzipfile
+
+LOCAL_SRC_FILES:= \
+        centraldir.c \
+        zipfile.c
+
+LOCAL_STATIC_LIBRARIES := \
+        libunz
+
+LOCAL_C_INCLUDES += external/zlib
+
+include $(BUILD_SHARED_LIBRARY)
+
 
 # build test_zipfile
 include $(CLEAR_VARS)
