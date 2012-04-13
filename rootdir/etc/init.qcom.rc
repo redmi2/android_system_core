@@ -59,6 +59,8 @@ on boot
     chmod 2770 /dev/socket/qmux_audio
     mkdir /dev/socket/qmux_bluetooth 0770 bluetooth bluetooth
     chmod 2770 /dev/socket/qmux_bluetooth
+    mkdir /dev/socket/qmux_gps 0770 gps gps
+    chmod 2770 /dev/socket/qmux_gps
 
     setprop wifi.interface wlan0
 
@@ -262,7 +264,7 @@ service qmiproxy /system/bin/qmiproxy
 service qmuxd /system/bin/qmuxd
     class late_start
     user radio
-    group radio audio bluetooth
+    group radio audio bluetooth gps
     disabled
 
 service netmgrd /system/bin/netmgrd
