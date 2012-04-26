@@ -216,6 +216,16 @@ on property:bluetooth.isEnabled=true
 on property:bluetooth.isEnabled=false
     start amp_unload
 
+service qcom-c_core-sh /system/bin/sh /init.qcom.class_core.sh
+    class core
+    user root
+    oneshot
+
+service qcom-c_main-sh /system/bin/sh /init.qcom.class_main.sh
+    class main
+    user root
+    oneshot
+
 service cnd /system/bin/cnd
     class late_start
     socket cnd stream 666 root radio
