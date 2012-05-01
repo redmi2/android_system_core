@@ -1,6 +1,7 @@
 /* tools/mkbootimg/mkbootimg.c
 **
 ** Copyright 2007, The Android Open Source Project
+** Copyright (c) 2012, Code Aurora Forum. All rights reserved.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -24,6 +25,8 @@
 
 #include "mincrypt/sha.h"
 #include "bootimg.h"
+
+#define ROUND_TO_PAGE(x, y) (((x) + (y)) & (~(y)))
 
 static void *load_file(const char *fn, unsigned *_sz)
 {
@@ -216,7 +219,8 @@ int main(int argc, char **argv)
             /* put the compressed image after the ramdisk so that the
                decompressor may run without having to relocate itself and
                the compressed image */
-            hdr.kernel_addr = hdr.ramdisk_addr + hdr.ramdisk_size;
+            hdr.kernel_addr = hdr.ramdisk_addr +
+                ROUND_TO_PAGE(hdr.ramdisk_size, (pagesize - 1));
             hdr.kernel_addr = (hdr.kernel_addr + 4) & 0xfffffffc;
     } else
             hdr.kernel_addr = base + 0x00008000;
