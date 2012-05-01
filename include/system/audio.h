@@ -456,6 +456,7 @@ static inline bool audio_is_valid_format(uint32_t format)
     case AUDIO_FORMAT_EVRC:
     case AUDIO_FORMAT_AC3:
     case AUDIO_FORMAT_AAC_ADIF:
+    case AUDIO_FORMAT_WMA:
         return true;
     default:
         return false;
