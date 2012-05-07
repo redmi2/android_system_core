@@ -53,7 +53,7 @@ start_coex ()
       "1")
        echo "ATH WLAN Chip ID is enabled"
        # Must have -d -z -n -v -s -w wlan0 parameters for atheros btfilter.
-       /system/bin/abtfilt -d -z -n -v -s -w wlan0 &
+       /system/bin/abtfilt -d -z -n -v -q -s -w wlan0 &
       ;;
       "0")
        echo "WCN WLAN Chip ID is enabled"
@@ -63,7 +63,7 @@ start_coex ()
       *)
        echo "NO WLAN Chip ID is enabled, so enabling WCN as default"
        # Must have -d -z -n -v -s -w wlan0 parameters for atheros btfilter.
-       /system/bin/abtfilt -d -z -n -v -s -w wlan0 &
+       /system/bin/abtfilt -d -z -n -v -q -s -w wlan0 &
       ;;
   esac
   coex_pid=$!
