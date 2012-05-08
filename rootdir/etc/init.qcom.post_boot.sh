@@ -69,14 +69,6 @@ case "$target" in
 	 echo 1 > /sys/module/pm_8x60/modes/cpu1/power_collapse/idle_enabled
 	 echo 1 > /sys/module/pm_8x60/modes/cpu0/standalone_power_collapse/idle_enabled
 	 echo 1 > /sys/module/pm_8x60/modes/cpu1/standalone_power_collapse/idle_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu0/power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu1/power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu0/standalone_power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu1/standalone_power_collapse/suspend_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu0/power_collapse/idle_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu1/power_collapse/idle_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu0/standalone_power_collapse/idle_enabled
-	 echo 1 > /sys/module/pm_8660/modes/cpu1/standalone_power_collapse/idle_enabled
 	 echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
 	 echo "ondemand" > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
 	 echo 50000 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_rate
