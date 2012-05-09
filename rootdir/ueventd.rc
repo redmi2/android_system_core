@@ -68,6 +68,7 @@
 /dev/i2c-1                0664   root       system
 /dev/i2c-2                0664   root       system
 /dev/i2c-4                0664   root       system
+/dev/i2c-5                0664   media       media
 /dev/msm_pcm_out*         0660   system     audio
 /dev/msm_pcm_in*          0660   system     audio
 /dev/msm_mvs              0660   system     audio
