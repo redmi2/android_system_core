@@ -387,7 +387,7 @@ service quipc_igsn /system/bin/quipc_igsn
 service quipc_main /system/bin/quipc_main
     class late_start
     user gps
-    group net_admin wifi inet gps
+    group gps net_admin wifi inet
     disabled
 
 service fm_dl /system/bin/sh /system/etc/init.qcom.fm.sh
