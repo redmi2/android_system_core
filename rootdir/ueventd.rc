@@ -132,7 +132,7 @@
 /dev/block/mmcblk0p17     0660   system     system
 /dev/block/mmcblk0p18     0660   system     system
 /dev/usb_accessory        0660   root       usb
-/dev/video*	          0660   system     camera 
+/dev/video*	          0660   system     camera
 /dev/media*	          0660   system     camera
 /dev/v4l-subdev*          0660   system     camera
 /dev/tun                  0660   system     vpn
@@ -177,3 +177,9 @@
 /sys/devices/virtual/smdpkt/smdcntl*       open_timeout   0664 radio radio
 #permissions for sensors
 /dev/msm_dsps             0660  system       system
+
+# DVB devices
+/dev/dvb/adapter0/demux*  0444   media       media
+/dev/dvb/adapter0/dvr*    0664   media       media
+/dev/dvb/adapter0/video*  0664   media       media
+

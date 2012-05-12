@@ -568,6 +568,26 @@ static void handle_generic_device_event(struct uevent *uevent)
          base = "/dev/log/";
          mkdir(base, 0755);
          name += 4;
+     } else if(!strncmp(uevent->subsystem, "dvb", 3)) {
+         /* This imitates the file system that would be created
+          * if we were using devfs instead to preserve backward compatibility
+          * for users of dvb devices
+          */
+         int adapter_id;
+         char dev_name[20] = {0};
+
+         sscanf(name, "dvb%d.%s", &adapter_id, dev_name);
+
+         /* build dvb directory */
+         base = "/dev/dvb";
+         mkdir(base, 0755);
+
+         /* build adapter directory */
+         snprintf(devpath, sizeof(devpath), "/dev/dvb/adapter%d", adapter_id);
+         mkdir(devpath, 0755);
+
+         /* build actual device directory */
+         snprintf(devpath, sizeof(devpath), "/dev/dvb/adapter%d/%s", adapter_id, dev_name);
      } else
          base = "/dev/";
      links = get_character_device_symlinks(uevent);
@@ -766,7 +786,7 @@ void handle_device_fd()
 **
 ** We drain any pending events from the netlink socket every time
 ** we poke another uevent file to make sure we don't overrun the
-** socket's buffer.  
+** socket's buffer.
 */
 
 static void do_coldboot(DIR *d)
