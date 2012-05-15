@@ -194,6 +194,7 @@ case "$target" in
         case "$soc_id" in
             "127" | "128" | "129")
                 start mpdecision
+                start thermald
         ;;
         esac
     ;;
