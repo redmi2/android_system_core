@@ -157,6 +157,8 @@ typedef enum {
     AUDIO_FORMAT_DTS                 = 0x0c000000UL,
     AUDIO_FORMAT_WMA                 = 0x0d000000UL,
     AUDIO_FORMAT_AAC_ADIF            = 0x0f000000UL,
+    AUDIO_FORMAT_EVRCB               = 0x10000000UL,
+    AUDIO_FORMAT_EVRCWB              = 0x11000000UL,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
@@ -457,6 +459,8 @@ static inline bool audio_is_valid_format(uint32_t format)
     case AUDIO_FORMAT_AC3:
     case AUDIO_FORMAT_AAC_ADIF:
     case AUDIO_FORMAT_WMA:
+    case AUDIO_FORMAT_EVRCB:
+    case AUDIO_FORMAT_EVRCWB:
         return true;
     default:
         return false;
