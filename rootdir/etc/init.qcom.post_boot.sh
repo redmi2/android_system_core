@@ -137,12 +137,7 @@ case "$target" in
          chmod 664 /sys/devices/system/cpu/cpu1/online
          chmod 664 /sys/devices/system/cpu/cpu2/online
          chmod 664 /sys/devices/system/cpu/cpu3/online
-         governor=`cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor`
-         case "$governor" in
-             "msm-dcvs")
-                 start qosmgrd
-                 ;;
-         esac
+         start qosmgrd
          ;;
 esac
 
