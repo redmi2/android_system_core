@@ -37,6 +37,29 @@
 target=`getprop ro.board.platform`
 case "$target" in
     msm8960*)
+      wlanchip=`cat /persist/wlan_chip_id`
+      echo "The WLAN Chip ID is $wlanchip"
+      case "$wlanchip" in
+      "AR6004-USB")
+        setprop wlan.driver.ath 2
+        mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
+        rm  /system/lib/modules/wlan.ko
+        rm  /system/lib/modules/cfg80211.ko
+        ln -s /system/lib/modules/ath6kl-3.5/ath6kl_usb.ko /system/lib/modules/wlan.ko
+        ln -s /system/lib/modules/ath6kl-3.5/cfg80211.ko /system/lib/modules/cfg80211.ko
+        mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
+        ;;
+      *)
+        echo "*** WI-FI chip ID is not specified in /persist/wlan_chip_id **"
+        echo "*** Use the default WCN driver.                             **"
+        setprop wlan.driver.ath 0 
+        mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
+        rm  /system/lib/modules/wlan.ko
+        rm  /system/lib/modules/cfg80211.ko
+        ln -s /system/lib/modules/prima/prima_wlan.ko /system/lib/modules/wlan.ko
+        ln -s /system/lib/modules/prima/cfg80211.ko /system/lib/modules/cfg80211.ko
+        mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
+
         # The property below is used in Qcom SDK for softap to determine
         # the wifi driver config file
         setprop wlan.driver.config /data/misc/wifi/WCNSS_qcom_cfg.ini
@@ -80,6 +103,8 @@ case "$target" in
         serialno=`getprop ro.serialno`
         echo $serialno > /sys/devices/platform/wcnss_wlan.0/serial_number
         ;;
+      esac
+      ;;
     msm8660*)
     exit 0
     ;;
