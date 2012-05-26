@@ -91,6 +91,13 @@ case "$target" in
 esac
 
 case "$target" in
+        "msm8960")
+        start location_mq
+        start xtwifi_inet
+        start xtwifi_client
+esac
+
+case "$target" in
     "msm7630_surf" | "msm7630_1x" | "msm7630_fusion")
         value=`cat /sys/devices/system/soc/soc0/hw_platform`
         case "$value" in
