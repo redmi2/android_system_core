@@ -252,7 +252,7 @@ service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
 service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
     class late_start
     user bluetooth
-    group bluetooth system net_bt_admin inet
+    group bluetooth net_bt_admin inet
     disabled
     oneshot
 
