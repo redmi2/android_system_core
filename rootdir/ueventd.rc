@@ -113,6 +113,7 @@
 /dev/sdioctl6             0640   radio      radio
 /dev/sdioctl7             0640   radio      radio
 /dev/sdioctl8             0640   radio      radio
+/dev/smuxctl32            0640   radio      radio
 /dev/rmnet_mux_ctrl       0640   radio      radio
 /dev/hsicctl0             0640   radio      radio
 /dev/hsicctl1             0640   radio      radio
