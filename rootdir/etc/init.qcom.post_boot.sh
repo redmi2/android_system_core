@@ -135,7 +135,38 @@ case "$target" in
          chmod 664 /sys/devices/system/cpu/cpu1/online
          chmod 664 /sys/devices/system/cpu/cpu2/online
          chmod 664 /sys/devices/system/cpu/cpu3/online
+         soc_id=`cat /sys/devices/system/soc/soc0/id`
          start qosmgrd
+         case "$soc_id" in
+             "130")
+                 echo 230 > /sys/class/gpio/export
+                 echo 228 > /sys/class/gpio/export
+                 echo "in" > /sys/class/gpio/gpio230/direction
+                 echo "rising" > /sys/class/gpio/gpio230/edge
+                 echo "in" > /sys/class/gpio/gpio228/direction
+                 echo "rising" > /sys/class/gpio/gpio228/edge
+                 echo 253 > /sys/class/gpio/export
+                 echo 254 > /sys/class/gpio/export
+                 echo 257 > /sys/class/gpio/export
+                 echo 258 > /sys/class/gpio/export
+                 echo 259 > /sys/class/gpio/export
+                 echo "out" > /sys/class/gpio/gpio253/direction
+                 echo "out" > /sys/class/gpio/gpio254/direction
+                 echo "out" > /sys/class/gpio/gpio257/direction
+                 echo "out" > /sys/class/gpio/gpio258/direction
+                 echo "out" > /sys/class/gpio/gpio259/direction
+                 chown media /sys/class/gpio/gpio253/value
+                 chown media /sys/class/gpio/gpio254/value
+                 chown media /sys/class/gpio/gpio257/value
+                 chown media /sys/class/gpio/gpio258/value
+                 chown media /sys/class/gpio/gpio259/value
+                 chown media /sys/class/gpio/gpio253/direction
+                 chown media /sys/class/gpio/gpio254/direction
+                 chown media /sys/class/gpio/gpio257/direction
+                 chown media /sys/class/gpio/gpio258/direction
+                 chown media /sys/class/gpio/gpio259/direction
+                 ;;
+         esac
          ;;
 esac
 
