@@ -463,6 +463,7 @@ static inline bool audio_is_valid_format(uint32_t format)
     case AUDIO_FORMAT_WMA_PRO:
     case AUDIO_FORMAT_EVRCB:
     case AUDIO_FORMAT_EVRCWB:
+    case AUDIO_FORMAT_DTS:
         return true;
     default:
         return false;
