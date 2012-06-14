@@ -20,7 +20,7 @@ LOCAL_SHARED_LIBRARIES += \
         libbinder
 
 LOCAL_MODULE:= libtestframework
-LOCAL_MODULE_TAGS := eng
+LOCAL_MODULE_TAGS := debug
 include $(BUILD_SHARED_LIBRARY)
 
 #testframework servcice
@@ -33,7 +33,7 @@ LOCAL_SHARED_LIBRARIES := libtestframework libcutils libutils libbinder
 
 LOCAL_CFLAGS := -DCUSTOM_EVENTS_TESTFRAMEWORK
 LOCAL_MODULE:= testframeworkservice
-LOCAL_MODULE_TAGS := eng
+LOCAL_MODULE_TAGS := debug
 
 include $(BUILD_EXECUTABLE)
 
