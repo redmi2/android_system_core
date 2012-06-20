@@ -214,15 +214,12 @@ service qcom-c_main-sh /system/bin/sh /init.qcom.class_main.sh
     user root
     oneshot
 
-on property:vold.decrypt=trigger_restart_framework
-    start qcom-c_main-sh
-
 service cnd /system/bin/cnd
     class late_start
     socket cnd stream 666 root radio
 
 service rmt_storage /system/bin/rmt_storage
-    class core
+    class main
     user root
     disabled
 
@@ -267,20 +264,20 @@ on property:ro.baseband="msm"
     setprop ro.qualcomm.bluetooth.dun true
 
 service qmiproxy /system/bin/qmiproxy
-    class main
+    class late_start
     user radio
     group radio
     disabled
 
 # QMUX must be in multiple groups to support external process connections
 service qmuxd /system/bin/qmuxd
-    class main
+    class late_start
     user radio
     group radio audio bluetooth
     disabled
 
 service netmgrd /system/bin/netmgrd
-    class main
+    class late_start
     disabled
 
 service sensors /system/bin/sensors.qcom
@@ -462,7 +459,7 @@ on property:persist.timed.enable=true
     start time_daemon
 
 service ril-daemon1 /system/bin/rild -c 1
-    class main
+    class late_start
     socket rild1 stream 660 root radio
     socket rild-debug1 stream 660 radio system
     user root
