@@ -100,7 +100,7 @@ case "$target" in
     ;;
     *)
     # Build settings may not produce the coex executable
-    if ls /system/bin/btwlancoex | ls /system/bin/abtfilt
+    if ls /system/bin/btwlancoex || ls /system/bin/abtfilt
     then
         start_coex
         wait $coex_pid
