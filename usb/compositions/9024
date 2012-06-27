@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# DESCRIPTION: RNDIS + ADB [Android]
+
+echo "Switching to composition number 0x9024"
+
+echo 0 > /sys/class/android_usb/android0/enable
+echo 0x9024 > /sys/class/android_usb/android0/idProduct
+echo 0x05C6 > /sys/class/android_usb/android0/idVendor
+echo rndis,adb > /sys/class/android_usb/android0/functions
+echo 1 > /sys/class/android_usb/android0/remote_wakeup
+echo 1 > /sys/class/android_usb/android0/f_rndis/wceis
+echo 1 > /sys/class/android_usb/android0/enable

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# DESCRIPTION: DIAG + QMI_RMNET (Android)
+
+echo "Switching to composition number 0x9021"
+
+echo 0 > /sys/class/android_usb/android0/enable
+echo 0x9021 > /sys/class/android_usb/android0/idProduct
+echo 0x05C6 > /sys/class/android_usb/android0/idVendor
+echo diag > /sys/class/android_usb/android0/f_diag/clients
+echo smd,bam2bam > /sys/class/android_usb/android0/f_rmnet/transports
+echo diag,rmnet > /sys/class/android_usb/android0/functions
+echo 1 > /sys/class/android_usb/android0/remote_wakeup
+echo 1 > /sys/class/android_usb/android0/enable

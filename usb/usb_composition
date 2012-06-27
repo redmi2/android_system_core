@@ -1,0 +1,133 @@
+#!/bin/sh
+# Switch to a chosen USB composition.
+
+COMP_DIR="/usr/bin/usb/compositions"
+
+legal_composition() {
+	for c in $( ls $COMP_DIR ); do
+		if [ "$1" = "$c" ]; then
+			echo "1"
+			exit
+		fi
+	done
+	echo "0"
+}
+
+read_pid() {
+	local tmp_pid='0'
+	read -p "Pid number : " tmp_pid
+	while [ true ]; do
+		if [ `legal_composition $tmp_pid` = "1" ]; then
+			echo "$tmp_pid"
+			exit
+		fi
+		read -p "Illegal Pid number, try again : " tmp_pid
+	done
+}
+
+read_hsic() {
+	local tmp_hsic='0'
+	read -p "Enable hsic ? (y/n)" tmp_hsic
+	while [ true ]; do
+		if [ $tmp_hsic = "y" ] || [ $tmp_hsic = "n" ]; then
+			echo "$tmp_hsic"
+			exit
+		fi
+		read -p "Only 'y' or 'n' are allowed, try again : " tmp_hsic
+	done
+}
+
+read_presistent() {
+	local tmp_hsic='0'
+	read -p "Would you like it to be the default composition ? (y/n)" tmp_hsic
+	while [ true ]; do
+		if [ $tmp_hsic = "y" ] || [ $tmp_hsic = "n" ]; then
+			echo "$tmp_hsic"
+			exit
+		fi
+		read -p "Only 'y' or 'n' are allowed, try again : " tmp_hsic
+	done
+}
+
+
+if [ "$#" -ge 4 ]; then
+	echo "Usage: usb_composition [Pid] [HSIC] [PERSISTENT]" >&2
+	exit
+
+elif [ "$#" -eq 3 ]; then
+
+	if [ `legal_composition $1` = "0" ]; then
+		echo "Illegal pid"
+		exit
+	fi
+	if [ $2 != "y" ] && [ $2 != "n" ]; then
+		echo "Illegal hsic choice (must be 'y' or 'n')."
+		exit
+	fi
+	if [ $3 != "y" ] && [ $3 != "n" ]; then
+		echo "Illegal presistent choice (must be 'y' or 'n')."
+		exit
+	fi
+	pid=$1
+	hsic=$2
+	presistent=$3
+
+elif [ "$#" -eq 2 ]; then
+
+	if [ `legal_composition $1` = "0" ]; then
+		echo "Illegal pid"
+		exit
+	fi
+	if [ $2 != "y" ] && [ $2 != "n" ]; then
+		echo "Illegal hsic choice (must be 'y' or 'n')."
+		exit
+	fi
+	pid=$1
+	hsic=$2
+	presistent="n"
+
+elif [ "$#" -eq 1 ]; then
+
+	if [ `legal_composition $1` = "0" ]; then
+		echo "Illegal pid"
+		exit
+	fi
+	pid=$1
+	hsic="n"
+	presistent="n"
+
+elif [ "$#" -eq 0 ]; then
+
+	echo "Choose Composition by Pid:"
+	for i in $( ls $COMP_DIR ); do
+		desc=`grep DESCRIPTION: $COMP_DIR/$i | sed 's/.*DESCRIPTION: *//g'`
+		echo "   $i -	$desc"
+	done
+	pid=`read_pid`
+	hsic=`read_hsic`
+        presistent=`read_presistent`
+
+
+fi
+
+if [ $presistent = "y" ]; then
+	rm /usr/bin/usb/usb_init
+	rm /usr/bin/usb/boot_composition
+	if [ $hsic = "y" ]; then
+		ln -s /usr/bin/usb/boot_hsic /usr/bin/usb/usb_init
+	else
+		ln -s /usr/bin/usb/boot_hsusb /usr/bin/usb/usb_init
+	fi
+	ln -s /usr/bin/usb/compositions/$pid /usr/bin/usb/boot_composition
+fi
+
+
+if [ $hsic = "y" ]; then
+	mode="hsic"
+else
+	mode="hsusb"
+fi
+echo $mode > /sys/devices/platform/usb_bam/enable
+$COMP_DIR/$pid
+
+

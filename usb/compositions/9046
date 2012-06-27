@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# DESCRIPTION: DIAG + ADB + DUN + QMI_RMNET1 + QMI_RMNET2 + QMI_RMNET3 + Mass Storage [Android]
+
+echo "Switching to composition number 0x9046"
+
+echo 0 > /sys/class/android_usb/android0/enable
+echo 0x9046 > /sys/class/android_usb/android0/idProduct
+echo 0x05C6 > /sys/class/android_usb/android0/idVendor
+echo diag > /sys/class/android_usb/android0/f_diag/clients
+echo smd > /sys/class/android_usb/android0/f_serial/transports
+echo SMD,BAM2BAM,SMD,BAM2BAM,SMD,BAM2BAM > /sys/class/android_usb/android0/f_rmnet/transports
+echo diag,adb,serial,rmnet,rmnet,rmnet,mass_storage > /sys/class/android_usb/android0/functions
+echo 1 > /sys/class/android_usb/android0/enable
