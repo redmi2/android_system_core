@@ -33,19 +33,21 @@ target=`getprop ro.board.platform`
 #
 start_sensors()
 {
-    mkdir -p /data/system/sensors
-    touch /data/system/sensors/settings
-    chmod 665 /data/system/sensors
+    if [ -c /dev/msm_dsps ]; then
+        mkdir -p /data/system/sensors
+        touch /data/system/sensors/settings
+        chmod 665 /data/system/sensors
 
-    mkdir -p /data/misc/sensors
-    chmod 775 /data/misc/sensors
+        mkdir -p /data/misc/sensors
+        chmod 775 /data/misc/sensors
 
-    if [ ! -s /data/system/sensors/settings ]; then
-        # If the settings file is empty, enable sensors HAL
-        # Otherwise leave the file with it's current contents
-        echo 1 > /data/system/sensors/settings
+        if [ ! -s /data/system/sensors/settings ]; then
+            # If the settings file is empty, enable sensors HAL
+            # Otherwise leave the file with it's current contents
+            echo 1 > /data/system/sensors/settings
+        fi
+        start sensors
     fi
-    start sensors
 }
 
 start_battery_monitor()
