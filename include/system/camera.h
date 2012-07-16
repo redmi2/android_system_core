@@ -88,6 +88,7 @@ enum {
     // Notify on autofocus start and stop. This is useful in continuous
     // autofocus - FOCUS_MODE_CONTINUOUS_VIDEO and FOCUS_MODE_CONTINUOUS_PICTURE.
     CAMERA_MSG_FOCUS_MOVE = 0x0800,       // notifyCallback
+    CAMERA_MSG_STATS_DATA = 0x1000,
     CAMERA_MSG_ALL_MSGS = 0xFFFF
 };
 
@@ -163,6 +164,9 @@ enum {
      * can silently finish itself or show a dialog.
      */
     CAMERA_CMD_PING = 9,
+	CAMERA_CMD_HISTOGRAM_ON     = 10,
+	CAMERA_CMD_HISTOGRAM_OFF     = 11,
+    CAMERA_CMD_HISTOGRAM_SEND_DATA  = 12,
 };
 
 /** camera fatal errors */
@@ -184,6 +188,13 @@ enum {
     CAMERA_FACING_BACK = 0,
     /** The facing of the camera is the same as that of the screen. */
     CAMERA_FACING_FRONT = 1
+};
+
+enum {
+    CAMERA_SUPPORT_MODE_2D = 0x01, /* Camera Sensor supports 2D mode. */
+    CAMERA_SUPPORT_MODE_3D = 0x02, /* Camera Sensor supports 3D mode. */
+    CAMERA_SUPPORT_MODE_NONZSL = 0x04, /* Camera Sensor in NON-ZSL mode. */
+    CAMERA_SUPPORT_MODE_ZSL = 0x08 /* Camera Sensor supports ZSL mode. */
 };
 
 enum {
@@ -244,6 +255,20 @@ typedef struct camera_face {
      */
     int32_t mouth[2];
 
+	/* ###QOALCOMM_CAMERA_ADDS_ON_START### */
+    int32_t smile_degree;
+    int32_t smile_score;
+    int32_t blink_detected;
+    int32_t face_recognised;
+    int32_t gaze_angle;
+    int32_t updown_dir;
+    int32_t leftright_dir;
+    int32_t roll_dir;
+    int32_t left_right_gaze;
+    int32_t top_bottom_gaze;
+    int32_t leye_blink;
+    int32_t reye_blink;
+	/* ###QOALCOMM_CAMERA_ADDS_ON_END### */
 } camera_face_t;
 
 /**
