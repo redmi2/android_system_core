@@ -102,6 +102,7 @@ struct {
 } control_perms[] = {
     { "dumpstate",AID_SHELL, AID_LOG },
     { "ril-daemon",AID_RADIO, AID_RADIO },
+    { "wifi-sdio-on",AID_WIFI, 0 },
      {NULL, 0, 0 }
 };
 
