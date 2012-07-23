@@ -141,6 +141,8 @@ typedef enum {
     AUDIO_FORMAT_VORBIS              = 0x07000000UL,
     AUDIO_FORMAT_EVRC                = 0x08000000UL,
     AUDIO_FORMAT_QCELP               = 0x09000000UL,
+    AUDIO_FORMAT_EVRCB               = 0x0a000000UL,
+    AUDIO_FORMAT_EVRCWB              = 0x0b000000UL,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
@@ -501,6 +503,8 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_VORBIS:
     case AUDIO_FORMAT_QCELP:
     case AUDIO_FORMAT_EVRC:
+    case AUDIO_FORMAT_EVRCB:
+    case AUDIO_FORMAT_EVRCWB:
         return true;
     default:
         return false;
