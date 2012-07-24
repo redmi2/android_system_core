@@ -236,9 +236,21 @@ typedef enum {
     AUDIO_CHANNEL_IN_Z_AXIS          = 0x2000,
     AUDIO_CHANNEL_IN_VOICE_UPLINK    = 0x4000,
     AUDIO_CHANNEL_IN_VOICE_DNLINK    = 0x8000,
+    AUDIO_CHANNEL_IN_FRONT_LEFT      = 0x10000,
+    AUDIO_CHANNEL_IN_FRONT_RIGHT     = 0x20000,
+    AUDIO_CHANNEL_IN_FRONT_CENTER    = 0x40000,
+    AUDIO_CHANNEL_IN_LOW_FREQUENCY   = 0x80000,
+    AUDIO_CHANNEL_IN_BACK_LEFT       = 0x100000,
+    AUDIO_CHANNEL_IN_BACK_RIGHT      = 0x200000,
 
     AUDIO_CHANNEL_IN_MONO   = AUDIO_CHANNEL_IN_FRONT,
     AUDIO_CHANNEL_IN_STEREO = (AUDIO_CHANNEL_IN_LEFT | AUDIO_CHANNEL_IN_RIGHT),
+    AUDIO_CHANNEL_IN_5POINT1 = (AUDIO_CHANNEL_IN_FRONT_LEFT |
+                               AUDIO_CHANNEL_IN_FRONT_RIGHT |
+                               AUDIO_CHANNEL_IN_FRONT_CENTER |
+                               AUDIO_CHANNEL_IN_LOW_FREQUENCY |
+                               AUDIO_CHANNEL_IN_BACK_LEFT |
+                               AUDIO_CHANNEL_IN_BACK_RIGHT),
     AUDIO_CHANNEL_IN_ALL    = (AUDIO_CHANNEL_IN_LEFT |
                                AUDIO_CHANNEL_IN_RIGHT |
                                AUDIO_CHANNEL_IN_FRONT |
@@ -252,7 +264,8 @@ typedef enum {
                                AUDIO_CHANNEL_IN_Y_AXIS |
                                AUDIO_CHANNEL_IN_Z_AXIS |
                                AUDIO_CHANNEL_IN_VOICE_UPLINK |
-                               AUDIO_CHANNEL_IN_VOICE_DNLINK),
+                               AUDIO_CHANNEL_IN_VOICE_DNLINK |
+                               AUDIO_CHANNEL_IN_5POINT1),
 };
 
 typedef uint32_t audio_channel_mask_t;
@@ -456,7 +469,7 @@ static inline audio_channel_mask_t audio_channel_out_mask_from_count(uint32_t ch
     }
 }
 
-/* Similar to above, but for input.  Currently handles only mono and stereo. */
+/* Similar to above, but for input.  Currently handles mono and stereo and 5.1 input. */
 static inline audio_channel_mask_t audio_channel_in_mask_from_count(uint32_t channel_count)
 {
     switch (channel_count) {
@@ -464,6 +477,8 @@ static inline audio_channel_mask_t audio_channel_in_mask_from_count(uint32_t cha
         return AUDIO_CHANNEL_IN_MONO;
     case 2:
         return AUDIO_CHANNEL_IN_STEREO;
+    case 6:
+        return AUDIO_CHANNEL_IN_5POINT1;
     default:
         return 0;
     }
