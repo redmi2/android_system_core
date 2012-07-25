@@ -318,7 +318,8 @@ typedef enum {
     AUDIO_DEVICE_OUT_USB_DEVICE                = 0x4000,
     AUDIO_DEVICE_OUT_FM                        = 0x8000,
     AUDIO_DEVICE_OUT_FM_TX                     = 0x10000,
-    AUDIO_DEVICE_OUT_DEFAULT                   = 0x80000,
+    AUDIO_DEVICE_OUT_PROXY                     = 0x80000,
+    AUDIO_DEVICE_OUT_DEFAULT                   = AUDIO_DEVICE_OUT_SPEAKER,
     AUDIO_DEVICE_OUT_ALL      = (AUDIO_DEVICE_OUT_EARPIECE |
                                  AUDIO_DEVICE_OUT_SPEAKER |
                                  AUDIO_DEVICE_OUT_WIRED_HEADSET |
@@ -336,6 +337,7 @@ typedef enum {
                                  AUDIO_DEVICE_OUT_USB_DEVICE |
                                  AUDIO_DEVICE_OUT_FM |
                                  AUDIO_DEVICE_OUT_FM_TX |
+                                 AUDIO_DEVICE_OUT_PROXY |
                                  AUDIO_DEVICE_OUT_DEFAULT),
     AUDIO_DEVICE_OUT_ALL_A2DP = (AUDIO_DEVICE_OUT_BLUETOOTH_A2DP |
                                  AUDIO_DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES |
@@ -357,7 +359,8 @@ typedef enum {
     AUDIO_DEVICE_IN_BACK_MIC              = 0x8000000,
     AUDIO_DEVICE_IN_FM_RX                 = 0x20000000,
     AUDIO_DEVICE_IN_FM_RX_A2DP            = 0x40000000,
-    AUDIO_DEVICE_IN_DEFAULT               = 0x80000000,
+    AUDIO_DEVICE_IN_PROXY                 = 0x80000000,
+    AUDIO_DEVICE_IN_DEFAULT               = AUDIO_DEVICE_IN_BUILTIN_MIC,
 
     AUDIO_DEVICE_IN_ALL     = (AUDIO_DEVICE_IN_COMMUNICATION |
                                AUDIO_DEVICE_IN_AMBIENT |
@@ -369,6 +372,7 @@ typedef enum {
                                AUDIO_DEVICE_IN_BACK_MIC |
                                AUDIO_DEVICE_IN_FM_RX |
                                AUDIO_DEVICE_IN_FM_RX_A2DP |
+                               AUDIO_DEVICE_IN_PROXY |
                                AUDIO_DEVICE_IN_DEFAULT),
     AUDIO_DEVICE_IN_ALL_SCO = AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
 } audio_devices_t;
