@@ -88,6 +88,7 @@
 /dev/msm_evrc             0660  system       audio
 /dev/msm_acdb             0660  system     audio
 /dev/msm_fm               0660  system       audio
+/dev/msm_ac3              0660  system       audio
 
 # CDMA radio interface MUX
 /dev/ts0710mux*           0640   radio      radio
