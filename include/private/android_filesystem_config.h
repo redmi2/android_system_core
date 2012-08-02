@@ -212,6 +212,7 @@ static struct fs_path_config android_files[] = {
          * Do not change. */
     { 02755, AID_ROOT,      AID_NET_RAW,   "system/bin/ping" },
     { 02750, AID_ROOT,      AID_INET,      "system/bin/netcfg" },
+    { 04750, AID_ROOT,      AID_SYSTEM,    "system/bin/diag_mdlog" },
     	/* the following five files are INTENTIONALLY set-uid, but they
 	 * are NOT included on user builds. */
     { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/su" },
