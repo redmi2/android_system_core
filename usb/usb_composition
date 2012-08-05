@@ -2,6 +2,8 @@
 # Switch to a chosen USB composition.
 
 COMP_DIR="/usr/bin/usb/compositions"
+symlink_hsusb="/usr/bin/usb/boot_hsusb_composition"
+symlink_hsic="/usr/bin/usb/boot_hsic_composition"
 
 legal_composition() {
 	for c in $( ls $COMP_DIR ); do
@@ -27,7 +29,7 @@ read_pid() {
 
 read_hsic() {
 	local tmp_hsic='0'
-	read -p "Enable hsic ? (y/n)" tmp_hsic
+	read -p "Choose core: y - hsic, n - hsusb  ? (y/n)" tmp_hsic
 	while [ true ]; do
 		if [ $tmp_hsic = "y" ] || [ $tmp_hsic = "n" ]; then
 			echo "$tmp_hsic"
@@ -49,6 +51,28 @@ read_presistent() {
 	done
 }
 
+common_functions() {
+	if [ "$1" = "empty" ] || [ "$2" = "empty" ]; then
+		echo "0"
+		exit
+	fi
+	func_list_1=`grep functions $COMP_DIR/$1 | sed 's/echo //' | sed 's/>.*$//' | tr , '\n' | tr : '\n'`
+	func_list_2=`grep functions $COMP_DIR/$2 | sed 's/echo //' | sed 's/>.*$//' | tr , '\n' | tr : '\n'`
+	for func_1 in $func_list_1
+	do
+		for func_2 in $func_list_2
+		do
+		if [ "$func_1" = "$func_2" ]; then
+			echo $func_1
+			exit
+		fi
+		done
+	done
+	echo "0"
+}
+
+hsusb_comp=`readlink $symlink_hsusb | xargs basename`
+hsic_comp=`readlink $symlink_hsic | xargs basename`
 
 if [ "$#" -ge 4 ]; then
 	echo "Usage: usb_composition [Pid] [HSIC] [PERSISTENT]" >&2
@@ -97,7 +121,8 @@ elif [ "$#" -eq 1 ]; then
 	presistent="n"
 
 elif [ "$#" -eq 0 ]; then
-
+	echo "boot hsusb composition: $hsusb_comp"
+	echo "boot hsic composition: $hsic_comp"
 	echo "Choose Composition by Pid:"
 	for i in $( ls $COMP_DIR ); do
 		desc=`grep DESCRIPTION: $COMP_DIR/$i | sed 's/.*DESCRIPTION: *//g'`
@@ -110,24 +135,29 @@ elif [ "$#" -eq 0 ]; then
 
 fi
 
-if [ $presistent = "y" ]; then
-	rm /usr/bin/usb/usb_init
-	rm /usr/bin/usb/boot_composition
-	if [ $hsic = "y" ]; then
-		ln -s /usr/bin/usb/boot_hsic /usr/bin/usb/usb_init
-	else
-		ln -s /usr/bin/usb/boot_hsusb /usr/bin/usb/usb_init
-	fi
-	ln -s /usr/bin/usb/compositions/$pid /usr/bin/usb/boot_composition
-fi
-
-
 if [ $hsic = "y" ]; then
-	mode="hsic"
+	other=$hsusb_comp
 else
-	mode="hsusb"
+	other=$hsic_comp
 fi
-echo $mode > /sys/devices/platform/usb_bam/enable
-$COMP_DIR/$pid
 
+common=`common_functions $other $pid`
+if [ $common != "0" ]; then
+	echo "Can't change composition, hsusb and hsic cant use the same usb function : $common"
+	exit
+fi
+
+if [ $presistent = "y" ]; then
+	if [ $hsic = "y" ]; then
+		rm $symlink_hsic
+		ln -s $COMP_DIR/$pid $symlink_hsic
+	else
+		rm $symlink_hsusb
+		ln -s $COMP_DIR/$pid $symlink_hsusb
+	fi
+fi
+
+if [ $hsic = "n" ]; then
+	$COMP_DIR/$pid n
+fi
 
