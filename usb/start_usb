@@ -8,7 +8,20 @@ case "$1" in
 
         case $KERNEL in
           3.*)
-		/usr/bin/usb/usb_init
+
+		# boot hsusb composition:
+		if [ -d /sys/class/android_usb/android0 ]
+		then
+			/usr/bin/usb/boot_hsusb_composition n
+		fi
+
+
+		# boot hsic composition:
+		if [ -d /sys/class/android_usb/android1 ]
+		then
+			/usr/bin/usb/boot_hsic_composition y
+		fi
+
 		;;
           2.*)
                 # Nothing to do for 2.x kernels
