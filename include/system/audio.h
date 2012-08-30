@@ -161,6 +161,7 @@ typedef enum {
     AUDIO_FORMAT_EVRCB               = 0x10000000UL,
     AUDIO_FORMAT_EVRCWB              = 0x11000000UL,
     AUDIO_FORMAT_EAC3                = 0x12000000UL,
+    AUDIO_FORMAT_DTS_LBR             = 0x13000000UL,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
@@ -199,6 +200,9 @@ typedef enum {
     AUDIO_CHANNEL_OUT_MONO     = AUDIO_CHANNEL_OUT_FRONT_LEFT,
     AUDIO_CHANNEL_OUT_STEREO   = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT),
+    AUDIO_CHANNEL_OUT_2POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
+                                  AUDIO_CHANNEL_OUT_FRONT_RIGHT |
+                                  AUDIO_CHANNEL_OUT_FRONT_CENTER),
     AUDIO_CHANNEL_OUT_QUAD     = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
                                   AUDIO_CHANNEL_OUT_BACK_LEFT |
@@ -558,6 +562,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_WMA:
     case AUDIO_FORMAT_WMA_PRO:
     case AUDIO_FORMAT_DTS:
+    case AUDIO_FORMAT_DTS_LBR:
         return true;
     default:
         return false;
