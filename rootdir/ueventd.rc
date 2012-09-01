@@ -90,6 +90,7 @@
 /dev/msm_ac3              0660  system       audio
 /dev/msm_cad              0660  system       audio
 /dev/msm_rtac             0660  system       audio
+/dev/oncrpc/300000ba:00010000  0660   system     drmrpc
 
 # CDMA radio interface MUX
 /dev/ts0710mux*           0640   radio      radio
