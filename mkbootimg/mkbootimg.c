@@ -68,6 +68,7 @@ int usage(void)
             "       [ --pagesize <pagesize> ]\n"
             "       [ --ramdisk_offset <ramdisk_offset> ]\n"
             "       [ --dt <filename> ]\n"
+            "       [ --tags-addr <address> ]\n"
             "       -o|--output <filename>\n"
             );
     return 1;
@@ -117,6 +118,8 @@ int main(int argc, char **argv)
     uint8_t* sha;
     unsigned base;
     unsigned ramdisk_offset=0;
+    int tags_addr_override = 0;
+    unsigned tags_addr = 0;
 
     argc--;
     argv++;
@@ -166,9 +169,16 @@ int main(int argc, char **argv)
             }
         } else if(!strcmp(arg, "--dt")) {
             dt_fn = val;
+        } else if(!strcmp(arg, "--tags-addr")) {
+            tags_addr_override = 1;
+            tags_addr = strtoul(val, 0, 16);
         } else {
             return usage();
         }
+    }
+
+    if (tags_addr_override) {
+        hdr.tags_addr = tags_addr;
     }
     hdr.page_size = pagesize;
 
