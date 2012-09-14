@@ -1,4 +1,4 @@
-#Copyright (c) 2012, The Linux Foundation. All rights reserved.
+#Copyright (c) 2009-2012, The Linux Foundation. All rights reserved.
 #
 #Redistribution and use in source and binary forms, with or without
 #modification, are permitted provided that the following conditions are
@@ -37,6 +37,7 @@ on early-boot
     # set RLIMIT_MEMLOCK to 64MB
     setrlimit 8 67108864 67108864
     exec /system/bin/sh /init.qcom.early_boot.sh $ro.board.platform
+    exec /system/bin/sh /init.qcom.syspart_fixup.sh $ro.board.platform $ro.serialno
 
 on boot
     exec system/bin/btnvtool -O
