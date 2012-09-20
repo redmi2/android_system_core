@@ -199,6 +199,8 @@ int do_exec(int nargs, char **args)
     pid_t pid;
     int status, i, j;
     char *par[MAX_PARAMETERS];
+    char *prop_val;
+    int len;
 
     if (nargs > MAX_PARAMETERS)
     {
@@ -207,6 +209,25 @@ int do_exec(int nargs, char **args)
 
     for(i=0, j=1; i<(nargs-1) ;i++,j++)
     {
+        if (args[j] && (args[j][0] == '$') && (args[j][1] != '$'))
+        {
+            prop_val = property_get(&args[j][1]);
+            if (prop_val)
+            {
+                len = strlen(args[j]);
+                if (strlen(prop_val) <= len)
+                {
+                    /* Overwrite arg with expansion.
+                     *
+                     * For now, only allow an expansion length that
+                     * can fit within the original arg length to
+                     * avoid extra allocations.
+                     * On failure, use original argument.
+                     */
+                    strncpy(args[j], prop_val, len + 1);
+                }
+            }
+        }
         par[i] = args[j];
     }
 
