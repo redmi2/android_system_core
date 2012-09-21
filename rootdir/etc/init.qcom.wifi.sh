@@ -1,30 +1,30 @@
 #!/system/bin/sh
-#Copyright (c) 2010-2012, The Linux Foundation. All rights reserved.
+# Copyright (c) 2010-2012, Code Aurora Forum. All rights reserved.
 #
-#Redistribution and use in source and binary forms, with or without
-#modification, are permitted provided that the following conditions are
-#met:
-#    * Redistributions of source code must retain the above copyright
-#      notice, this list of conditions and the following disclaimer.
-#    * Redistributions in binary form must reproduce the above
-#      copyright notice, this list of conditions and the following
-#      disclaimer in the documentation and/or other materials provided
-#      with the distribution.
-#    * Neither the name of The Linux Foundation nor the names of its
-#      contributors may be used to endorse or promote products derived
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+#     * Neither the name of Code Aurora Forum, Inc. nor the names of its
+#       contributors may be used to endorse or promote products derived
 #      from this software without specific prior written permission.
 #
-#THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
-#WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-#MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
-#ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
-#BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-#CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-#SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-#BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-#WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-#OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
-#IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS
+# BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+# OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 # This script will load and unload the wifi driver to put the wifi in
 # in deep sleep mode so that there won't be voltage leakage.
@@ -34,13 +34,7 @@
 # the script won't do anything. Otherwise (GUI is not going to Turn On
 # the Wifi) the script will load/unload the driver
 # This script will get called after post bootup.
-target="$1"
-serialno="$2"
-
-# No path is set up at this point so we have to do it here.
-PATH=/sbin:/system/sbin:/system/bin:/system/xbin
-export PATH
-
+target=`getprop ro.board.platform`
 case "$target" in
     msm8960*)
       wlanchip=`cat /persist/wlan_chip_id`
@@ -75,7 +69,7 @@ case "$target" in
         # as a loadable module it can have one of several names.  So
         # look to see if an appropriately named kernel module is
         # present
-    wcnssmod=`ls /system/lib/modules/wcnss*.ko` 2> /dev/null
+        wcnssmod=`ls /system/lib/modules/wcnss*.ko`
         case "$wcnssmod" in
             *wcnss*)
                 # A kernel module is present, so load it
@@ -106,13 +100,8 @@ case "$target" in
                 ;;
         esac
         # Plumb down the device serial number
-    if [ -f /sys/devices/*wcnss-wlan/serial_number ]; then
-        cd /sys/devices/*wcnss-wlan
-        echo $serialno > serial_number
-        cd /
-    elif [ -f /sys/devices/platform/wcnss_wlan.0/serial_number ]; then
+        serialno=`getprop ro.serialno`
         echo $serialno > /sys/devices/platform/wcnss_wlan.0/serial_number
-    fi
         ;;
       esac
       ;;
@@ -125,52 +114,96 @@ case "$target" in
         case "$wlanchip" in
             "ATH6KL")
              setprop wlan.driver.ath 1
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              rm  /system/lib/modules/wlan.ko
              rm  /system/lib/modules/cfg80211.ko
              ln -s /system/lib/modules/ath6kl/ath6kl_sdio.ko /system/lib/modules/wlan.ko
              ln -s /system/lib/modules/ath6kl/cfg80211.ko /system/lib/modules/cfg80211.ko
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              ;;
             "WCN1314")
              setprop wlan.driver.ath 0
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              rm  /system/lib/modules/wlan.ko
              rm  /system/lib/modules/cfg80211.ko
              ln -s /system/lib/modules/volans/WCN1314_rf.ko /system/lib/modules/wlan.ko
              ln -s /system/lib/modules/volans/cfg80211.ko /system/lib/modules/cfg80211.ko
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              ;;
             *)
              setprop wlan.driver.ath 1
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              rm  /system/lib/modules/wlan.ko
              rm  /system/lib/modules/cfg80211.ko
              ln -s /system/lib/modules/ath6kl/ath6kl_sdio.ko /system/lib/modules/wlan.ko
              ln -s /system/lib/modules/ath6kl/cfg80211.ko /system/lib/modules/cfg80211.ko
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              echo "********************************************************************"
-             echo "*** Error:WI-FI chip ID is not specified in /persist/wlan_chip_id **"
+              echo "*** Error:WI-FI chip ID is not specified in /persist/wlan_chip_id **"
              echo "*******    WI-FI may not work    ***********************************"
              ;;
         esac
     ;;
     msm7630*)
+        wifishd=`getprop wlan.driver.status`
         wlanchip=`cat /persist/wlan_chip_id`
         echo "The WLAN Chip ID is $wlanchip"
         case "$wlanchip" in
             "WCN1314")
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              ln -s /system/lib/modules/volans/WCN1314_rf.ko /system/lib/modules/wlan.ko
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
              ;;
             "WCN1312")
+             mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
              ln -s /system/lib/modules/libra/libra.ko /system/lib/modules/wlan.ko
-             ln -s /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
+	      ln -s /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
              ln -s /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
-             ;;
+             mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
+	      ;;
            *)
             echo "********************************************************************"
-	    echo "*** Error:WI-FI chip ID is not specified in /persist/wlan_chip_id **"
+	     echo "*** Error:WI-FI chip ID is not specified in /persist/wlan_chip_id **"
             echo "*******    WI-FI may not work    ***********************************"
             ;;
         esac
+        case "$wifishd" in
+            "ok")
+             ;;
+            "loading")
+            ;;
+           *)
+               case "$wlanchip" in
+                   "WCN1314")
+                    ;;
+
+                   "WCN1312")
+                        /system/bin/amploader -i
+                        ;;
+                   *)
+	                ;;
+               esac
+        esac
     ;;
     msm7627*)
+        mount -t vfat -o remount,rw,barrier=0 /dev/block/mtdblock1 /system
         ln -s /data/hostapd/qcom_cfg.ini /etc/firmware/wlan/qcom_cfg.ini
         ln -s /persist/qcom_wlan_nv.bin /etc/firmware/wlan/qcom_wlan_nv.bin
+        mount -t vfat -o remount,ro,barrier=0 /dev/block/mtdblock1 /system
+        wifishd=`getprop wlan.driver.status`
+        case "$wifishd" in
+            "ok")
+             ;;
+            "loading")
+             ;;
+            *)
+# For the new .38 kernel for 1312, there was an FFA panic
+# when no 1312/1314 chip was present. Hence this is commented out
+# Will need to reenable this code for 1312.
+#
+#                /system/bin/amploader -i
+            ;;
+        esac
     ;;
 
     *)
