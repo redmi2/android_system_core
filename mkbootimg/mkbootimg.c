@@ -198,11 +198,6 @@ int main(int argc, char **argv)
         return usage();
     }
 
-    if(ramdisk_offset == 0) {
-        fprintf(stderr,"error: no ramdisk offset specified\n");
-        return usage();
-    }
-
     if(strlen(board) >= BOOT_NAME_SIZE) {
         fprintf(stderr,"error: board name too large\n");
         return usage();
