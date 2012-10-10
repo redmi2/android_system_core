@@ -591,6 +591,9 @@ static inline size_t audio_bytes_per_sample(audio_format_t format)
     case AUDIO_FORMAT_PCM_8_BIT:
         size = sizeof(uint8_t);
         break;
+    case AUDIO_FORMAT_AMR_WB:
+        size = 61;
+        break;
     default:
         break;
     }
