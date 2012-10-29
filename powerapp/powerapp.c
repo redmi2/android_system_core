@@ -117,18 +117,10 @@ void suspend_or_resume(void)
            printf("Suspend failed %d (%s)\n", errno, strerror(errno));
        }
        suspend = 0;
-       printf("Suspend \n");
       }
       else
       {
-        strcpy (buf, RESUME_STRING);
-        errno = 0;
-        if(write(fd, buf, strlen(buf)) == -1)
-        {
-           printf("Resume failed %d (%s)\n", errno, strerror(errno));
-        }
         suspend = 1;
-        printf("Resume\n");
       }
     }
 
