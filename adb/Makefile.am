@@ -27,7 +27,6 @@ AM_CFLAGS = -O2 \
 	-DANDROID_GADGET=1 \
 	-D__reboot=reboot \
 	-I../include \
-	-I../../kernel/include/linux \
 	-include ../include/arch/linux-arm/OEConfig.h
 
 adbd_LDFLAGS = -lpthread -all-static
