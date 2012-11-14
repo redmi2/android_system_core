@@ -91,7 +91,7 @@ case "$target" in
 esac
 
 case "$target" in
-        "msm8960")
+        "msm8960" | "msm7627a" )
         start location_mq
         start xtwifi_inet
         start xtwifi_client
