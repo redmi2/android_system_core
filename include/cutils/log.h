@@ -503,6 +503,25 @@ typedef enum {
 int __android_log_buf_write(int bufID, int prio, const char *tag, const char *text);
 int __android_log_buf_print(int bufID, int prio, const char *tag, const char *fmt, ...);
 
+#ifndef ALOGD
+#define ALOGD LOGD
+#endif
+
+#ifndef ALOGE
+#define ALOGE LOGE
+#endif
+
+#ifndef ALOGV
+#define ALOGV LOGV
+#endif
+
+#ifndef ALOGW
+#define ALOGW LOGW
+#endif
+
+#ifndef ALOGI
+#define ALOGI LOGI
+#endif
 
 #ifdef __cplusplus
 }
