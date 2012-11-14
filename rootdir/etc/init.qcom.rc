@@ -400,19 +400,19 @@ service quipc_main /system/bin/quipc_main
 
 service location_mq /system/bin/location-mq
     class late_start
-    user gps
+    user root
     group gps
     disabled
 
 service xtwifi_inet /system/bin/xtwifi-inet-agent
     class late_start
-    user gps
+    user root
     group inet gps
     disabled
 
 service xtwifi_client /system/bin/xtwifi-client
     class late_start
-    user gps
+    user root
     group net_admin wifi inet gps
     disabled
 
