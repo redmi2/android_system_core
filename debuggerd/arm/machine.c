@@ -179,3 +179,51 @@ void dump_registers(const ptrace_context_t* context __attribute((unused)),
     _LOG(log, only_in_tombstone, "    scr %08lx\n", vfp_regs.fpscr);
 #endif
 }
+
+/*
+ * Dumps memory region, starting from a specified address.
+ */
+void dump_memory_region(log_t *log, int pid, uintptr_t addr, unsigned size,
+        bool at_fault)
+{
+    bool only_in_tombstone = !at_fault;
+    char code_buffer[100];
+    uintptr_t start ,end;
+    int count = 0;
+    char *buf = code_buffer;
+
+    start = addr & ~3;
+    end = start + size;
+
+    _LOG(log, only_in_tombstone, "dump memory region: %08x --> %08x\n", start, end);
+
+    while (start < end) {
+        if ((count % 4) == 0) {
+            buf = code_buffer;
+            sprintf(buf, "%08x ", start);
+            buf += 10;
+        }
+
+        /*
+         * If we see (data == -1 && errno != 0), we know that the ptrace
+         * call failed, probably because we're dumping memory in an
+         * unmapped or inaccessible page.  I don't know if there's
+         * value in making that explicit in the output -- it likely
+         * just complicates parsing and clarifies nothing for the
+         * enlightened reader.
+         */
+        long data = ptrace(PTRACE_PEEKTEXT, pid, (void*)start, NULL);
+        sprintf(buf, "%08lx ", data);
+        start += 4;
+        buf += 9;
+
+        if ((count % 4) == 3) {
+            _LOG(log, only_in_tombstone, "%s\n", code_buffer);
+        }
+        count++;
+    }
+
+    if ((count % 4) != 0) {
+        _LOG(log, only_in_tombstone, "%s\n", code_buffer);
+    }
+}
