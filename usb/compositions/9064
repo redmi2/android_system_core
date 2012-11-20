@@ -36,7 +36,7 @@ else
 	mode="hsusb"
 fi
 
-echo $mode > /sys/devices/platform/usb_bam/enable
+echo $mode > /sys/bus/platform/devices/usb_bam/enable
 echo 0 > /sys/class/android_usb/android$num/enable
 echo 0x9064 > /sys/class/android_usb/android$num/idProduct
 echo 0x05C6 > /sys/class/android_usb/android$num/idVendor
