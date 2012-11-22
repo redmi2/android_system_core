@@ -230,19 +230,14 @@ if [ $persistent = "y" ]; then
 		rm /usr/bin/usb/compositions/hsusb_next
 		echo "$pid" > /usr/bin/usb/compositions/hsusb_next
 	fi
-	if [ $hsic = "y" ]; then
-		mode="hsic"
-	else
-		mode="hsusb"
-	fi
-
-	echo $mode > /sys/devices/platform/usb_bam/enable
 fi
 
 if [ $hsic = "n" ]; then
 	if [ $immediate = "y" ]; then
 		$COMP_DIR/$pid n
 	fi
+else
+	echo "Please reboot device for HSIC composition to take effect"
 fi
 
 
