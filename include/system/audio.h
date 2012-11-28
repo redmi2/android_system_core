@@ -194,6 +194,9 @@ enum {
     AUDIO_CHANNEL_OUT_MONO     = AUDIO_CHANNEL_OUT_FRONT_LEFT,
     AUDIO_CHANNEL_OUT_STEREO   = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT),
+    AUDIO_CHANNEL_OUT_2POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
+                                  AUDIO_CHANNEL_OUT_FRONT_RIGHT |
+                                  AUDIO_CHANNEL_OUT_FRONT_CENTER),
     AUDIO_CHANNEL_OUT_QUAD     = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
                                   AUDIO_CHANNEL_OUT_BACK_LEFT |
@@ -202,12 +205,21 @@ enum {
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
                                   AUDIO_CHANNEL_OUT_FRONT_CENTER |
                                   AUDIO_CHANNEL_OUT_BACK_CENTER),
+    AUDIO_CHANNEL_OUT_PENTA =    (AUDIO_CHANNEL_OUT_QUAD |
+                                  AUDIO_CHANNEL_OUT_FRONT_CENTER),
     AUDIO_CHANNEL_OUT_5POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
                                   AUDIO_CHANNEL_OUT_FRONT_CENTER |
                                   AUDIO_CHANNEL_OUT_LOW_FREQUENCY |
                                   AUDIO_CHANNEL_OUT_BACK_LEFT |
                                   AUDIO_CHANNEL_OUT_BACK_RIGHT),
+    AUDIO_CHANNEL_OUT_6POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
+                                  AUDIO_CHANNEL_OUT_FRONT_RIGHT |
+                                  AUDIO_CHANNEL_OUT_FRONT_CENTER |
+                                  AUDIO_CHANNEL_OUT_LOW_FREQUENCY |
+                                  AUDIO_CHANNEL_OUT_BACK_LEFT |
+                                  AUDIO_CHANNEL_OUT_BACK_RIGHT |
+                                  AUDIO_CHANNEL_OUT_BACK_CENTER),
     // matches the correct AudioFormat.CHANNEL_OUT_7POINT1_SURROUND definition for 7.1
     AUDIO_CHANNEL_OUT_7POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
@@ -251,9 +263,24 @@ enum {
     AUDIO_CHANNEL_IN_Z_AXIS          = 0x2000,
     AUDIO_CHANNEL_IN_VOICE_UPLINK    = 0x4000,
     AUDIO_CHANNEL_IN_VOICE_DNLINK    = 0x8000,
+    AUDIO_CHANNEL_IN_FRONT_LEFT      = 0x10000,
+    AUDIO_CHANNEL_IN_FRONT_RIGHT     = 0x20000,
+    AUDIO_CHANNEL_IN_FRONT_CENTER    = 0x40000,
+    AUDIO_CHANNEL_IN_LOW_FREQUENCY   = 0x80000,
+    AUDIO_CHANNEL_IN_BACK_LEFT       = 0x100000,
+    AUDIO_CHANNEL_IN_BACK_RIGHT      = 0x200000,
 
     AUDIO_CHANNEL_IN_MONO   = AUDIO_CHANNEL_IN_FRONT,
     AUDIO_CHANNEL_IN_STEREO = (AUDIO_CHANNEL_IN_LEFT | AUDIO_CHANNEL_IN_RIGHT),
+    AUDIO_CHANNEL_IN_5POINT1 = (AUDIO_CHANNEL_IN_FRONT_LEFT |
+                               AUDIO_CHANNEL_IN_FRONT_RIGHT |
+                               AUDIO_CHANNEL_IN_FRONT_CENTER |
+                               AUDIO_CHANNEL_IN_LOW_FREQUENCY |
+                               AUDIO_CHANNEL_IN_BACK_LEFT |
+                               AUDIO_CHANNEL_IN_BACK_RIGHT),
+    AUDIO_CHANNEL_IN_VOICE_UPLINK_MONO = (AUDIO_CHANNEL_IN_VOICE_UPLINK | AUDIO_CHANNEL_IN_MONO),
+    AUDIO_CHANNEL_IN_VOICE_DNLINK_MONO = (AUDIO_CHANNEL_IN_VOICE_DNLINK | AUDIO_CHANNEL_IN_MONO),
+    AUDIO_CHANNEL_IN_VOICE_CALL_MONO   = (AUDIO_CHANNEL_IN_VOICE_UPLINK_MONO | AUDIO_CHANNEL_IN_VOICE_DNLINK_MONO),
     AUDIO_CHANNEL_IN_ALL    = (AUDIO_CHANNEL_IN_LEFT |
                                AUDIO_CHANNEL_IN_RIGHT |
                                AUDIO_CHANNEL_IN_FRONT |
@@ -267,7 +294,8 @@ enum {
                                AUDIO_CHANNEL_IN_Y_AXIS |
                                AUDIO_CHANNEL_IN_Z_AXIS |
                                AUDIO_CHANNEL_IN_VOICE_UPLINK |
-                               AUDIO_CHANNEL_IN_VOICE_DNLINK),
+                               AUDIO_CHANNEL_IN_VOICE_DNLINK |
+                               AUDIO_CHANNEL_IN_5POINT1),
 };
 
 typedef uint32_t audio_channel_mask_t;
@@ -525,7 +553,7 @@ static inline audio_channel_mask_t audio_channel_out_mask_from_count(uint32_t ch
     }
 }
 
-/* Similar to above, but for input.  Currently handles only mono and stereo. */
+/* Similar to above, but for input.  Currently handles mono and stereo and 5.1 input. */
 static inline audio_channel_mask_t audio_channel_in_mask_from_count(uint32_t channel_count)
 {
     switch (channel_count) {
@@ -533,6 +561,8 @@ static inline audio_channel_mask_t audio_channel_in_mask_from_count(uint32_t cha
         return AUDIO_CHANNEL_IN_MONO;
     case 2:
         return AUDIO_CHANNEL_IN_STEREO;
+    case 6:
+        return AUDIO_CHANNEL_IN_5POINT1;
     default:
         return 0;
     }
