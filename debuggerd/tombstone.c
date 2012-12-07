@@ -39,6 +39,11 @@
 #include <selinux/android.h>
 #endif
 
+#ifdef HAS_LIBDVM
+/* Dalvik crash dump info */
+#include <../../dalvik/vm/DalvikCrashDump.h>
+#endif
+
 #include "machine.h"
 #include "tombstone.h"
 #include "utility.h"
@@ -616,6 +621,11 @@ static bool dump_crash(log_t* log, pid_t pid, pid_t tid, int signal,
 
     ptrace_context_t* context = load_ptrace_context(tid);
     dump_thread(context, log, tid, true, total_sleep_time_usec);
+
+#ifdef HAS_LIBDVM
+    /* Dump dalvik crash info */
+    dump_dalvik(context, log, tid, true);
+#endif
 
     if (want_logs) {
         dump_logs(log, pid, true);
