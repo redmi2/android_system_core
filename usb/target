@@ -24,26 +24,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# DESCRIPTION:  MBIM : ECM
 
-echo "Switching to composition number 0x9058"
-
-if [ "$1" = "y" ]; then
-	num="1"
-	mode="hsic"
-else
-	num="0"
-	mode="hsusb"
-fi
-
-echo $mode > /sys/bus/platform/devices/usb_bam/enable
-echo 0 > /sys/class/android_usb/android$num/enable
-echo 0x9058 > /sys/class/android_usb/android$num/idProduct
-echo 0x05C6 > /sys/class/android_usb/android$num/idVendor
-echo 239 > /sys/class/android_usb/android$num/bDeviceClass
-echo 2 > /sys/class/android_usb/android$num/bDeviceSubClass
-echo 1 > /sys/class/android_usb/android$num/bDeviceProtocol
-echo usb_mbim:ecm_qc > /sys/class/android_usb/android$num/functions
-echo 1 > /sys/class/android_usb/android$num/remote_wakeup
-echo 1 > /sys/class/android_usb/android$num/enable
-
+case `cat /sys/devices/system/soc/soc0/build_id` in
+	*9x15* )
+		res="9x15"
+		;;
+	*9x25* )
+		res="9x25"
+		;;
+	* )
+		res="none"
+		;;
+esac
+echo $res
