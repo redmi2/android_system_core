@@ -25,7 +25,8 @@
 /dev/diag_arm9            0660   radio      radio
 /dev/android_adb          0660   adb        adb
 /dev/android_adb_enable   0660   adb        adb
-/dev/ttyMSM0              0600   bluetooth  bluetooth
+/dev/ttyMSM0              0600   bluetooth bluetooth
+/dev/ttyMSM10             0600   gps        gps
 /dev/uinput               0660   system     bluetooth
 /dev/alarm                0664   system     radio
 /dev/tty0                 0660   root       system
@@ -101,3 +102,6 @@
 /sys/devices/virtual/input/input*   enable      0660  root   input
 /sys/devices/virtual/input/input*   poll_delay  0660  root   input
 /sys/devices/virtual/usb_composite/*   enable      0664  root   system
+
+#permissions for sensors
+/dev/msm_dsps             0660  system       system
