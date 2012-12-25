@@ -166,7 +166,7 @@ static struct fs_path_config android_dirs[] = {
     { 00771, AID_SYSTEM, AID_SYSTEM, "data/data" },
     { 00771, AID_SHELL,  AID_SHELL,  "data/local/tmp" },
     { 00771, AID_SHELL,  AID_SHELL,  "data/local" },
-    { 00740, AID_GPS,    AID_GPS,    "data/misc/location/atlas" },
+    { 00750, AID_GPS,    AID_GPS,    "data/misc/location/atlas" },
     { 00740, AID_GPS,    AID_GPS,    "data/misc/location" },
     { 01771, AID_SYSTEM, AID_MISC,   "data/misc" },
     { 00770, AID_DHCP,   AID_DHCP,   "data/misc/dhcp" },
