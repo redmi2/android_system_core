@@ -25,6 +25,12 @@ endif # ARCH_ARM_HAVE_VFP_D32
 
 LOCAL_SHARED_LIBRARIES := libcutils libc libcorkscrew
 
+ifneq ($(BUILD_TINY_ANDROID), true)
+# For dalvik crash dump, don't include for tiny android build
+LOCAL_CFLAGS += -DHAS_LIBDVM
+LOCAL_SHARED_LIBRARIES += libdvm
+endif
+
 ifeq ($(HAVE_SELINUX),true)
 LOCAL_SHARED_LIBRARIES += libselinux
 LOCAL_C_INCLUDES += external/libselinux/include
