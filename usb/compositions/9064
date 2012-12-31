@@ -44,6 +44,7 @@ run_9x15() {
 	echo 239 > /sys/class/android_usb/android$num/bDeviceClass
 	echo 2 > /sys/class/android_usb/android$num/bDeviceSubClass
 	echo 1 > /sys/class/android_usb/android$num/bDeviceProtocol
+	echo diag > /sys/class/android_usb/android0/f_diag/clients
 	echo smd > /sys/class/android_usb/android0/f_serial/transports
 	echo smd,bam2bam > /sys/class/android_usb/android0/f_rmnet/transports
 	echo diag,adb,serial,rmnet:ecm_qc:usb_mbim > /sys/class/android_usb/android$num/functions
@@ -59,6 +60,7 @@ run_9x25() {
 	echo 239 > /sys/class/android_usb/android$num/bDeviceClass
 	echo 2 > /sys/class/android_usb/android$num/bDeviceSubClass
 	echo 1 > /sys/class/android_usb/android$num/bDeviceProtocol
+	echo diag > /sys/class/android_usb/android0/f_diag/clients
 	echo smd > /sys/class/android_usb/android0/f_serial/transports
 	echo smd,bam2bam_ipa > /sys/class/android_usb/android0/f_rmnet/transports
 	echo diag,adb,serial,rmnet:ecm:usb_mbim > /sys/class/android_usb/android$num/functions
