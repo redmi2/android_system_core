@@ -104,6 +104,7 @@ typedef enum {
     AUDIO_FORMAT_PCM_SUB_8_BIT           = 0x2, /* DO NOT CHANGE - PCM unsigned 8 bits */
     AUDIO_FORMAT_PCM_SUB_32_BIT          = 0x3, /* PCM signed .31 fixed point */
     AUDIO_FORMAT_PCM_SUB_8_24_BIT        = 0x4, /* PCM signed 7.24 fixed point */
+    AUDIO_FORMAT_PCM_SUB_24_BIT          = 0x5, /* PCM signed 24 fixed point */
 } audio_format_pcm_sub_fmt_t;
 
 /* MP3 sub format field definition : can use 11 LSBs in the same way as MP3
@@ -176,6 +177,8 @@ typedef enum {
                                         AUDIO_FORMAT_PCM_SUB_32_BIT),
     AUDIO_FORMAT_PCM_8_24_BIT        = (AUDIO_FORMAT_PCM |
                                         AUDIO_FORMAT_PCM_SUB_8_24_BIT),
+    AUDIO_FORMAT_PCM_24_BIT          = (AUDIO_FORMAT_PCM |
+                                        AUDIO_FORMAT_PCM_SUB_24_BIT),
 } audio_format_t;
 
 typedef enum {
@@ -551,6 +554,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     switch (format & AUDIO_FORMAT_MAIN_MASK) {
     case AUDIO_FORMAT_PCM:
         if (format != AUDIO_FORMAT_PCM_16_BIT &&
+                format != AUDIO_FORMAT_PCM_24_BIT &&
                 format != AUDIO_FORMAT_PCM_8_BIT) {
             return false;
         }
@@ -593,6 +597,9 @@ static inline size_t audio_bytes_per_sample(audio_format_t format)
     case AUDIO_FORMAT_PCM_32_BIT:
     case AUDIO_FORMAT_PCM_8_24_BIT:
         size = sizeof(int32_t);
+        break;
+    case AUDIO_FORMAT_PCM_24_BIT:
+        size = 3;
         break;
     case AUDIO_FORMAT_PCM_16_BIT:
         size = sizeof(int16_t);
