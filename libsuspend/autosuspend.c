@@ -23,17 +23,21 @@
 
 #include "autosuspend_ops.h"
 
+enum {
+  STATE_UNINIT,
+  STATE_FAILED,
+  STATE_DISABLED,
+  STATE_ENABLED
+};
+
 static struct autosuspend_ops *autosuspend_ops;
-static bool autosuspend_enabled;
-static bool autosuspend_inited;
+static int autosuspend_state = STATE_UNINIT;
 
 static int autosuspend_init(void)
 {
-    if (autosuspend_inited) {
-        return 0;
+    if (autosuspend_state != STATE_UNINIT) {
+        return autosuspend_state;
     }
-
-    autosuspend_inited = true;
 
     autosuspend_ops = autosuspend_earlysuspend_init();
     if (autosuspend_ops) {
@@ -52,26 +56,28 @@ static int autosuspend_init(void)
 
     if (!autosuspend_ops) {
         ALOGE("failed to initialize autosuspend\n");
-        return -1;
+        autosuspend_state = STATE_FAILED;
+        return autosuspend_state;
     }
 
 out:
+    autosuspend_state = STATE_DISABLED;
+
     ALOGV("autosuspend initialized\n");
-    return 0;
+    return autosuspend_state;
 }
 
 int autosuspend_enable(void)
 {
     int ret;
 
-    ret = autosuspend_init();
-    if (ret) {
-        return ret;
+    if (autosuspend_init() == STATE_FAILED) {
+        return -1;
     }
 
     ALOGV("autosuspend_enable\n");
 
-    if (autosuspend_enabled) {
+    if (autosuspend_state == STATE_ENABLED) {
         return 0;
     }
 
@@ -80,7 +86,7 @@ int autosuspend_enable(void)
         return ret;
     }
 
-    autosuspend_enabled = true;
+    autosuspend_state = STATE_ENABLED;
     return 0;
 }
 
@@ -88,14 +94,13 @@ int autosuspend_disable(void)
 {
     int ret;
 
-    ret = autosuspend_init();
-    if (ret) {
-        return ret;
+    if (autosuspend_init() == STATE_FAILED) {
+        return -1;
     }
 
     ALOGV("autosuspend_disable\n");
 
-    if (!autosuspend_enabled) {
+    if (autosuspend_state == STATE_DISABLED) {
         return 0;
     }
 
@@ -104,6 +109,6 @@ int autosuspend_disable(void)
         return ret;
     }
 
-    autosuspend_enabled = false;
+    autosuspend_state = STATE_DISABLED;
     return 0;
 }
