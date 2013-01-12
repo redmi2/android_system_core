@@ -62,6 +62,7 @@
 #define AID_DRMRPC        1026  /* group for drm rpc */
 #define AID_NFC           1027  /* nfc subsystem */
 #define AID_SDCARD_R      1028  /* external storage read access */
+#define AID_FM_RADIO      1029  /* FM radio */
 
 #define AID_SHELL         2000  /* adb and debug shell user */
 #define AID_CACHE         2001  /* cache access */
@@ -140,6 +141,7 @@ static const struct android_id_info android_ids[] = {
     { "net_bw_acct", AID_NET_BW_ACCT, },
     { "qcom_diag", AID_QCOM_DIAG, },
     { "misc",      AID_MISC, },
+    { "fm_radio",  AID_FM_RADIO, },
     { "nobody",    AID_NOBODY, },
 };
 
