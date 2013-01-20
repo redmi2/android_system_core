@@ -88,6 +88,7 @@ enum {
     // Notify on autofocus start and stop. This is useful in continuous
     // autofocus - FOCUS_MODE_CONTINUOUS_VIDEO and FOCUS_MODE_CONTINUOUS_PICTURE.
     CAMERA_MSG_FOCUS_MOVE = 0x0800,       // notifyCallback
+    CAMERA_MSG_STATS_DATA = 0x1000,
     CAMERA_MSG_ALL_MSGS = 0xFFFF
 };
 
@@ -174,6 +175,9 @@ enum {
      * count is non-positive or too big to be realized.
      */
     CAMERA_CMD_SET_VIDEO_BUFFER_COUNT = 10,
+    CAMERA_CMD_HISTOGRAM_ON     = 11,
+    CAMERA_CMD_HISTOGRAM_OFF     = 12,
+    CAMERA_CMD_HISTOGRAM_SEND_DATA  = 13,
 };
 
 /** camera fatal errors */
