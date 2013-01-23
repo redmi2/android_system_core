@@ -355,8 +355,11 @@ on property:vold.decrypt=trigger_shutdown_framework
 
 ## Daemon processes to be run by init.
 ##
+
+# Removing 'ueventd' from the 'core' class for MPQ program
+# Boot up advertisement feature shall take care of starting it at appropriate time
 service ueventd /sbin/ueventd
-    class core
+#    class core
     critical
 
 service console /system/bin/sh
@@ -378,8 +381,10 @@ service adbd /sbin/adbd
 on property:ro.kernel.qemu=1
     start adbd
 
+# Removing 'servicemanager' from the 'core' class for MPQ program
+# Boot up advertisement feature shall take care of starting it at appropriate time
 service servicemanager /system/bin/servicemanager
-    class core
+#    class core
     user system
     group system
     critical
@@ -409,8 +414,10 @@ service ril-daemon /system/bin/rild
     user root
     group radio cache inet misc audio sdcard_r sdcard_rw qcom_oncrpc diag qcom_diag log
 
+# Removing 'surfaceflinger' from the 'main' class for MPQ program
+# Boot up advertisement feature shall take care of starting it at appropriate time
 service surfaceflinger /system/bin/surfaceflinger
-    class main
+#    class main
     user system
     group graphics
     onrestart restart zygote
