@@ -114,6 +114,23 @@ int add_environment(const char *key, const char *val)
             snprintf(entry, len, "%s=%s", key, val);
             ENV[n] = entry;
             return 0;
+        } else {
+            char *entry;
+            size_t len = strlen(key);
+            if(!strncmp(ENV[n], key, len) && ENV[n][len] == '=') {
+                len = len + strlen(val) + 2;
+                entry = malloc(len);
+                if(!entry) {
+                    ERROR("Fail to add env variable: %s. Not enough memory!",
+                          key);
+                    return 1;
+                }
+
+                free((char *)ENV[n]);
+                snprintf(entry, len, "%s=%s", key, val);
+                ENV[n] = entry;
+                return 0;
+            }
         }
     }
 
