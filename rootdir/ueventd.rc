@@ -65,6 +65,7 @@
 /dev/msm_audio_ctl        0660   system     audio
 /dev/htc-acoustic         0660   system     audio
 /dev/vdec                 0660   system     audio
+/dev/qseecom              0660   system     drmrpc
 /dev/q6venc               0660   system     audio
 /dev/snd/dsp              0660   system     audio
 /dev/snd/dsp1             0660   system     audio
