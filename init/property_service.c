@@ -81,7 +81,6 @@ struct {
     { "sys.",             AID_SYSTEM,   0 },
     { "service.",         AID_SYSTEM,   0 },
     { "wlan.",            AID_SYSTEM,   0 },
-    { "bluetooth.",       AID_BLUETOOTH,   0 },
     { "dhcp.",            AID_SYSTEM,   0 },
     { "dhcp.",            AID_DHCP,     0 },
     { "debug.",           AID_SYSTEM,   0 },
@@ -95,6 +94,7 @@ struct {
     { "persist.service.bdroid.", AID_BLUETOOTH,   0 },
     { "selinux."         , AID_SYSTEM,   0 },
     { "hw.fm.",           AID_FM_RADIO,  0 },
+    { "bluetooth.",       AID_SYSTEM,    0 },
     { NULL, 0, 0 }
 };
 
