@@ -512,3 +512,30 @@ service mdnsd /system/bin/mdnsd
     socket mdnsd stream 0660 mdnsr inet
     disabled
     oneshot
+
+service imsdatadaemon /system/bin/imsdatadaemon
+    class main
+    user root
+    disabled
+
+service imsqmidaemon /system/bin/imsqmidaemon
+    class main
+    user root
+    disabled
+
+service ims_rtp_daemon /system/bin/ims_rtp_daemon
+   class main
+   user root
+   disabled
+
+on boot
+    chmod 777 /system/bin/imsqmidaemon
+    start imsqmidaemon
+
+on property:ims.dpl.QMI_DAEMON_STATUS=1
+    chmod 777 /system/bin/imsdatadaemon
+    start imsdatadaemon
+
+on property:ims.dpl.DATA_DAEMON_STATUS=1
+    chmod 777 /data/data/imsrtpsocket
+    start ims_rtp_daemon
