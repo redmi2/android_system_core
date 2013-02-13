@@ -95,6 +95,8 @@ struct {
     { "selinux."         , AID_SYSTEM,   0 },
     { "hw.fm.",           AID_FM_RADIO,  0 },
     { "bluetooth.",       AID_SYSTEM,    0 },
+    { "bluetooth.hciattach",       AID_BLUETOOTH, 0  },
+    { "bluetooth.status",        AID_BLUETOOTH, AID_SYSTEM },
     { NULL, 0, 0 }
 };
 
