@@ -3,8 +3,8 @@ BUILD_COMPONENTS :=
 if USELIBCUTILS
 BUILD_COMPONENTS += libcutils
 endif
-BUILD_COMPONENTS += liblog logcat
+BUILD_COMPONENTS += liblog logcat libzipfile
 
-BUILD_COMPONENTS += adb libmincrypt
+BUILD_COMPONENTS += adb libmincrypt fastboot
 
 SUBDIRS := $(BUILD_COMPONENTS)
