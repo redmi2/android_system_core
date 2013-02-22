@@ -9,6 +9,7 @@
   AM_MAINTAINER_MODE
 
   AC_CONFIG_HEADER([config.h])
+  AC_CONFIG_MACRO_DIR([m4])
 
   # Checks for programs.
   AM_PROG_AS
@@ -46,6 +47,20 @@
   AC_CHECK_FUNCS([strlcpy],[STRLCPY=yes],[STRLCPY=no])
   AM_CONDITIONAL([HAVE_STRLCPY],[test "x$STRLCPY" = "xyes"])
 
+  AC_ARG_WITH([host-os],
+          [AS_HELP_STRING([--with-host-os=HOST_OS],[Host OS to build adb host.(default: linux)])],
+          [HOST_OS="$withval"],
+          [HOST_OS= 'linux'])
+
+
+  if test "x$HOST_OS" = "xlinux-gnueabi"; then
+	HOST_OS=linux
+  else
+	AC_MSG_NOTICE([Unknown host OS $HOST_OS detected.])
+  fi
+
+  AM_CONDITIONAL([LINUX], [test "x$HOST_OS" = "xlinux"])
+
   AC_OUTPUT([ \
           Makefile \
           libcutils/Makefile \
@@ -54,5 +69,7 @@
           logcat/Makefile \
           libmincrypt/Makefile \
           libmincrypt/libmincrypt.pc \
+          libzipfile/Makefile \
+          fastboot/Makefile \
           adb/Makefile
   ])
