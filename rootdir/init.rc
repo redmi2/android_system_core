@@ -396,9 +396,9 @@ on property:selinux.reload_policy=1
 service console /system/bin/sh
     class core
     console
-    disabled
-    user shell
-    group log
+#   disabled
+#   user shell
+#   group log
 
 on property:ro.debuggable=1
     start console
