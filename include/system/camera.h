@@ -178,6 +178,8 @@ enum {
     CAMERA_CMD_HISTOGRAM_ON     = 11,
     CAMERA_CMD_HISTOGRAM_OFF     = 12,
     CAMERA_CMD_HISTOGRAM_SEND_DATA  = 13,
+    CAMERA_CMD_SET_LOW_LIGHT_MODE = 14,
+    CAMERA_CMD_SET_TOUCH_AF = 15,
 };
 
 /** camera fatal errors */
