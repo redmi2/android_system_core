@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2012, The Linux Foundation. All rights reserved.
+# Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -52,7 +52,8 @@ run_9x25() {
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 0x9057 > /sys/class/android_usb/android$num/idProduct
 	echo 0x05C6 > /sys/class/android_usb/android$num/idVendor
-	echo rndis:ecm > /sys/class/android_usb/android$num/functions
+	echo rndis:ecm_qc > /sys/class/android_usb/android$num/functions
+	echo BAM2BAM_IPA > /sys/class/android_usb/android$num/f_ecm_qc/ecm_transports
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
 	echo 1 > /sys/class/android_usb/android0/f_rndis/wceis
 	echo 1 > /sys/class/android_usb/android$num/enable
