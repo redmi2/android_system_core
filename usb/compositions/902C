@@ -30,13 +30,10 @@ echo "Switching to composition number 0x902C"
 
 if [ "$1" = "y" ]; then
 	num="1"
-	mode="hsic"
 else
 	num="0"
-	mode="hsusb"
 fi
 
-echo $mode > /sys/devices/platform/usb_bam/enable
 echo 0 > /sys/class/android_usb/android$num/enable
 echo 0x902C > /sys/class/android_usb/android$num/idProduct
 echo 0x05C6 > /sys/class/android_usb/android$num/idVendor
