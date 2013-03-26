@@ -39,9 +39,12 @@
 #endif
 
 #if LINUX_ENABLED
-#include <syscall.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#endif
+
+#if ADB_REBOOT_ENABLED
+#include <syscall.h>
 #endif
 
 typedef struct stinfo stinfo;
@@ -202,7 +205,7 @@ void reboot_service(int fd, void *arg)
         waitpid(pid, &ret, 0);
     }
 
-#if LINUX_ENABLED
+#if ADB_REBOOT_ENABLED
     ret = syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
                     LINUX_REBOOT_CMD_RESTART2, (char *)arg);
 #else

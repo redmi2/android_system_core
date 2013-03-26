@@ -62,7 +62,7 @@ adbd_CFLAGS = -O2 \
 	-D_XOPEN_SOURCE \
 	-D_GNU_SOURCE \
 	-DANDROID_GADGET=1 \
-	-DLINUX_ENABLED=1 \
+	-DADB_REBOOT_ENABLED=1 \
 	-I../include \
 	-include ../include/arch/linux-arm/OEConfig.h
 
