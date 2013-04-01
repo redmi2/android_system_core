@@ -30,14 +30,11 @@ echo "Switching to composition number 0x902D"
 
 if [ "$1" = "y" ]; then
 	num="1"
-	mode="hsic"
 else
 	num="0"
-	mode="hsusb"
 fi
 
 run_9x15() {
-	echo $mode > /sys/bus/platform/devices/usb_bam/enable
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 0x902D > /sys/class/android_usb/android$num/idProduct
 	echo 0x05C6 > /sys/class/android_usb/android$num/idVendor
@@ -49,7 +46,6 @@ run_9x15() {
 }
 
 run_9x25() {
-	echo $mode > /sys/bus/platform/devices/usb_bam/enable
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 0x902D > /sys/class/android_usb/android$num/idProduct
 	echo 0x05C6 > /sys/class/android_usb/android$num/idVendor
