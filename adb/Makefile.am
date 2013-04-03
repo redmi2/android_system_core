@@ -25,7 +25,7 @@ AM_CFLAGS = -O2 \
 	-D_XOPEN_SOURCE \
 	-D_GNU_SOURCE \
 	-DANDROID_GADGET=1 \
-	-D__reboot=reboot \
+	-DLINUX_ENABLED=1 \
 	-I../include \
 	-I../../kernel/include/linux \
 	-include ../include/arch/linux-arm/OEConfig.h

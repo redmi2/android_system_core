@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2013, The Linux Foundation. All rights reserved.
+ * Not a Contribution.
+ *
  * Copyright (C) 2007 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +39,7 @@
 #endif
 
 #if LINUX_ENABLED
+#include <syscall.h>
 #include <termios.h>
 #include <sys/ioctl.h>
 #endif
@@ -199,11 +203,12 @@ void reboot_service(int fd, void *arg)
     }
 
 #if LINUX_ENABLED
-#define __reboot reboot
-#endif
-
+    ret = syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
+                    LINUX_REBOOT_CMD_RESTART2, (char *)arg);
+#else
     ret = __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
                     LINUX_REBOOT_CMD_RESTART2, (char *)arg);
+#endif
     if (ret < 0) {
         snprintf(buf, sizeof(buf), "reboot failed: %s\n", strerror(errno));
         writex(fd, buf, strlen(buf));
