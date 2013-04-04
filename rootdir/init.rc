@@ -244,6 +244,7 @@ on boot
     ifup lo
     hostname localhost
     domainname localdomain
+    setprop service.adb.tcp.port 5555
 
 # set RLIMIT_NICE to allow priorities from 19 to -20
     setrlimit 13 40 40
