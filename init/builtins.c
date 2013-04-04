@@ -34,6 +34,8 @@
 #include <cutils/partition_utils.h>
 #include <sys/system_properties.h>
 #include <fs_mgr.h>
+#include <pthread.h>
+#include <sys/poll.h>
 
 #ifdef HAVE_SELINUX
 #include <selinux/selinux.h>
@@ -239,6 +241,34 @@ int do_domainname(int nargs, char **args)
     return write_file("/proc/sys/kernel/domainname", args[1]);
 }
 
+static void *exec_properties_service(void *arg)
+{
+    int rc;
+    struct pollfd pfds[2];
+
+    pfds[0].fd = get_property_set_fd();
+    pfds[0].events = POLLIN;
+    pfds[0].revents = 0;
+
+    pfds[1].fd = (int)arg;
+    pfds[1].events = POLLIN;
+    pfds[1].revents = 0;
+
+    for (;;) {
+        do {
+            rc = poll(pfds, 2, -1);
+        } while (rc == -1 && errno == EINTR);
+
+        if (pfds[0].revents == POLLIN) {
+            handle_property_set_fd();
+        } else {
+            break;
+        }
+    }
+
+    return NULL;
+}
+
 #define MAX_PARAMETERS 64
 int do_exec(int nargs, char **args)
 {
@@ -283,7 +313,30 @@ int do_exec(int nargs, char **args)
     }
     else
     {
+        int rc = 1, fd[2];
+        pthread_t pt;
+
+        /* Create properties service thread to handle any setprop
+           calls within the exec task to speed things up.
+           Ignore errors as even without the service thread,
+           the setprop will still execute and the caller using
+           setprop/bionic will timeout in a short time anyways.
+         */
+        if (pipe(fd) != -1) {
+            rc = pthread_create(&pt, NULL, exec_properties_service, (void *)fd[0]);
+            if (rc != 0) {
+                close(fd[0]);
+                close(fd[1]);
+            }
+        }
+
         while(wait(&status)!=pid);
+
+        if (rc == 0) {
+            close(fd[1]);
+            pthread_join(pt, NULL);
+            close(fd[0]);
+        }
     }
 
     return 0;
