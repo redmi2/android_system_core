@@ -510,6 +510,20 @@ void action_for_each_trigger(const char *trigger,
     }
 }
 
+static int already_pending(struct action *newact)
+{
+    struct listnode *node;
+    struct action *act;
+    list_for_each(node, &action_queue) {
+        act = node_to_item(node, struct action, qlist);
+        if (act == newact) {
+            // Duplicate found
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void queue_property_triggers(const char *name, const char *value)
 {
     struct listnode *node;
@@ -524,7 +538,9 @@ void queue_property_triggers(const char *name, const char *value)
                     test[name_length] == '=' &&
                     (!strcmp(test + name_length + 1, value) ||
                      !strcmp(test + name_length + 1, "*"))) {
-                action_add_queue_tail(act);
+                // Add if not already in queue
+                if(!already_pending(act))
+                    action_add_queue_tail(act);
             }
         }
     }
