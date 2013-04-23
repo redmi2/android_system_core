@@ -128,6 +128,7 @@ void service_for_each_class(const char *classname,
 void service_for_each_flags(unsigned matchflags,
                             void (*func)(struct service *svc));
 void service_stop(struct service *svc);
+void service_kill(struct service *svc, int signal);
 void service_reset(struct service *svc);
 void service_start(struct service *svc, const char *dynamic_args);
 void property_changed(const char *name, const char *value);

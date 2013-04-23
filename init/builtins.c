@@ -689,6 +689,23 @@ int do_stop(int nargs, char **args)
     return 0;
 }
 
+int do_kill(int nargs, char **args)
+{
+    struct service *svc;
+    int signal;
+    INFO("do_kill. Service %s", args[1]);
+    svc = service_find_by_name(args[1]);
+    signal = 10; // SIGUSR1 by default
+    if (nargs > 2) {
+        signal = atoi(args[2]);
+    }
+    INFO("Sending kill with signal %d for service %s", signal, args[1]);
+    if (svc) {
+        service_kill(svc, signal);
+    }
+    return 0;
+}
+
 int do_restart(int nargs, char **args)
 {
     struct service *svc;
