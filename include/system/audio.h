@@ -168,7 +168,16 @@ typedef enum {
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
+    AUDIO_FORMAT_SUB_DTS_TE          = 0x00000001UL, // DTS Transcoder Engagement Flag
+
     /* Aliases */
+    /* DTS */
+    AUDIO_FORMAT_DTS_TE              = (AUDIO_FORMAT_DTS |
+                                        AUDIO_FORMAT_SUB_DTS_TE),
+    AUDIO_FORMAT_DTS_LBR_TE          = (AUDIO_FORMAT_DTS_LBR |
+                                        AUDIO_FORMAT_SUB_DTS_TE),
+
+    /* PCM */
     AUDIO_FORMAT_PCM_16_BIT          = (AUDIO_FORMAT_PCM |
                                         AUDIO_FORMAT_PCM_SUB_16_BIT),
     AUDIO_FORMAT_PCM_8_BIT           = (AUDIO_FORMAT_PCM |
