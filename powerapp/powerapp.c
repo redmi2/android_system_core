@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2011,2013 The Linux Foundation. All rights reserved.
  *
  *   Redistribution and use in source and binary forms, with or without
  *   modification, are permitted provided that the following conditions are
@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <linux/reboot.h>
 #include <libgen.h>
+#include <mtd/mtd-user.h>
 
 #define KEY_INPUT_DEVICE "/dev/input/event0"
 #define SHUTDOWN_COMMAND "/sbin/shutdown"
@@ -49,6 +50,238 @@
 #define SUSPEND_STRING "mem"
 #define RESUME_STRING "on"
 #define POWER_OFF_TIMER 1000000
+
+/* Finds and opens an mtdchar device with the given partition name. Returns a
+   valid file desciptor or -1 on failure. */
+static int mtd_open_partition_name(const char *partition_name, unsigned int *dev_id,
+                                   unsigned int *size, unsigned int *erasesize)
+{
+   int mtd_fd = -1, procfs_fd;
+   int num_matches;
+   unsigned char match_found = 0;
+   size_t partition_name_len, bytes_read, offset = 0;
+   char name[32];
+   char buf[1024];
+
+   if (!partition_name || !dev_id || !size || !erasesize)
+   {
+      fprintf(stderr, "Unexpected NULL ptr\n");
+   }
+   else if ((procfs_fd = open("/proc/mtd", O_RDONLY)) < 0)
+   {
+      perror("open");
+   }
+   else
+   {
+      bytes_read = read(procfs_fd, buf, sizeof(buf) - 1);
+      if (bytes_read < 0)
+      {
+         perror("read");
+         bytes_read = 0;
+      }
+      (void) close(procfs_fd);
+
+      buf[bytes_read] = '\0';
+      partition_name_len = strlen(partition_name) + 1;
+      memset(name, 0, sizeof(name));
+      while (offset < bytes_read &&
+             (num_matches = sscanf(&buf[offset], "mtd%u: %x %x \"%31[^\"]",
+                                   dev_id, size, erasesize, name)) != EOF)
+      {
+         if (num_matches == 4 &&
+             strncmp(name, partition_name, partition_name_len) == 0)
+         {
+            match_found = 1;
+            break;
+         }
+         else
+         {
+            while (buf[offset++] != '\n' && offset < bytes_read);
+         }
+      }
+
+      if (!match_found)
+      {
+         fprintf(stderr, "Couldn't find partition with name \"%s\"",
+                 partition_name);
+      }
+      else
+      {
+         (void) snprintf(name, sizeof(name), "/dev/mtd%u", *dev_id);
+         mtd_fd = open(name, O_RDWR);
+         if (mtd_fd < 0)
+         {
+            perror("open");
+         }
+      }
+   }
+
+   return mtd_fd;
+}
+
+/* Sets offset to start of first good block. Returns -1 on error, 0 on success */
+static int mtd_find_first_good_block(int fd, loff_t *offset, unsigned int size,
+                                     unsigned int erasesize)
+{
+   int ret = -1;
+
+   if (!offset || erasesize == 0)
+   {
+      fprintf(stderr, "Bad parameters\n");
+   }
+   else
+   {
+      *offset = 0;
+      while (*offset < size)
+      {
+         int ret = ioctl(fd, MEMGETBADBLOCK, offset);
+         if (ret == 1)
+         {
+            printf("skipping bad block at offset 0x%llx\n", *offset);
+            *offset += erasesize;
+            continue;
+         }
+         else
+         {
+            if (ret == -1 && errno != EOPNOTSUPP)
+            {
+               perror("ioctl (MEMGETBADBLOCK)");
+               *offset = size;
+            }
+            break;
+         }
+      }
+
+      if (*offset < size)
+      {
+         ret = 0;
+      }
+   }
+
+   return ret;
+}
+
+/* Erases a full eraseblock at the given offset, then writes one or more pages
+   of data to the block. Assumes that data_len is a multiple of the page size
+   and is <= erasesize. Returns number of bytes written (0 on failure). */
+static unsigned int mtd_write_data(int fd, loff_t offset, const unsigned char *data,
+                                   unsigned int data_len, unsigned int erasesize)
+{
+   unsigned int ret = 0;
+   int attempts = 0;
+   struct erase_info_user ei;
+
+   memset(&ei, 0, sizeof(ei));
+   ei.start = offset;
+   ei.length = erasesize;
+
+   do
+   {
+      if (ioctl(fd, MEMERASE, &ei) < 0)
+      {
+         perror("ioctl (MEMERASE)");
+      }
+      else if (lseek(fd, offset, SEEK_SET) != offset)
+      {
+         perror("lseek");
+      }
+      else if (write(fd, data, data_len) != data_len)
+      {
+         perror("write");
+      }
+      else
+      {
+         ret = data_len;
+         break;
+      }
+   } while (++attempts < 3);
+
+   return ret;
+}
+
+/* Returns the page size (minimum write size) for the given device, or 0 on error. */
+static unsigned int mtd_get_page_size(unsigned int dev_id)
+{
+   int fd;
+   char buf[64];
+   size_t bytes_read;
+   unsigned int page_size = 0;
+
+   (void) snprintf(buf, sizeof(buf), "/sys/class/mtd/mtd%u/subpagesize", dev_id);
+   fd = open(buf, O_RDONLY);
+   if (fd < 0)
+   {
+      perror("open");
+   }
+   else
+   {
+      bytes_read = read(fd, buf, sizeof(buf) - 1);
+      if (bytes_read < 0)
+      {
+         perror("read");
+      }
+      else
+      {
+         buf[bytes_read] = '\0';
+         if (sscanf(buf, "%u", &page_size) != 1)
+         {
+            fprintf(stderr, "Couldn't read page size\n");
+            page_size = 0;
+         }
+      }
+      close(fd);
+   }
+
+   return page_size;
+}
+
+/* Writes a special value to the FOTA NAND partition to let boot know we are
+   going to recovery */
+static void set_fota_cookie(void)
+{
+   int fd;
+   unsigned int dev_id, size, erasesize, writesize;
+   unsigned char *data;
+   loff_t offset;
+
+   if ((fd = mtd_open_partition_name("fota", &dev_id, &size, &erasesize)) < 0)
+   {
+      fprintf(stderr, "Couldn't find fota partition\n");
+   }
+   else
+   {
+      if ((writesize = mtd_get_page_size(dev_id)) < 4)
+      {
+         fprintf(stderr, "Couldn't determine page size! (%d)\n", writesize);
+      }
+      else if (mtd_find_first_good_block(fd, &offset, size, erasesize) != 0)
+      {
+         fprintf(stderr, "Couldn't find good block in partition\n");
+      }
+      else
+      {
+         data = malloc(writesize);
+         if (data == NULL)
+         {
+            fprintf(stderr, "Couldn't allocate %d bytes\n", erasesize);
+         }
+         else
+         {
+            memset(data, 0, writesize);
+            data[0] = 0x43;
+            data[1] = 0x53;
+            data[2] = 0x64;
+            data[3] = 0x64;
+            if (mtd_write_data(fd, offset, data, writesize, erasesize) == writesize)
+            {
+               printf("Successfully wrote FOTA cookie\n");
+            }
+            free(data);
+         }
+      }
+      (void) close(fd);
+   }
+}
 
 int diff_timestamps(struct timeval* then, struct timeval* now)
 {
@@ -88,6 +321,11 @@ void sys_shutdown_or_reboot(int reboot, char *arg1)
           cmd = LINUX_REBOOT_CMD_RESTART;
    }
 
+   if (cmd == LINUX_REBOOT_CMD_RESTART2 && strncmp(arg1, "recovery", 9) == 0)
+   {
+      set_fota_cookie();
+   }
+
    n = syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2, cmd, arg1);
    if (n < 0)
    {
@@ -99,7 +337,6 @@ void suspend_or_resume(void)
 {
    int fd = -1;
    char buf[BUFFER_SZ];
-   int n = 0;
    static int suspend = 1;
 
    printf("Power Key Initiated System Suspend or Resume\n");
