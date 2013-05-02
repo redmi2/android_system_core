@@ -82,7 +82,7 @@ case `source /usr/bin/usb/target` in
 			*1.0* )
 				run_9x25
 				;;
-			*2.0* )
+			*2.* )
 				run_9x25_v2
 				;;
 			* )
