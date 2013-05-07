@@ -105,6 +105,7 @@ typedef enum {
     AUDIO_FORMAT_PCM_SUB_32_BIT          = 0x3, /* PCM signed .31 fixed point */
     AUDIO_FORMAT_PCM_SUB_8_24_BIT        = 0x4, /* PCM signed 7.24 fixed point */
     AUDIO_FORMAT_PCM_SUB_24_BIT          = 0x5, /* PCM signed 24 fixed point */
+    AUDIO_FORMAT_SUB_DTS_TE          = 0x10, /* DTS Transcoder Engagement Flag */
 } audio_format_pcm_sub_fmt_t;
 
 /* MP3 sub format field definition : can use 11 LSBs in the same way as MP3
@@ -168,8 +169,6 @@ typedef enum {
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
-    AUDIO_FORMAT_SUB_DTS_TE          = 0x00000001UL, // DTS Transcoder Engagement Flag
-
     /* Aliases */
     /* DTS */
     AUDIO_FORMAT_DTS_TE              = (AUDIO_FORMAT_DTS |
@@ -188,6 +187,12 @@ typedef enum {
                                         AUDIO_FORMAT_PCM_SUB_8_24_BIT),
     AUDIO_FORMAT_PCM_24_BIT          = (AUDIO_FORMAT_PCM |
                                         AUDIO_FORMAT_PCM_SUB_24_BIT),
+    AUDIO_FORMAT_PCM_16_BIT_TE       = (AUDIO_FORMAT_PCM |
+                                        AUDIO_FORMAT_PCM_SUB_16_BIT |
+                                        AUDIO_FORMAT_SUB_DTS_TE),
+    AUDIO_FORMAT_PCM_24_BIT_TE       = (AUDIO_FORMAT_PCM |
+                                        AUDIO_FORMAT_PCM_SUB_24_BIT |
+                                        AUDIO_FORMAT_SUB_DTS_TE),
 } audio_format_t;
 
 typedef enum {
@@ -562,9 +567,14 @@ static inline bool audio_is_valid_format(audio_format_t format)
 {
     switch (format & AUDIO_FORMAT_MAIN_MASK) {
     case AUDIO_FORMAT_PCM:
-        if (format != AUDIO_FORMAT_PCM_16_BIT &&
-                format != AUDIO_FORMAT_PCM_24_BIT &&
-                format != AUDIO_FORMAT_PCM_8_BIT) {
+        switch (format) {
+        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_PCM_16_BIT_TE:
+        case AUDIO_FORMAT_PCM_24_BIT_TE:
+            break;
+        default :
             return false;
         }
     case AUDIO_FORMAT_MP3:
@@ -608,9 +618,11 @@ static inline size_t audio_bytes_per_sample(audio_format_t format)
         size = sizeof(int32_t);
         break;
     case AUDIO_FORMAT_PCM_24_BIT:
+    case AUDIO_FORMAT_PCM_24_BIT_TE:
         size = 3;
         break;
     case AUDIO_FORMAT_PCM_16_BIT:
+    case AUDIO_FORMAT_PCM_16_BIT_TE:
         size = sizeof(int16_t);
         break;
     case AUDIO_FORMAT_PCM_8_BIT:
