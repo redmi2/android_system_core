@@ -56,13 +56,13 @@ run_9x25() {
 
 case `source /usr/bin/usb/target` in
 	*9x15* )
-		run_9x15
+		run_9x15 &
 		;;
 	*9x25* )
-		run_9x25
+		run_9x25 &
 		;;
 	* )
-		run_9x15
+		run_9x15 &
 		;;
 esac
 
