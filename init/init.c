@@ -509,6 +509,15 @@ void service_stop(struct service *svc)
     service_stop_or_reset(svc, SVC_DISABLED);
 }
 
+void service_kill(struct service *svc, int signal)
+{
+    INFO("service_kill. signal: %d", signal);
+    if (svc->pid) {
+        NOTICE("service '%s' is being killed\n", svc->name);
+        kill(-svc->pid, signal);
+    }
+}
+
 void property_changed(const char *name, const char *value)
 {
     if (property_triggers_enabled)

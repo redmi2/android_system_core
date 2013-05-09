@@ -115,6 +115,7 @@ int lookup_keyword(const char *s)
         break;
     case 'k':
         if (!strcmp(s, "eycodes")) return K_keycodes;
+        if (!strcmp(s, "ill")) return K_kill;
         break;
     case 'l':
         if (!strcmp(s, "oglevel")) return K_loglevel;
