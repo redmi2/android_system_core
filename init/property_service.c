@@ -51,6 +51,9 @@
 
 #define PERSISTENT_PROPERTY_DIR  "/data/property"
 
+#define PROP_PATH_DEFAULT_PROP   "/system/vendor/speccfg/spec.default.prop"
+#define PROP_PATH_SPEC_PROP      "/system/vendor/speccfg/spec.prop"
+
 static int persistent_properties_loaded = 0;
 static int property_area_inited = 0;
 
@@ -88,6 +91,8 @@ struct {
     { "log.",             AID_SHELL,    0 },
     { "service.adb.root", AID_SHELL,    0 },
     { "service.adb.tcp.port", AID_SHELL,    0 },
+    { "persist.env.",     AID_SYSTEM,   0 },
+    { "persist.multisim.",AID_SYSTEM,   0 },
     { "persist.sys.",     AID_SYSTEM,   0 },
     { "persist.usb.",     AID_SYSTEM,   0 },
     { "persist.service.", AID_SYSTEM,   0 },
@@ -620,6 +625,11 @@ void start_property_service(void)
 
     load_properties_from_file(PROP_PATH_SYSTEM_BUILD);
     load_properties_from_file(PROP_PATH_SYSTEM_DEFAULT);
+
+    /* Load the props file */
+    load_properties_from_file(PROP_PATH_DEFAULT_PROP);
+    load_properties_from_file(PROP_PATH_SPEC_PROP);
+
     load_override_properties();
     /* Read persistent properties after all default values have been loaded. */
     load_persistent_properties();
