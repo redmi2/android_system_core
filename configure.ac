@@ -71,5 +71,6 @@
           libmincrypt/libmincrypt.pc \
           libzipfile/Makefile \
           fastboot/Makefile \
-          adb/Makefile
+          adb/Makefile \
+          usb/Makefile
   ])
