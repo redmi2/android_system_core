@@ -39,6 +39,15 @@ case "$1" in
   start)
         echo -n "Starting adbd: "
         start-stop-daemon -S -b -a /sbin/adbd
+
+        if [ -e "/etc/adb_devid" ]
+        then
+                cat /etc/adb_devid > /sys/class/android_usb/f_accessory/device/iSerial
+        else
+                cat /proc/sys/kernel/random/boot_id | cut -d- -f5 > /sys/class/android_usb/f_accessory/device/iSerial
+                cat /sys/class/android_usb/f_accessory/device/iSerial > /etc/adb_devid
+        fi
+
         echo "done"
         ;;
   stop)
