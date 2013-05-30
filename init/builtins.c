@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -259,9 +260,10 @@ static void *exec_properties_service(void *arg)
             rc = poll(pfds, 2, -1);
         } while (rc == -1 && errno == EINTR);
 
-        if (pfds[0].revents == POLLIN) {
+        if (pfds[0].revents & POLLIN) {
             handle_property_set_fd();
-        } else {
+        }
+        if (pfds[1].revents & POLLHUP) {
             break;
         }
     }
@@ -276,7 +278,7 @@ int do_exec(int nargs, char **args)
     int status, i, j;
     char *par[MAX_PARAMETERS];
     char prop_val[PROP_VALUE_MAX];
-    int len;
+    size_t len;
 
     if (nargs > MAX_PARAMETERS)
     {
@@ -309,7 +311,10 @@ int do_exec(int nargs, char **args)
     pid = fork();
     if (!pid)
     {
-        execv(par[0],par);
+        if (execv(par[0],par) == -1) {
+            ERROR("cannot exec '%s': %s\n", par[0], strerror(errno));
+        }
+        _exit(1);
     }
     else
     {
@@ -322,7 +327,7 @@ int do_exec(int nargs, char **args)
            the setprop will still execute and the caller using
            setprop/bionic will timeout in a short time anyways.
          */
-        if (pipe(fd) != -1) {
+        if (pipe2(fd, O_CLOEXEC) != -1) {
             rc = pthread_create(&pt, NULL, exec_properties_service, (void *)fd[0]);
             if (rc != 0) {
                 close(fd[0]);
