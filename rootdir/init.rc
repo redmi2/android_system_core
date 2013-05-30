@@ -472,8 +472,7 @@ service media /system/bin/mediaserver
 
 service bootanim /system/bin/bootanimation
     class main
-    user graphics
-    group graphics
+    group graphics audio
     disabled
     oneshot
 
