@@ -523,3 +523,18 @@ service mdnsd /system/bin/mdnsd
     socket mdnsd stream 0660 mdnsr inet
     disabled
     oneshot
+
+service qlogd /system/xbin/qlogd
+    class main
+    disabled
+on property:persist.sys.qlogd=1
+    start qlogd
+on property:persist.sys.qlogd=0
+    stop qlogd
+service rootagent /system/bin/sh /system/etc/init.qcom.rootagent.sh
+    disabled
+    oneshot
+on property:persist.sys.rootagent=1
+    start rootagent
+on property:persist.sys.rootagent=0
+    stop rootagent
