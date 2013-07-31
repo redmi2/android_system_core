@@ -120,6 +120,9 @@ struct {
     // used for setting Dolby specific properties
     { "dolby.", AID_SYSTEM,   0 },
 #endif // DOLBY_DAP
+#ifdef DOLBY_UDC_MULTICHANNEL
+    { "dolby.audio",      AID_MEDIA,    0 },
+#endif // DOLBY_UDC_MULTICHANNEL
     { NULL, 0, 0 }
 };
 
