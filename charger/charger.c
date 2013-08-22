@@ -66,6 +66,8 @@
 
 #define BATTERY_FULL_THRESH     95
 
+#define BACKLIGHT_TOGGLE_PATH "/sys/class/leds/lcd-backlight/brightness"
+
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
 #define LAST_KMSG_MAX_SZ        (32 * 1024)
 
@@ -185,6 +187,36 @@ static struct charger charger_state = {
 static int char_width;
 static int char_height;
 
+/*On certain targets the FBIOBLANK ioctl does not turn off the
+ * backlight. In those cases we need to manually toggle it on/off
+ */
+static int set_backlight(int toggle)
+{
+        int fd;
+        char buffer[10];
+
+        memset(buffer, '\0', sizeof(buffer));
+        fd = open(BACKLIGHT_TOGGLE_PATH, O_RDWR);
+        if (fd < 0) {
+                LOGE("Could not open backlight node : %s", strerror(errno));
+                goto cleanup;
+        }
+        if (toggle) {
+                LOGI("Enabling backlight");
+                snprintf(buffer, sizeof(int), "%d\n", 100);
+        } else {
+                LOGI("Disabling backlight");
+                snprintf(buffer, sizeof(int), "%d\n", 0);
+        }
+        if (write(fd, buffer,strlen(buffer)) < 0) {
+                LOGE("Could not write to backlight node : %s", strerror(errno));
+                goto cleanup;
+        }
+cleanup:
+        if (fd >= 0)
+                close(fd);
+        return 0;
+}
 /* current time in milliseconds */
 static int64_t curr_time_ms(void)
 {
@@ -620,6 +652,20 @@ static void android_green(void)
     gr_color(0xa4, 0xc6, 0x39, 255);
 }
 
+static void draw_capacity(struct charger *charger)
+{
+    char cap_str[64];
+    int x, y;
+    int str_len_px;
+
+    snprintf(cap_str, sizeof(cap_str), "%d%%", charger->batt_anim->capacity);
+    str_len_px = gr_measure(cap_str);
+    x = (gr_fb_width() - str_len_px) / 2;
+    y = (gr_fb_height() + char_height) / 2;
+    android_green();
+    gr_text(x, y, cap_str, 0);
+}
+
 /* returns the last y-offset of where the surface ends */
 static int draw_surface_centered(struct charger *charger, gr_surface surface)
 {
@@ -672,8 +718,10 @@ static void redraw_screen(struct charger *charger)
     /* try to display *something* */
     if (batt_anim->capacity < 0 || batt_anim->num_frames == 0)
         draw_unknown(charger);
-    else
+    else {
         draw_battery(charger);
+        draw_capacity(charger);
+    }
     gr_flip();
 }
 
@@ -703,6 +751,7 @@ static void update_screen_state(struct charger *charger, int64_t now)
         reset_animation(batt_anim);
         charger->next_screen_transition = -1;
         gr_fb_blank(true);
+        set_backlight(false);
         LOGV("[%lld] animation done\n", now);
         if (charger->num_supplies_online > 0)
             request_suspend(true);
@@ -736,8 +785,11 @@ static void update_screen_state(struct charger *charger, int64_t now)
     }
 
     /* unblank the screen  on first cycle */
-    if (batt_anim->cur_cycle == 0)
+    if (batt_anim->cur_cycle == 0) {
         gr_fb_blank(false);
+        set_backlight(true);
+    }
+
 
     /* draw the new frame (@ cur_frame) */
     redraw_screen(charger);
@@ -1001,6 +1053,7 @@ int main(int argc, char **argv)
 
 #ifndef CHARGER_DISABLE_INIT_BLANK
     gr_fb_blank(true);
+    set_backlight(false);
 #endif
 
     charger->next_screen_transition = now - 1;
