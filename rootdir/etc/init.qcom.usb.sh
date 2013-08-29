@@ -31,10 +31,10 @@
 # then use unique persistent serial number for device connected via usb.
 # User needs to set unique usb serial number to persist.usb.serialno
 #
-serialno=`getprop ro.serialno`
+serialno=`getprop persist.usb.serialno`
 case "$serialno" in
     "")
-    serialnum=`getprop persist.usb.serialno`
+    serialnum=`getprop ro.serialno`
     case "$serialnum" in
         "");; #Do nothing, use default serial number
         *)
