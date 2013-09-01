@@ -43,6 +43,14 @@ case "$1" in
 			;;
 		esac
 
+		# enable debug message
+		if [ -f /usr/bin/usb/debuger/default_debug ];
+		then
+			rm -rf /usr/bin/usb/debuger/statusFile
+			usb_debug -f on n /usr/bin/usb/debuger/default_debug
+		fi
+
+
 		# boot hsusb composition:
 		if [ -d /sys/class/android_usb/android0 ]
 		then
