@@ -73,10 +73,11 @@ void NetlinkEvent::dump() {
  * Parse an binary message from a NETLINK_ROUTE netlink socket.
  */
 bool NetlinkEvent::parseBinaryNetlinkMessage(char *buffer, int size) {
-    size_t sz = size;
-    const struct nlmsghdr *nh = (struct nlmsghdr *) buffer;
+    const struct nlmsghdr *nh;
 
-    while (NLMSG_OK(nh, sz) && (nh->nlmsg_type != NLMSG_DONE)) {
+    for (nh= (struct nlmsghdr *) buffer;
+         NLMSG_OK(nh, size) && (nh->nlmsg_type != NLMSG_DONE);
+         nh = NLMSG_NEXT(nh, size)) {
 
         if (nh->nlmsg_type == RTM_NEWLINK) {
             int len = nh->nlmsg_len - sizeof(*nh);
@@ -130,7 +131,6 @@ bool NetlinkEvent::parseBinaryNetlinkMessage(char *buffer, int size) {
         } else {
                 SLOGD("Unexpected netlink message. type=0x%x\n", nh->nlmsg_type);
         }
-        nh = NLMSG_NEXT(nh, size);
     }
 
     return true;
