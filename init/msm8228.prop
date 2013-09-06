@@ -1,0 +1,8 @@
+# overwrite msm8228 chip properties
+ro.product.model=msm8228
+ro.product.name=msm8228
+ro.product.device=msm8228
+ro.product.board=MSM8228
+ro.board.platform=msm8228
+ro.build.product=msm8228
+ro.board.platform=msm8228

@@ -72,6 +72,7 @@
 
 #define PROP_PATH_DEFAULT_PROP   "/system/vendor/speccfg/spec.default.prop"
 #define PROP_PATH_SPEC_PROP      "/system/vendor/speccfg/spec.prop"
+#define PROP_PATH_MSM8228_PROP   "/system/msm8228.prop"
 
 static int persistent_properties_loaded = 0;
 static int property_area_inited = 0;
@@ -645,10 +646,38 @@ void load_persist_props(void)
     load_persistent_properties();
 }
 
+int is_msm8228_chip()
+{
+    int soc_id;
+    FILE *file;
+    char line[128];
+    const char *filename = "/sys/devices/soc0/soc_id";
+
+    file = fopen(filename, "r");
+    if (!file || !fgets(line, sizeof(line), file)) {
+        ERROR("Could not get %s contents\n", filename);
+    }
+    fclose(file);
+
+    if (1 == sscanf(line, "%d\n", &soc_id)) {
+	ERROR("**** soc_id == %d \n", soc_id);
+        if(soc_id >= 219 && 224 >= soc_id)
+        {
+            return 1;
+        }
+        return 0;
+    }
+
+    ERROR("Unexpected output in file %s (%s).\n", filename, line);
+    return -1;
+}
+
 void start_property_service(void)
 {
     int fd;
 
+    if(is_msm8228_chip() == 1)
+        load_properties_from_file(PROP_PATH_MSM8228_PROP);
     load_properties_from_file(PROP_PATH_SYSTEM_BUILD);
     load_properties_from_file(PROP_PATH_SYSTEM_DEFAULT);
 
