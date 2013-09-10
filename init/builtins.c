@@ -347,7 +347,10 @@ int do_exec(int nargs, char **args)
 
 int do_export(int nargs, char **args)
 {
-    add_environment(args[1], args[2]);
+    if (nargs == 2)
+        remove_environment(args[1]);
+    else
+        add_environment(args[1], args[2]);
     return 0;
 }
 
