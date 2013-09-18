@@ -53,7 +53,7 @@ enum {
     KEYWORD(disabled,    OPTION,  0, 0)
     KEYWORD(domainname,  COMMAND, 1, do_domainname)
     KEYWORD(exec,        COMMAND, 1, do_exec)
-    KEYWORD(export,      COMMAND, 2, do_export)
+    KEYWORD(export,      COMMAND, 1, do_export)
     KEYWORD(group,       OPTION,  0, 0)
     KEYWORD(hostname,    COMMAND, 1, do_hostname)
     KEYWORD(ifup,        COMMAND, 1, do_ifup)
