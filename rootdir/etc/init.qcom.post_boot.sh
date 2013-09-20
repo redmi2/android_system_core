@@ -209,6 +209,7 @@ esac
 # Enable Power modes and set the CPU Freq Sampling rates
 case "$target" in
      "msm7627a")
+	start qosmgrd
 	echo 1 > /sys/module/pm2/modes/cpu0/standalone_power_collapse/idle_enabled
 	echo 1 > /sys/module/pm2/modes/cpu1/standalone_power_collapse/idle_enabled
 	echo 1 > /sys/module/pm2/modes/cpu0/standalone_power_collapse/suspend_enabled
