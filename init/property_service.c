@@ -89,6 +89,8 @@ struct {
     { "bluetooth.",       AID_SYSTEM,    0 },
     { "wifi.",            AID_WIFI,     0 },
     { "hw.fm.",           AID_FM_RADIO,  0 },
+    { "iwedia.",               AID_MEDIA,     0 },
+    { "iwedia.",               AID_SYSTEM,    0 },
     { NULL, 0, 0 }
 };
 
