@@ -56,6 +56,7 @@
 #include "property_service.h"
 #include "init.h"
 #include "util.h"
+#include "vendor_init.h"
 #include "log.h"
 
 using android::base::StringPrintf;
