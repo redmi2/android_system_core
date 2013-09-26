@@ -97,6 +97,7 @@ enum {
 enum {
     CAMERA_META_DATA_ASD = 0x001,    //ASD data
     CAMERA_META_DATA_FD = 0x002,     //FD/FP data
+    CAMERA_META_DATA_HDR = 0x003,    //Auto HDR data
 };
 
 /** cmdType in sendCommand functions */
@@ -193,6 +194,8 @@ enum {
     CAMERA_CMD_HISTOGRAM_ON     = 11,
     CAMERA_CMD_HISTOGRAM_OFF     = 12,
     CAMERA_CMD_HISTOGRAM_SEND_DATA  = 13,
+    CAMERA_CMD_LONGSHOT_ON = 14,
+    CAMERA_CMD_LONGSHOT_OFF = 15,
     CAMERA_CMD_METADATA_ON = 100,
     CAMERA_CMD_METADATA_OFF = 101,
 };
