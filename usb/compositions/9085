@@ -58,6 +58,7 @@ run_9x25() {
 	echo 1 > /sys/class/android_usb/android$num/bDeviceProtocol
 	echo diag > /sys/class/android_usb/android0/f_diag/clients
 	echo diag,adb,usb_mbim,gps > /sys/class/android_usb/android$num/functions
+	echo BAM2BAM_IPA > /sys/class/android_usb/android$num/f_usb_mbim/mbim_transports
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
