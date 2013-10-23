@@ -501,8 +501,6 @@ service media /system/bin/mediaserver
 
 service bootanim /system/bin/bootanimation
     class main
-    user media
-    group graphics audio
     disabled
     oneshot
 
