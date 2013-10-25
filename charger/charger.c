@@ -72,6 +72,8 @@
 
 #define BACKLIGHT_TOGGLE_PATH "/sys/class/leds/lcd-backlight/brightness"
 
+#define ANDROID_ALARM_RTC_POWEROFF_WAKEUP    4
+
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
 #define LAST_KMSG_MAX_SZ        (32 * 1024)
 
@@ -1090,6 +1092,79 @@ err:
     return -1;
 }
 
+static int alarm_enable_poweron_alarm()
+{
+    int fd;
+    char buffer[10];
+
+    fd = open("/sys/module/qpnp_rtc/parameters/poweron_alarm", O_RDWR);
+    if (fd < 0) {
+        LOGE("Could not open poweron_alarm\n");
+        goto err;
+    }
+
+    snprintf(buffer, sizeof(buffer), "%s\n", "Y");
+
+    if (write(fd, buffer, strlen(buffer)) < 0) {
+        LOGE("Could not write to poweron_alarm\n");
+        goto err;
+    }
+
+    close(fd);
+    return 0;
+
+err:
+    if (fd >= 0)
+        close(fd);
+    return -1;
+}
+
+static int alarm_restore_alm_time()
+{
+    int rc, fd = -1;
+    struct timespec alarm_time;
+    struct timeval wall_time;
+    time_t rtc_secs, alarm_delta;
+
+    rc = alarm_get_rtc_time(&rtc_secs);
+    if (rc < 0)
+        goto err;
+
+    gettimeofday(&wall_time, NULL);
+    alarm_delta = wall_time.tv_sec - rtc_secs;
+    alarm_time.tv_sec = alarm_delta + alm_secs + 120;
+    alarm_time.tv_nsec = 0;
+
+    fd = open("/dev/alarm", O_RDWR);
+    if (fd < 0) {
+        LOGE("Can't open alarm devfs node\n");
+        goto err;
+    }
+
+    rc = ioctl(fd, ANDROID_ALARM_SET(
+                      ANDROID_ALARM_RTC_POWEROFF_WAKEUP), &alarm_time);
+    if (rc < 0) {
+        LOGE("Unable to set alarm time to %ld\n", alarm_time.tv_sec);
+        goto err;
+    }
+
+    /*
+     * enable poweron alarm to avoid clearing
+     * alarm register during shutdown
+     */
+    rc = alarm_enable_poweron_alarm();
+    if (rc < 0)
+        goto err;
+
+    close(fd);
+    return 0;
+
+err:
+    if (fd >= 0)
+        close(fd);
+    return -1;
+}
+
 static int alarm_is_alm_expired()
 {
     int rc;
@@ -1164,6 +1239,14 @@ void *alarm_thread(void *p)
      */
     rc = alarm_get_alm_time(&alm_secs);
     if (rc < 0 || !alm_secs)
+        goto err;
+
+    /*
+     * prepare for restoring alarm time when
+     * shutdown event occurs
+     */
+    rc = alarm_restore_alm_time();
+    if (rc < 0)
         goto err;
 
     rc = alarm_get_rtc_time(&rtc_secs);
