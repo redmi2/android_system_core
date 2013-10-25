@@ -197,6 +197,30 @@ failed:
     return 1;
 }
 
+/* remove_environment - remove "key" to the current environment */
+int remove_environment(const char *key)
+{
+    int n;
+
+    if (!key)
+        return 1;
+
+    for (n = 0; n < 31; n++) {
+        if (ENV[n]) {
+            size_t len = strlen(key);
+            if(!strncmp(ENV[n], key, len) && ENV[n][len] == '=') {
+                free((char *)ENV[n]);
+                ENV[n] = NULL;
+                NOTICE("Env variable %s is removed\n", key);
+                return 0;
+            }
+        }
+    }
+
+    ERROR("Fail to find Env variable: %s.", key);
+    return 1;
+}
+
 static void zap_stdio(void)
 {
     int fd;
