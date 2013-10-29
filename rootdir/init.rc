@@ -479,6 +479,7 @@ service surfaceflinger /system/bin/surfaceflinger
     user system
     group graphics drmrpc
     onrestart restart zygote
+    onrestart restart ppd
 
 service zygote /system/bin/app_process -Xzygote /system/bin --zygote --start-system-server
     class main
