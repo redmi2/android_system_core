@@ -750,8 +750,8 @@ static void update_screen_state(struct charger *charger, int64_t now)
     if (batt_anim->cur_cycle == batt_anim->num_cycles) {
         reset_animation(batt_anim);
         charger->next_screen_transition = -1;
-        gr_fb_blank(true);
         set_backlight(false);
+        gr_fb_blank(true);
         LOGV("[%lld] animation done\n", now);
         if (charger->num_supplies_online > 0)
             request_suspend(true);
@@ -1052,8 +1052,8 @@ int main(int argc, char **argv)
     ev_sync_key_state(set_key_callback, charger);
 
 #ifndef CHARGER_DISABLE_INIT_BLANK
-    gr_fb_blank(true);
     set_backlight(false);
+    gr_fb_blank(true);
 #endif
 
     charger->next_screen_transition = now - 1;
