@@ -72,6 +72,8 @@
 
 #define BACKLIGHT_TOGGLE_PATH "/sys/class/leds/lcd-backlight/brightness"
 
+#define ANDROID_ALARM_RTC_POWEROFF_WAKEUP    4
+
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
 #define LAST_KMSG_MAX_SZ        (32 * 1024)
 
@@ -190,6 +192,12 @@ static struct charger charger_state = {
 
 static int char_width;
 static int char_height;
+
+/*
+ * shouldn't be changed after
+ * reading from alarm register
+ */
+static time_t alm_secs;
 
 /*On certain targets the FBIOBLANK ioctl does not turn off the
  * backlight. In those cases we need to manually toggle it on/off
@@ -1084,6 +1092,92 @@ err:
     return -1;
 }
 
+static int alarm_enable_poweron_alarm()
+{
+    int fd;
+    char buffer[10];
+
+    fd = open("/sys/module/qpnp_rtc/parameters/poweron_alarm", O_RDWR);
+    if (fd < 0) {
+        LOGE("Could not open poweron_alarm\n");
+        goto err;
+    }
+
+    snprintf(buffer, sizeof(buffer), "%s\n", "Y");
+
+    if (write(fd, buffer, strlen(buffer)) < 0) {
+        LOGE("Could not write to poweron_alarm\n");
+        goto err;
+    }
+
+    close(fd);
+    return 0;
+
+err:
+    if (fd >= 0)
+        close(fd);
+    return -1;
+}
+
+static int alarm_restore_alm_time()
+{
+    int rc, fd = -1;
+    struct timespec alarm_time;
+    struct timeval wall_time;
+    time_t rtc_secs, alarm_delta;
+
+    rc = alarm_get_rtc_time(&rtc_secs);
+    if (rc < 0)
+        goto err;
+
+    gettimeofday(&wall_time, NULL);
+    alarm_delta = wall_time.tv_sec - rtc_secs;
+    alarm_time.tv_sec = alarm_delta + alm_secs + 120;
+    alarm_time.tv_nsec = 0;
+
+    fd = open("/dev/alarm", O_RDWR);
+    if (fd < 0) {
+        LOGE("Can't open alarm devfs node\n");
+        goto err;
+    }
+
+    rc = ioctl(fd, ANDROID_ALARM_SET(
+                      ANDROID_ALARM_RTC_POWEROFF_WAKEUP), &alarm_time);
+    if (rc < 0) {
+        LOGE("Unable to set alarm time to %ld\n", alarm_time.tv_sec);
+        goto err;
+    }
+
+    /*
+     * enable poweron alarm to avoid clearing
+     * alarm register during shutdown
+     */
+    rc = alarm_enable_poweron_alarm();
+    if (rc < 0)
+        goto err;
+
+    close(fd);
+    return 0;
+
+err:
+    if (fd >= 0)
+        close(fd);
+    return -1;
+}
+
+static int alarm_is_alm_expired()
+{
+    int rc;
+    time_t rtc_secs;
+
+    rc = alarm_get_rtc_time(&rtc_secs);
+    if (rc < 0)
+        return 0;
+
+    return (alm_secs >= rtc_secs - 2 &&
+            alm_secs <= rtc_secs + 2) ? 1 : 0;
+}
+
 static int alarm_set_reboot_time_and_wait(time_t secs)
 {
     int rc, fd;
@@ -1116,7 +1210,7 @@ static int alarm_set_reboot_time_and_wait(time_t secs)
 
     do {
         rc = ioctl(fd, ANDROID_ALARM_WAIT);
-    } while (rc < 0 && errno == EINTR);
+    } while ((rc < 0 && errno == EINTR) || !alarm_is_alm_expired());
 
     if (rc <= 0) {
         LOGE("Unable to wait on alarm\n");
@@ -1134,7 +1228,7 @@ err:
 
 void *alarm_thread(void *p)
 {
-    time_t g_alm_secs, g_rtc_secs, s_rb_secs;
+    time_t rtc_secs, rb_secs;
     int rc;
 
     /*
@@ -1143,11 +1237,19 @@ void *alarm_thread(void *p)
      * shutdown time is 2 minutes earlier than
      * the actual alarm time set by user
      */
-    rc = alarm_get_alm_time(&g_alm_secs);
-    if (rc < 0 || !g_alm_secs)
+    rc = alarm_get_alm_time(&alm_secs);
+    if (rc < 0 || !alm_secs)
         goto err;
 
-    rc = alarm_get_rtc_time(&g_rtc_secs);
+    /*
+     * prepare for restoring alarm time when
+     * shutdown event occurs
+     */
+    rc = alarm_restore_alm_time();
+    if (rc < 0)
+        goto err;
+
+    rc = alarm_get_rtc_time(&rtc_secs);
     if (rc < 0)
         goto err;
 
@@ -1155,11 +1257,11 @@ void *alarm_thread(void *p)
      * calculate the reboot time after which
      * the phone will reboot
      */
-    s_rb_secs = g_alm_secs - g_rtc_secs;
-    if (s_rb_secs <= 0)
+    rb_secs = alm_secs - rtc_secs;
+    if (rb_secs <= 0)
         goto err;
 
-    rc = alarm_set_reboot_time_and_wait(s_rb_secs);
+    rc = alarm_set_reboot_time_and_wait(rb_secs);
     if (rc < 0)
         goto err;
 
