@@ -100,9 +100,9 @@ case "$target" in
         insmod /system/lib/modules/ss_mfcinit.ko
         insmod /system/lib/modules/ss_vencoder.ko
         insmod /system/lib/modules/ss_vdecoder.ko
-        chmod 0666 /dev/ss_mfc_reg
-        chmod 0666 /dev/ss_vdec
-        chmod 0666 /dev/ss_venc
+        chmod -h 0666 /dev/ss_mfc_reg
+        chmod -h 0666 /dev/ss_vdec
+        chmod -h 0666 /dev/ss_venc
 
         value=`cat /sys/devices/system/soc/soc0/hw_platform`
 
@@ -160,7 +160,7 @@ case "$target" in
                     ;;
                 esac
 
-               chown system system $mem/memory$block/state
+               chown -h system system $mem/memory$block/state
 
                 echo online > $mem/memory$block/state
                 case "$?" in
@@ -202,17 +202,17 @@ case "$target" in
                 setprop ro.sf.lcd_density 240
                 start profiler_daemon;;
         esac
-        chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
-        chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
+        chown -h root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
+        chmod -h 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
         ;;
     "msm7627a" )
-        chown root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
-        chmod 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
+        chown -h root.system /sys/devices/platform/msm_hsusb/gadget/wakeup
+        chmod -h 220 /sys/devices/platform/msm_hsusb/gadget/wakeup
         ;;
     "msm8960")
 	echo 1 > /data/system/sensors/settings
 	start sensors
-	chown root.system /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
-	chmod 220 /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
+	chown -h root.system /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
+	chmod -h 220 /sys/devices/platform/msm_otg/msm_hsusb/gadget/wakeup
 	;;
 esac
