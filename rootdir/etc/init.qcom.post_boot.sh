@@ -32,7 +32,7 @@ case "$target" in
     "qsd8250_surf" | "qsd8250_ffa" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" | "qsd8650a_st1x")
         echo "ondemand" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
         echo 90 > /sys/devices/system/cpu/cpu0/cpufreq/ondemand/up_threshold
-        chown system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+        chown -h system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
         ;;
 esac
 
@@ -78,18 +78,18 @@ case "$target" in
 	 echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
 	 echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
 	 echo 4 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
-	 chown system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
-	 chown system /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
+	 chown -h system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+	 chown -h system /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
 	 echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
 	 echo 384000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-	 chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-	 chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-	 chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-	 chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-	 chown root.system /sys/devices/system/cpu/mfreq
-	 chmod 220 /sys/devices/system/cpu/mfreq
-	 chown root.system /sys/devices/system/cpu/cpu1/online
-	 chmod 664 /sys/devices/system/cpu/cpu1/online
+	 chown -h system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+	 chown -h system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+	 chown -h system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+	 chown -h system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+	 chown -h root.system /sys/devices/system/cpu/mfreq
+	 chmod -h 220 /sys/devices/system/cpu/mfreq
+	 chown -h root.system /sys/devices/system/cpu/cpu1/online
+	 chmod -h 664 /sys/devices/system/cpu/cpu1/online
         ;;
 esac
 
@@ -111,18 +111,18 @@ case "$target" in
      echo 90 > /sys/devices/system/cpu/cpu1/cpufreq/ondemand/up_threshold
      echo 1 > /sys/devices/system/cpu/cpufreq/ondemand/io_is_busy
      echo 4 > /sys/devices/system/cpu/cpufreq/ondemand/sampling_down_factor
-     chown system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
-     chown system /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
+     chown -h system /sys/devices/system/cpu/cpu0/cpufreq/ondemand/sampling_rate
+     chown -h system /sys/devices/system/cpu/cpu1/cpufreq/ondemand/sampling_rate
      echo 384000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
      echo 384000 > /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-     chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
-     chown system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
-     chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
-     chown system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
-     chown root.system /sys/devices/system/cpu/mfreq
-     chmod 220 /sys/devices/system/cpu/mfreq
-     chown root.system /sys/devices/system/cpu/cpu1/online
-     chmod 664 /sys/devices/system/cpu/cpu1/online
+     chown -h system /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq
+     chown -h system /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+     chown -h system /sys/devices/system/cpu/cpu1/cpufreq/scaling_max_freq
+     chown -h system /sys/devices/system/cpu/cpu1/cpufreq/scaling_min_freq
+     chown -h root.system /sys/devices/system/cpu/mfreq
+     chmod -h 220 /sys/devices/system/cpu/mfreq
+     chown -h root.system /sys/devices/system/cpu/cpu1/online
+     chmod -h 664 /sys/devices/system/cpu/cpu1/online
         ;;
 esac
 
@@ -147,10 +147,10 @@ esac
 emmc_boot=`getprop ro.emmc`
 case "$emmc_boot"
     in "1")
-        chown system /sys/devices/platform/rs300000a7.65536/force_sync
-        chown system /sys/devices/platform/rs300000a7.65536/sync_sts
-        chown system /sys/devices/platform/rs300100a7.65536/force_sync
-        chown system /sys/devices/platform/rs300100a7.65536/sync_sts
+        chown -h system /sys/devices/platform/rs300000a7.65536/force_sync
+        chown -h system /sys/devices/platform/rs300000a7.65536/sync_sts
+        chown -h system /sys/devices/platform/rs300100a7.65536/force_sync
+        chown -h system /sys/devices/platform/rs300100a7.65536/sync_sts
     ;;
 esac
 
