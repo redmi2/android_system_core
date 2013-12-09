@@ -195,7 +195,9 @@ static void *server_socket_thread(void * arg)
 #undef write
 #define open    adb_open
 #define write   adb_write
+#ifdef ADB_QEMU
 #include <hardware/qemu_pipe.h>
+#endif
 #undef open
 #undef write
 #define open    ___xxx_open
@@ -246,6 +248,9 @@ static const char _ok_resp[]    = "ok";
     D("transport: qemu_socket_thread() starting\n");
 
     /* adb QEMUD service connection request. */
+
+#ifdef ADB_QEMU
+
     snprintf(con_name, sizeof(con_name), "qemud:adb:%d", port);
 
     /* Connect to the adb QEMUD service. */
@@ -257,7 +262,9 @@ static const char _ok_resp[]    = "ok";
         D("adb service is not available. Falling back to TCP socket.\n");
         adb_thread_create(&thr, server_socket_thread, arg);
         return 0;
+
     }
+#endif
 
     for(;;) {
         /*
@@ -280,12 +287,14 @@ static const char _ok_resp[]    = "ok";
                 adb_write(fd, _start_req, strlen(_start_req));
             }
 
+#ifdef ADB_QEMU
             /* Prepare for accepting of the next ADB host connection. */
             fd = qemu_pipe_open(con_name);
             if (fd < 0) {
                 D("adb service become unavailable.\n");
                 return 0;
             }
+#endif
         } else {
             D("Unable to send the '%s' request to ADB service.\n", _accept_req);
             return 0;
@@ -328,7 +337,7 @@ void local_init(int port)
                     HOST ? "client" : "server");
     }
 }
-
+#ifdef ADB_QEMU
 static void remote_kick(atransport *t)
 {
     int fd = t->sfd;
@@ -350,12 +359,14 @@ static void remote_kick(atransport *t)
     }
 #endif
 }
+#endif
 
+#ifdef ADB_QEMU
 static void remote_close(atransport *t)
 {
     adb_close(t->fd);
 }
-
+#endif
 
 #if ADB_HOST
 /* Only call this function if you already hold local_transports_lock. */
@@ -402,9 +413,10 @@ int get_available_local_transport_index()
 int init_socket_transport(atransport *t, int s, int adb_port, int local)
 {
     int  fail = 0;
-
+#ifdef ADB_QEMU
     t->kick = remote_kick;
     t->close = remote_close;
+#endif
     t->read_from_remote = remote_read;
     t->write_to_remote = remote_write;
     t->sfd = s;

@@ -11,6 +11,15 @@
   AC_CONFIG_HEADER([config.h])
   AC_CONFIG_MACRO_DIR([m4])
 
+  #Checks for libraries.
+    PKG_CHECK_MODULES([OPENSSL], [openssl])
+    AC_SUBST([OPENSSL_CFLAGS])
+    AC_SUBST([OPENSSL_LIBS])
+
+    PKG_CHECK_MODULES([GTHREAD], [gthread-2.0])
+    AC_SUBST([GTHREAD_CFLAGS])
+    AC_SUBST([GTHREAD_LIBS])
+
   # Checks for programs.
   AM_PROG_AS
   AC_PROG_CC
