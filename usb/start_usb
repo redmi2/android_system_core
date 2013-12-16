@@ -54,6 +54,8 @@ case "$1" in
 			if [ "$ODU" == "Y" ] &&  [ "$ODU_EN" == "Y" ]
 			then
 				echo "EHCI HSIC device will be bound(odu=$ODU)"
+				ln -fs /usr/bin/usb/compositions/901D \
+				  /usr/bin/usb/boot_hsusb_composition
 			else
 			#In other cases (for WLAN) unbind HSIC by default
 				echo "Shutdown EHCI HSIC device"
