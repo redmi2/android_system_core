@@ -27,6 +27,8 @@
 # Starts the USB Android Gadget.
 
 export KERNEL=`uname -r`
+export ODU="N"
+export ODU_EN="N"
 
 case "$1" in
   start)
@@ -38,8 +40,25 @@ case "$1" in
 			# Nothing to do here for 9x15
 			;;
 			*9x25* )
-			echo "Shutdown EHCI HSIC device"
-			echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
+			if [ -f /sys/module/usbnet/parameters/usbnet_odu ]
+			then
+				ODU=`cat /sys/module/usbnet/parameters/usbnet_odu`
+			fi
+			if [ -f /usr/bin/usb/odu ]
+			then
+				ODU_EN=`cat /usr/bin/usb/odu`
+			fi
+			echo "ODU supported=$ODU enabled=$ODU_EN"
+
+			#In case of ODU, don't unbind the HSIC device
+			if [ "$ODU" == "Y" ] &&  [ "$ODU_EN" == "Y" ]
+			then
+				echo "EHCI HSIC device will be bound(odu=$ODU)"
+			else
+			#In other cases (for WLAN) unbind HSIC by default
+				echo "Shutdown EHCI HSIC device"
+				echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
+			fi
 			;;
 		esac
 
