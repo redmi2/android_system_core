@@ -50,6 +50,8 @@
 #define AID_MEDIA         1013  /* mediaserver process */
 #define AID_DHCP          1014  /* dhcp client */
 #define AID_SDCARD_RW     1015  /* external storage write access */
+#define AID_SDCARD_R      1028  /* external storage read access */
+#define AID_NET_BW_STATS  3006  /* read bandwidth statistics */
 #define AID_VPN           1016  /* vpn system */
 #define AID_KEYSTORE      1017  /* keystore subsystem */
 #define AID_USB           1018  /* USB devices */
@@ -108,6 +110,8 @@ static const struct android_id_info android_ids[] = {
     { "net_bt_admin", AID_NET_BT_ADMIN, },
     { "net_bt",    AID_NET_BT, },
     { "sdcard_rw", AID_SDCARD_RW, },
+    { "sdcard_r",  AID_SDCARD_R, },
+    { "net_bw_stats", AID_NET_BW_STATS, },
     { "vpn",       AID_VPN, },
     { "keystore",  AID_KEYSTORE, },
     { "usb",       AID_USB, },
@@ -128,6 +132,7 @@ struct fs_path_config {
     unsigned mode;
     unsigned uid;
     unsigned gid;
+
     const char *prefix;
 };
 

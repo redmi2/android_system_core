@@ -19,6 +19,7 @@
 #include <resolv.h>
 #include <cutils/list.h>
 #include <cutils/sockets.h>
+#include <stdbool.h>
 
 #include "sysdeps.h"
 #include "adb.h"
@@ -27,7 +28,6 @@
 #include "mincrypt/rsa.h"
 
 #define TRACE_TAG TRACE_AUTH
-
 
 struct adb_public_key {
     struct listnode node;

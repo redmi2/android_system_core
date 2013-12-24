@@ -159,7 +159,9 @@ void  adb_trace_init(void)
 #undef write
 #define open    adb_open
 #define write   adb_write
-#include <hardware/qemu_pipe.h>
+#ifdef ADB_QEMU
+#include<hardware/qemu_pipe.h>
+#endif
 #undef open
 #undef write
 #define open    ___xxx_open
@@ -177,10 +179,14 @@ static int adb_qemu_trace_init(void)
         return 0;
     }
 
+#ifdef ADB_QEMU
     /* adb debugging QEMUD service connection request. */
     snprintf(con_name, sizeof(con_name), "qemud:adb-debug");
     adb_debug_qemu = qemu_pipe_open(con_name);
     return (adb_debug_qemu >= 0) ? 0 : -1;
+#else
+    return 0;
+#endif
 }
 
 void adb_qemu_trace(const char* fmt, ...)

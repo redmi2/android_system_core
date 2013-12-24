@@ -42,6 +42,7 @@ typedef struct RSAPublicKey {
     uint32_t n0inv;           /* -1 / n[0] mod 2^32 */
     uint32_t n[RSANUMWORDS];  /* modulus as little endian array */
     uint32_t rr[RSANUMWORDS]; /* R^2 as little endian array */
+    int exponent;             /* 3 or 65537 */
 } RSAPublicKey;
 
 int RSA_verify(const RSAPublicKey *key,
