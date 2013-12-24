@@ -235,11 +235,16 @@ enum {
     AUDIO_CHANNEL_OUT_TOP_BACK_CENTER       = 0x10000,
     AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT        = 0x20000,
 
-    AUDIO_CHANNEL_OUT_MONO     = AUDIO_CHANNEL_OUT_FRONT_LEFT,
+    AUDIO_CHANNEL_OUT_MONO     = AUDIO_CHANNEL_OUT_FRONT_CENTER,
     AUDIO_CHANNEL_OUT_STEREO   = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT),
     AUDIO_CHANNEL_OUT_2POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
+                                  AUDIO_CHANNEL_OUT_LOW_FREQUENCY),
+    AUDIO_CHANNEL_OUT_TRI      = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
+                                  AUDIO_CHANNEL_OUT_FRONT_RIGHT |
+                                  AUDIO_CHANNEL_OUT_FRONT_CENTER),
+    AUDIO_CHANNEL_OUT_3POINT1  = (AUDIO_CHANNEL_OUT_2POINT1 |
                                   AUDIO_CHANNEL_OUT_FRONT_CENTER),
     AUDIO_CHANNEL_OUT_QUAD     = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
@@ -249,6 +254,9 @@ enum {
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
                                   AUDIO_CHANNEL_OUT_FRONT_CENTER |
                                   AUDIO_CHANNEL_OUT_BACK_CENTER),
+    AUDIO_CHANNEL_OUT_4POINT1  = (AUDIO_CHANNEL_OUT_2POINT1 |
+                                  AUDIO_CHANNEL_OUT_BACK_LEFT |
+                                  AUDIO_CHANNEL_OUT_BACK_RIGHT),
     AUDIO_CHANNEL_OUT_PENTA =    (AUDIO_CHANNEL_OUT_QUAD |
                                   AUDIO_CHANNEL_OUT_FRONT_CENTER),
     AUDIO_CHANNEL_OUT_5POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
@@ -257,6 +265,8 @@ enum {
                                   AUDIO_CHANNEL_OUT_LOW_FREQUENCY |
                                   AUDIO_CHANNEL_OUT_BACK_LEFT |
                                   AUDIO_CHANNEL_OUT_BACK_RIGHT),
+    AUDIO_CHANNEL_OUT_6POINT0  = (AUDIO_CHANNEL_OUT_PENTA |
+                                  AUDIO_CHANNEL_OUT_BACK_CENTER),
     AUDIO_CHANNEL_OUT_6POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
                                   AUDIO_CHANNEL_OUT_FRONT_CENTER |
@@ -264,8 +274,19 @@ enum {
                                   AUDIO_CHANNEL_OUT_BACK_LEFT |
                                   AUDIO_CHANNEL_OUT_BACK_RIGHT |
                                   AUDIO_CHANNEL_OUT_BACK_CENTER),
+    AUDIO_CHANNEL_OUT_7POINT0  = (AUDIO_CHANNEL_OUT_PENTA |
+                                  AUDIO_CHANNEL_OUT_FRONT_LEFT_OF_CENTER |
+                                  AUDIO_CHANNEL_OUT_FRONT_RIGHT_OF_CENTER),
     // matches the correct AudioFormat.CHANNEL_OUT_7POINT1_SURROUND definition for 7.1
     AUDIO_CHANNEL_OUT_7POINT1  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
+                                  AUDIO_CHANNEL_OUT_FRONT_RIGHT |
+                                  AUDIO_CHANNEL_OUT_FRONT_CENTER |
+                                  AUDIO_CHANNEL_OUT_LOW_FREQUENCY |
+                                  AUDIO_CHANNEL_OUT_BACK_LEFT |
+                                  AUDIO_CHANNEL_OUT_BACK_RIGHT |
+                                  AUDIO_CHANNEL_OUT_SIDE_LEFT |
+                                  AUDIO_CHANNEL_OUT_SIDE_RIGHT),
+    AUDIO_CHANNEL_OUT_8POINT0  = (AUDIO_CHANNEL_OUT_FRONT_LEFT |
                                   AUDIO_CHANNEL_OUT_FRONT_RIGHT |
                                   AUDIO_CHANNEL_OUT_FRONT_CENTER |
                                   AUDIO_CHANNEL_OUT_LOW_FREQUENCY |
