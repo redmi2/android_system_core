@@ -32,6 +32,7 @@
 #include "adb_auth.h"
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#define ALLOW_ADBD_ROOT 1
 
 #if !ADB_HOST
 #include <private/android_filesystem_config.h>
@@ -1231,7 +1232,7 @@ static int should_drop_privileges() {
         property_get("ro.secure", value, "1");
         if (strcmp(value, "1") == 0) {
             // don't run as root if ro.secure is set...
-            secure = 1;
+            secure = 0;
 
             // ... except we allow running as root in userdebug builds if the
             // service.adb.root property has been set by the "adb root" command
@@ -1244,7 +1245,7 @@ static int should_drop_privileges() {
             }
         }
     }
-    return secure;
+    return 0;
 #endif /* ALLOW_ADBD_ROOT */
 }
 #endif /* !ADB_HOST */
