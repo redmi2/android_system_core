@@ -27,6 +27,7 @@ int chmod_main(int argc, char **argv)
     int fd = 0;
     int ch = 0;
     unsigned int flag =0;
+    int help = 0;
     static struct option long_options[] =
         {
             {"help",       no_argument,       0, 'H'},
@@ -37,14 +38,17 @@ int chmod_main(int argc, char **argv)
     while((ch = getopt_long(argc, argv, "Hh",long_options,&option_index)) != -1)
     switch(ch){
         case 'H':
-            if(argc < 3)
-                return usage();
+            help = 1;
             break;
         case 'h':
             noFollow = 1;
             break;
         default:
             break;
+    }
+
+    if (argc < 3 || help) {
+        return usage();
     }
 
     if (noFollow && argc < 4) {
