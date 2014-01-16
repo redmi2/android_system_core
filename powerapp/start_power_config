@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+# Copyright (c) 2011-2014, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
@@ -33,7 +33,7 @@ set -e
 
 case "$1" in
   start)
-        soc_id=`cat /sys/devices/system/soc/soc0/id`
+        soc_id=`cat /sys/devices/soc0/soc_id`
         case "$soc_id" in
         "104" | "105" | "106" | "107")
                 echo -n "Starting powerconfig for 9x15: "
@@ -59,6 +59,18 @@ case "$1" in
                 echo 1 > /sys/module/lpm_resources/enable_low_power/pxo
                 echo 1 > /sys/module/lpm_resources/enable_low_power/vdd_dig
                 echo 675000 > /sys/module/lpm_resources/enable_low_power/vdd_mem
+                echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+                echo "done";
+                ;;
+         esac
+
+         case "$soc_id" in
+         "187" | "227" | "228" | "229" | "230" | "231")
+                echo -n "Starting powerconfig for 9x35: "
+                echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu0/standalone_power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu0/standalone_power_collapse/idle_enabled
                 echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
                 echo "done";
                 ;;
