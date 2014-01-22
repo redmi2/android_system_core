@@ -62,6 +62,12 @@
           [HOST_OS= 'linux'])
 
 
+  AC_ARG_WITH(sanitized-headers,
+        AS_HELP_STRING([--with-sanitized-headers=DIR],
+            [Specify the location of the sanitized Linux headers]),
+        [CPPFLAGS="$CPPFLAGS -I$withval"])
+
+
   if test "x$HOST_OS" = "xlinux-gnueabi"; then
 	HOST_OS=linux
   else
