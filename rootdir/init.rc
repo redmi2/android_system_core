@@ -281,7 +281,8 @@ on post-fs-data
 
     # For security reasons, /data/local/tmp should always be empty.
     # Do not place files or directories in /data/local/tmp
-    mkdir /data/local/tmp 0771 shell shell
+    exec /system/bin/rm -rf /data/local/tmp
+    mkdir /data/local/tmp 0771 root root
     mkdir /data/data 0771 system system
     mkdir /data/app-private 0771 system system
     mkdir /data/app-asec 0700 root root
@@ -335,6 +336,8 @@ on boot
 
     # set RLIMIT_NICE to allow priorities from 19 to -20
     setrlimit 13 40 40
+
+    setrlimit 7 2048 4096
 
     # Memory management.  Basic kernel parameters, and allow the high
     # level system server to be able to adjust the kernel OOM driver
@@ -640,3 +643,11 @@ service pre-recovery /system/bin/uncrypt
     class main
     disabled
     oneshot
+
+service fakeperm /system/bin/fakeperm
+    class main
+    user root
+
+service b2g /system/bin/b2g.sh
+    class main
+    onrestart restart media
