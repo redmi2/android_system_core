@@ -39,6 +39,11 @@ struct state {
     long procs_r;
     long procs_b;
 
+    long swap_in;
+    long swap_out;
+    long page_in;
+    long page_out;
+
     long mem_free;
     long mem_mapped;
     long mem_anon;
@@ -205,6 +210,10 @@ static int read_vmstat(struct state *s) {
 
     while (fgets(line, MAX_LINE, f)) {
         sscanf(line, "pgmajfault %ld", &s->sys_flt);
+        sscanf(line, "pswpin %ld", &s->swap_in);
+        sscanf(line, "pswpout %ld", &s->swap_out);
+        sscanf(line, "pgpgin %ld", &s->page_in);
+        sscanf(line, "pgpgout %ld", &s->page_out);
     }
 
     fclose(f);
@@ -213,8 +222,8 @@ static int read_vmstat(struct state *s) {
 }
 
 static void print_header(void) {
-    printf("%-5s  %-27s  %-14s  %-17s\n", "procs", "memory", "system", "cpu");
-    printf("%2s %2s  %6s %6s %6s %6s  %4s %4s %4s  %2s %2s %2s %2s %2s %2s\n", "r", "b", "free", "mapped", "anon", "slab", "in", "cs", "flt", "us", "ni", "sy", "id", "wa", "ir");
+    printf("%-7s  %-13s  %-13s  %-27s  %-14s  %-17s\n", "procs", "swap", "paging", "memory", "system", "cpu");
+    printf("%2s %2s  %6s %6s  %6s %6s  %6s %6s %6s %6s  %4s %4s %4s  %2s %2s %2s %2s %2s %2s\n", "r", "b", "si", "so", "pgin", "pgout", "free", "mapped", "anon", "slab", "in", "cs", "flt", "us", "ni", "sy", "id", "wa", "ir");
 }
 
 /* Jiffies to percent conversion */
@@ -229,8 +238,10 @@ static void print_line(struct state *old, struct state *new) {
     id = JP(new->cpu_id - old->cpu_id); NORM(id);
     wa = JP(new->cpu_wa - old->cpu_wa); NORM(wa);
     ir = JP(new->cpu_ir - old->cpu_ir); NORM(ir);
-    printf("%2ld %2ld  %6ld %6ld %6ld %6ld  %4ld %4ld %4ld  %2d %2d %2d %2d %2d %2d\n",
+    printf("%2ld %2ld  %6ld %6ld  %6ld %6ld  %6ld %6ld %6ld %6ld  %4ld %4ld %4ld  %2d %2d %2d %2d %2d %2d\n",
         new->procs_r ? (new->procs_r - 1) : 0, new->procs_b,
+        new->swap_in - old->swap_in, new->swap_out - old->swap_out,
+        new->page_in - old->page_in, new->page_out - old->page_out,
         new->mem_free, new->mem_mapped, new->mem_anon, new->mem_slab,
         new->sys_in - old->sys_in, new->sys_cs - old->sys_cs, new->sys_flt - old->sys_flt,
         us, ni, sy, id, wa, ir);
