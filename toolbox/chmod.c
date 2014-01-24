@@ -21,7 +21,8 @@ void recurse_chmod(char* path, int mode, unsigned int flag)
         // not a directory, carry on
         return;
     }
-    char *subpath = malloc(sizeof(char)*PATH_MAX);
+    int maxpathlen = sizeof(char)*PATH_MAX;
+    char *subpath = malloc(maxpathlen);
     int pathlen = strlen(path);
 
     while ((dp = readdir(dir)) != NULL) {
@@ -33,9 +34,9 @@ void recurse_chmod(char* path, int mode, unsigned int flag)
             exit(1);
         }
 
-        strlcpy(subpath, path, sizeof(subpath));
-        strlcat(subpath, "/", sizeof(subpath));
-        strlcat(subpath, dp->d_name, sizeof(subpath));
+        strlcpy(subpath, path, maxpathlen);
+        strlcat(subpath, "/", maxpathlen);
+        strlcat(subpath, dp->d_name, maxpathlen);
 
         if(((fd = open(subpath, flag|O_RDONLY)) != -1) || ((fd = open(subpath, flag|O_WRONLY)) != -1)) {
             if (fchmod(fd, mode) < 0){
@@ -73,6 +74,7 @@ int chmod_main(int argc, char **argv)
     int ch = 0;
     int recursive = 0;
     unsigned int flag =0;
+    int help = 0;
     static struct option long_options[] =
         {
             {"help",       no_argument,       0, 'H'},
@@ -84,21 +86,20 @@ int chmod_main(int argc, char **argv)
     while((ch = getopt_long(argc, argv, "HhR",long_options,&option_index)) != -1)
     switch(ch){
         case 'H':
-        if(argc < 3)
-            return usage();
-        break;
+            help = 1;
+            break;
         case 'R':
-        recursive = 1;
-        break;
+            recursive = 1;
+            break;
         case 'h':
-        noFollow = 1;
-        break;
+            noFollow = 1;
+            break;
         default:
-        break;
+            break;
 
     }
 
-    if (recursive && argc < 4) {
+    if (argc < 3 || help || (recursive && argc < 4)) {
         return usage();
     }
 
