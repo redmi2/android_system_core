@@ -31,6 +31,9 @@ sysclktz 0
 
 loglevel 3
 
+# Redirect rilpoxy to rild
+    symlink /dev/socket/rild /dev/socket/rilproxy
+
 # Backward compatibility
     symlink /system/etc /etc
     symlink /sys/kernel/debug /d
