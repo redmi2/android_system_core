@@ -48,6 +48,7 @@ case "$1" in
 			mount -o remount,gid=5,mode=620 /dev/pts
 			mkdir -p /system/bin
 			ln -s /bin/sh  /system/bin/sh
+			echo 1 > /sys/devices/virtual/android_usb/android0/f_rndis_qc/max_pkt_per_xfer
 			;;
 		esac
 
