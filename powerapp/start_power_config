@@ -67,6 +67,29 @@ case "$1" in
          case "$soc_id" in
          "187" | "227" | "228" | "229" | "230" | "231")
                 echo -n "Starting powerconfig for 9x35: "
+                subsyszero=`cat /sys/bus/msm_subsys/devices/subsys0/name`
+                subsysone=`cat /sys/bus/msm_subsys/devices/subsys1/name`
+                subsystwo=`cat /sys/bus/msm_subsys/devices/subsys2/name`
+                if [ "$subsyszero" == "modem" ]
+                then
+                   subsys=subsys0
+                elif [ "$subsysone" == "modem" ]
+                then
+                   subsys=subsys1
+                else
+                   subsys=subsys2
+                fi
+                counter=0
+                while [ ${counter} -le 10 ]
+                do
+                  msstate=`cat /sys/bus/msm_subsys/devices/$subsys/state`
+                  if [ "$msstate" == "ONLINE" ]
+                  then
+                      break
+                  fi
+                  counter=$(( $counter + 1 ))
+                  sleep 1
+                done
                 echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/suspend_enabled
                 echo 1 > /sys/module/msm_pm/modes/cpu0/standalone_power_collapse/suspend_enabled
                 echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/idle_enabled
