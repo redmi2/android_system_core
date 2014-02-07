@@ -538,7 +538,7 @@ static void dump_log_file(log_t* log, pid_t pid, const char* filename,
 
         struct logger_entry* entry = &log_entry.entry;
 
-        if (entry->pid != (int32_t) pid) {
+        if (tailOnly && entry->pid != (int32_t) pid) {
             /* wrong pid, ignore */
             continue;
         }
