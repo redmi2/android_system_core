@@ -486,7 +486,7 @@ static void dump_log_file(int tfd, unsigned pid, const char* filename,
 
         struct logger_entry* entry = &log_entry.entry;
 
-        if (entry->pid != (int32_t) pid) {
+        if (tailOnly && entry->pid != (int32_t) pid) {
             /* wrong pid, ignore */
             continue;
         }
