@@ -61,6 +61,9 @@ run_9x35() {
 	echo 9084 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
 	echo diag > /sys/class/android_usb/android0/f_diag/clients
+	echo 1 > /sys/class/android_usb/android0/f_qdss/debug_intf
+	echo bam > /sys/class/android_usb/android0/f_qdss/transports
+	echo qdss_bam > /sys/class/android_usb/android0/f_qdss/transport_names
 	echo qti,bam2bam_ipa > /sys/class/android_usb/android0/f_rmnet/transports
 	echo diag,qdss,ffs,rmnet > /sys/class/android_usb/android$num/functions
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
