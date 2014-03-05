@@ -47,6 +47,10 @@
 
 #include "minui/minui.h"
 
+#include <pthread.h>
+#include <linux/android_alarm.h>
+#include <linux/rtc.h>
+
 #ifndef max
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #endif
@@ -186,6 +190,17 @@ static struct charger charger_state = {
 
 static int char_width;
 static int char_height;
+
+enum alarm_time_type {
+    ALARM_TIME,
+    RTC_TIME,
+};
+
+/*
+ * shouldn't be changed after
+ * reading from alarm register
+ */
+static time_t alm_secs;
 
 /*On certain targets the FBIOBLANK ioctl does not turn off the
  * backlight. In those cases we need to manually toggle it on/off
@@ -652,6 +667,20 @@ static void android_green(void)
     gr_color(0xa4, 0xc6, 0x39, 255);
 }
 
+static void draw_capacity(struct charger *charger)
+{
+    char cap_str[64];
+    int x, y;
+    int str_len_px;
+
+    snprintf(cap_str, sizeof(cap_str), "%d%%", charger->batt_anim->capacity);
+    str_len_px = gr_measure(cap_str);
+    x = (gr_fb_width() - str_len_px) / 2;
+    y = (gr_fb_height() + char_height) / 2;
+    android_green();
+    gr_text(x, y, cap_str, 0);
+}
+
 /* returns the last y-offset of where the surface ends */
 static int draw_surface_centered(struct charger *charger, gr_surface surface)
 {
@@ -704,8 +733,10 @@ static void redraw_screen(struct charger *charger)
     /* try to display *something* */
     if (batt_anim->capacity < 0 || batt_anim->num_frames == 0)
         draw_unknown(charger);
-    else
+    else {
         draw_battery(charger);
+        draw_capacity(charger);
+    }
     gr_flip();
 }
 
@@ -984,6 +1015,168 @@ static void event_loop(struct charger *charger)
     }
 }
 
+static int alarm_get_time(enum alarm_time_type time_type,
+                          time_t *secs)
+{
+    struct tm tm;
+    unsigned int cmd;
+    int rc, fd = -1;
+
+    if (!secs)
+        goto err;
+
+    fd = open("/dev/rtc0", O_RDWR);
+    if (fd < 0) {
+        LOGE("Can't open rtc devfs node\n");
+        goto err;
+    }
+
+    switch (time_type) {
+        case ALARM_TIME:
+            cmd = RTC_ALM_READ;
+            break;
+        case RTC_TIME:
+            cmd = RTC_RD_TIME;
+            break;
+        default:
+            LOGE("Invalid time type\n");
+            goto err;
+    }
+
+    rc = ioctl(fd, cmd, &tm);
+    if (rc < 0) {
+        LOGE("Unable to get time\n");
+        goto err;
+    }
+
+    close(fd);
+
+    *secs = mktime(&tm) + tm.tm_gmtoff;
+    if (*secs < 0) {
+        LOGE("Invalid seconds = %ld\n", *secs);
+        goto err;
+    }
+
+    return 0;
+
+err:
+    if (fd >= 0)
+        close(fd);
+    return -1;
+}
+
+#define ERR_SECS	2
+static int alarm_is_alm_expired()
+{
+    int rc;
+    time_t rtc_secs;
+
+    rc = alarm_get_time(RTC_TIME, &rtc_secs);
+    if (rc < 0)
+        return 0;
+
+    return (alm_secs >= rtc_secs - ERR_SECS &&
+            alm_secs <= rtc_secs + ERR_SECS) ? 1 : 0;
+}
+
+static int alarm_set_reboot_time_and_wait(time_t secs)
+{
+    int rc, fd;
+    struct timespec ts;
+
+    fd = open("/dev/alarm", O_RDWR);
+    if (fd < 0) {
+        LOGE("Can't open alarm devfs node\n");
+        goto err;
+    }
+
+    /* get the elapsed realtime from boot time to now */
+    rc = ioctl(fd, ANDROID_ALARM_GET_TIME(
+                      ANDROID_ALARM_ELAPSED_REALTIME_WAKEUP), &ts);
+    if (rc < 0) {
+        LOGE("Unable to get elapsed realtime\n");
+        goto err;
+    }
+
+    /* calculate the elapsed time from boot time to reboot time */
+    ts.tv_sec += secs;
+    ts.tv_nsec = 0;
+
+    rc = ioctl(fd, ANDROID_ALARM_SET(
+                      ANDROID_ALARM_ELAPSED_REALTIME_WAKEUP), &ts);
+    if (rc < 0) {
+        LOGE("Unable to set reboot time to %ld\n", secs);
+        goto err;
+    }
+
+    do {
+        rc = ioctl(fd, ANDROID_ALARM_WAIT);
+    } while ((rc < 0 && errno == EINTR) || !alarm_is_alm_expired());
+
+    if (rc <= 0) {
+        LOGE("Unable to wait on alarm\n");
+        goto err;
+    }
+
+    close(fd);
+    return 0;
+
+err:
+    if (fd >= 0)
+        close(fd);
+    return -1;
+}
+
+void *alarm_thread(void *p)
+{
+    time_t rtc_secs, rb_secs;
+    int rc;
+
+    /*
+     * to support power off alarm, the time
+     * stored in alarm register at latest
+     * shutdown time should be some time
+     * earlier than the actual alarm time
+     * set by user
+     */
+    rc = alarm_get_time(ALARM_TIME, &alm_secs);
+    if (rc < 0 || !alm_secs)
+        goto err;
+
+    rc = alarm_get_time(RTC_TIME, &rtc_secs);
+    if (rc < 0)
+        goto err;
+
+    /*
+     * calculate the reboot time after which
+     * the phone will reboot
+     */
+    rb_secs = alm_secs - rtc_secs;
+    if (rb_secs <= 0)
+        goto err;
+
+    rc = alarm_set_reboot_time_and_wait(rb_secs);
+    if (rc < 0)
+        goto err;
+
+    LOGI("Exit from power off charging, reboot the phone!\n");
+    android_reboot(ANDROID_RB_RESTART, 0, 0);
+
+err:
+    LOGE("Exit from alarm thread\n");
+    return NULL;
+}
+
+void alarm_thread_create()
+{
+    pthread_t tid;
+    int rc;
+
+    rc = pthread_create(&tid, NULL, alarm_thread, NULL);
+    if (rc < 0)
+        LOGE("Create alarm thread failed\n");
+}
+
 int main(int argc, char **argv)
 {
     int ret;
@@ -998,6 +1191,8 @@ int main(int argc, char **argv)
     klog_set_level(CHARGER_KLOG_LEVEL);
 
     dump_last_kmsg();
+
+    alarm_thread_create();
 
     LOGI("--------------- STARTING CHARGER MODE ---------------\n");
 
