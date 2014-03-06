@@ -212,6 +212,12 @@ case "$1" in
                 chmod 664 /sys/devices/system/cpu/cpu1/online
                 chmod 664 /sys/devices/system/cpu/cpu2/online
                 chmod 664 /sys/devices/system/cpu/cpu3/online
+                # disable msm_hsic_host for 8x26
+                if [ -e /sys/bus/platform/drivers/msm_hsic_host ]; then
+                    if [ ! -L /sys/bus/usb/devices/1-1 ]; then
+                        echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
+                    fi
+                fi
                 echo "done"
                 set +e
                 ;;
