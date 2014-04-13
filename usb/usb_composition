@@ -234,7 +234,7 @@ fi
 
 if [ $hsic = "n" ]; then
 	if [ $immediate = "y" ]; then
-		$COMP_DIR/$pid n
+		$COMP_DIR/$pid n 0.2
 	fi
 else
 	echo "Please reboot device for HSIC composition to take effect"
