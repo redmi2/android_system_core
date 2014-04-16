@@ -36,6 +36,12 @@ else
 	mode="hsusb"
 fi
 
+if [ "$#" -ge 2 ]; then
+	delay=$2
+else
+	delay="0"
+fi
+
 run_9x15() {
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 0x9085 > /sys/class/android_usb/android$num/idProduct
@@ -46,6 +52,7 @@ run_9x15() {
 	echo diag > /sys/class/android_usb/android0/f_diag/clients
 	echo diag,adb,usb_mbim,gps > /sys/class/android_usb/android$num/functions
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
+	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
 
@@ -60,6 +67,7 @@ run_9x25() {
 	echo diag,adb,usb_mbim,gps > /sys/class/android_usb/android$num/functions
 	echo BAM2BAM_IPA > /sys/class/android_usb/android$num/f_usb_mbim/mbim_transports
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
+	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
 
@@ -74,6 +82,7 @@ run_9x35() {
 	echo diag,ffs,usb_mbim,gps > /sys/class/android_usb/android$num/functions
 	echo BAM2BAM_IPA > /sys/class/android_usb/android0/f_usb_mbim/mbim_transports
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
+	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
 

@@ -34,6 +34,11 @@ else
 	num="0"
 fi
 
+if [ "$#" -ge 2 ]; then
+	delay=$2
+else
+	delay="0"
+fi
 
 run_9x35() {
 	echo 0 > /sys/class/android_usb/android$num/enable
@@ -42,6 +47,7 @@ run_9x35() {
 	echo diag > /sys/class/android_usb/android0/f_diag/clients
 	echo diag,ffs,rmnet> /sys/class/android_usb/android$num/functions
 	echo QTI,BAM2BAM_IPA > /sys/class/android_usb/android0/f_rmnet/transports
+	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
 
