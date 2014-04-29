@@ -18,8 +18,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <cutils/list.h>
-
 char*
 buff_addc (char*  buff, char*  buffEnd, int  c)
 {
@@ -106,24 +104,3 @@ buff_add  (char*  buff, char*  buffEnd, const char*  format, ... )
     }
     return buff;
 }
-
-void list_init(struct listnode *node)
-{
-    node->next = node;
-    node->prev = node;
-}
-
-void list_add_tail(struct listnode *head, struct listnode *item)
-{
-    item->next = head;
-    item->prev = head->prev;
-    head->prev->next = item;
-    head->prev = item;
-}
-
-void list_remove(struct listnode *item)
-{
-    item->next->prev = item->prev;
-    item->prev->next = item->next;
-}
-
