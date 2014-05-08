@@ -45,7 +45,7 @@
 /* usb scan debugging is waaaay too verbose */
 #define DBGX(x...)
 
-ADB_MUTEX_DEFINE( usb_lock );
+static adb_mutex_t usb_lock = ADB_MUTEX_INITIALIZER;
 
 struct usb_handle
 {
@@ -116,8 +116,7 @@ static void kick_disconnected_devices()
 
 }
 
-static void register_device(const char *dev_name, const char *devpath,
-                            unsigned char ep_in, unsigned char ep_out,
+static void register_device(const char *dev_name, unsigned char ep_in, unsigned char ep_out,
                             int ifc, int serial_index, unsigned zero_mask);
 
 static inline int badname(const char *name)
@@ -130,7 +129,7 @@ static inline int badname(const char *name)
 
 static void find_usb_device(const char *base,
         void (*register_device_callback)
-                (const char *, const char *, unsigned char, unsigned char, int, int, unsigned))
+                (const char *, unsigned char, unsigned char, int, int, unsigned))
 {
     char busname[32], devname[32];
     unsigned char local_ep_in, local_ep_out;
@@ -150,7 +149,7 @@ static void find_usb_device(const char *base,
 
 //        DBGX("[ scanning %s ]\n", busname);
         while((de = readdir(devdir))) {
-            unsigned char devdesc[4096];
+            unsigned char devdesc[256];
             unsigned char* bufptr = devdesc;
             unsigned char* bufend;
             struct usb_device_descriptor* device;
@@ -192,8 +191,9 @@ static void find_usb_device(const char *base,
                 continue;
             }
 
-            vid = device->idVendor;
-            pid = device->idProduct;
+            vid = __le16_to_cpu(device->idVendor);
+            pid = __le16_to_cpu(device->idProduct);
+            pid = devdesc[10] | (devdesc[11] << 8);
             DBGX("[ %s is V:%04x P:%04x ]\n", devname, vid, pid);
 
                 // should have config descriptor next
@@ -227,11 +227,6 @@ static void find_usb_device(const char *base,
                     if (interface->bNumEndpoints == 2 &&
                             is_adb_interface(vid, pid, interface->bInterfaceClass,
                             interface->bInterfaceSubClass, interface->bInterfaceProtocol))  {
-
-                        struct stat st;
-                        char pathbuf[128];
-                        char link[256];
-                        char *devpath = NULL;
 
                         DBGX("looking for bulk endpoints\n");
                             // looks like ADB...
@@ -269,26 +264,7 @@ static void find_usb_device(const char *base,
                             local_ep_out = ep1->bEndpointAddress;
                         }
 
-                            // Determine the device path
-                        if (!fstat(fd, &st) && S_ISCHR(st.st_mode)) {
-                            char *slash;
-                            ssize_t link_len;
-                            snprintf(pathbuf, sizeof(pathbuf), "/sys/dev/char/%d:%d",
-                                     major(st.st_rdev), minor(st.st_rdev));
-                            link_len = readlink(pathbuf, link, sizeof(link) - 1);
-                            if (link_len > 0) {
-                                link[link_len] = '\0';
-                                slash = strrchr(link, '/');
-                                if (slash) {
-                                    snprintf(pathbuf, sizeof(pathbuf),
-                                             "usb:%s", slash + 1);
-                                    devpath = pathbuf;
-                                }
-                            }
-                        }
-
-                        register_device_callback(devname, devpath,
-                                local_ep_in, local_ep_out,
+                        register_device_callback(devname, local_ep_in, local_ep_out,
                                 interface->bInterfaceNumber, device->iSerialNumber, zero_mask);
                         break;
                     }
@@ -394,7 +370,6 @@ static int usb_bulk_read(usb_handle *h, void *data, int len)
         h->reaper_thread = pthread_self();
         adb_mutex_unlock(&h->lock);
         res = ioctl(h->desc, USBDEVFS_REAPURB, &out);
-        int saved_errno = errno;
         adb_mutex_lock(&h->lock);
         h->reaper_thread = 0;
         if(h->dead) {
@@ -402,7 +377,7 @@ static int usb_bulk_read(usb_handle *h, void *data, int len)
             break;
         }
         if(res < 0) {
-            if(saved_errno == EINTR) {
+            if(errno == EINTR) {
                 continue;
             }
             D("[ reap urb - error ]\n");
@@ -557,7 +532,7 @@ int usb_close(usb_handle *h)
     return 0;
 }
 
-static void register_device(const char *dev_name, const char *devpath,
+static void register_device(const char *dev_name,
                             unsigned char ep_in, unsigned char ep_out,
                             int interface, int serial_index, unsigned zero_mask)
 {
@@ -630,7 +605,6 @@ static void register_device(const char *dev_name, const char *devpath,
         ctrl.wIndex = 0;
         ctrl.wLength = sizeof(languages);
         ctrl.data = languages;
-        ctrl.timeout = 1000;
 
         result = ioctl(usb->desc, USBDEVFS_CONTROL, &ctrl);
         if (result > 0)
@@ -643,10 +617,9 @@ static void register_device(const char *dev_name, const char *devpath,
             ctrl.bRequestType = USB_DIR_IN|USB_TYPE_STANDARD|USB_RECIP_DEVICE;
             ctrl.bRequest = USB_REQ_GET_DESCRIPTOR;
             ctrl.wValue = (USB_DT_STRING << 8) | serial_index;
-            ctrl.wIndex = __le16_to_cpu(languages[i]);
+            ctrl.wIndex = languages[i];
             ctrl.wLength = sizeof(buffer);
             ctrl.data = buffer;
-            ctrl.timeout = 1000;
 
             result = ioctl(usb->desc, USBDEVFS_CONTROL, &ctrl);
             if (result > 0) {
@@ -654,7 +627,7 @@ static void register_device(const char *dev_name, const char *devpath,
                 // skip first word, and copy the rest to the serial string, changing shorts to bytes.
                 result /= 2;
                 for (i = 1; i < result; i++)
-                    serial[i - 1] = __le16_to_cpu(buffer[i]);
+                    serial[i - 1] = buffer[i];
                 serial[i - 1] = 0;
                 break;
             }
@@ -669,7 +642,7 @@ static void register_device(const char *dev_name, const char *devpath,
     usb->next->prev = usb;
     adb_mutex_unlock(&usb_lock);
 
-    register_usb_transport(usb, serial, devpath, usb->writeable);
+    register_usb_transport(usb, serial, usb->writeable);
     return;
 
 fail:
@@ -713,3 +686,4 @@ void usb_init()
         fatal_errno("cannot create input thread");
     }
 }
+

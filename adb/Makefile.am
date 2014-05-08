@@ -10,7 +10,6 @@ adb_SOURCES := \
 	transport_usb.c \
 	commandline.c \
 	adb_client.c \
-	adb_auth_host.c \
 	sockets.c \
 	services.c \
 	file_sync_client.c  \
@@ -28,15 +27,13 @@ adb_CFLAGS = -O2 \
 	-D_XOPEN_SOURCE \
 	-D_GNU_SOURCE \
 	-I../include \
-	-include ../include/arch/linux-arm/OEConfig.h \
-	${OPENSSL_CFLAGS} \
-	${GTHREAD_CFLAGS}
+	-include ../include/arch/linux-arm/OEConfig.h
+
+adb_LDFLAGS = -lpthread -all-static
 
 adb_LDADD = ../libcutils/libcutils.a
 adb_LDADD += ../libzipfile/libzipfile.a
 adb_LDADD += -lz
-adb_LDADD += ${OPENSSL_LIBS} ${GTHREAD_LIBS}
-adb_LDADD += -ldl
 
 # adbd device daemon
 # =========================================================
@@ -47,8 +44,6 @@ adbd_SOURCES = adb.c \
 	transport.c \
 	transport_local.c \
 	transport_usb.c \
-	adb_auth_client.c\
-	backup_service.c \
 	sockets.c \
 	services.c \
 	file_sync_service.c \
@@ -58,7 +53,6 @@ adbd_SOURCES = adb.c \
 	usb_linux_client.c \
 	log_service.c \
 	utils.c
-
 
 adbd_CFLAGS = -O2 \
 	-g \
@@ -70,11 +64,8 @@ adbd_CFLAGS = -O2 \
 	-DANDROID_GADGET=1 \
 	-DADB_REBOOT_ENABLED=1 \
 	-I../include \
-	-include ../include/arch/linux-arm/OEConfig.h \
-        ${OPENSSL_CFLAGS} \
-        ${GTHREAD_CFLAGS}
+	-include ../include/arch/linux-arm/OEConfig.h
 
-adbd_LDFLAGS = -lresolv
+adbd_LDFLAGS = -lpthread -all-static
+
 adbd_LDADD =  ../libcutils/libcutils.a
-adbd_LDADD += ${OPENSSL_LIBS} ${GTHREAD_LIBS}
-adbd_LDADD += -ldl
