@@ -121,6 +121,7 @@ struct {
     // used for setting Dolby specific properties
     { "dolby.", AID_SYSTEM,   0 },
 #endif // DOLBY_END
+    { "usb_uicc.", AID_SYSTEM,  0 },
     { NULL, 0, 0 }
 };
 
