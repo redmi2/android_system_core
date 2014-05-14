@@ -35,6 +35,7 @@ else
 fi
 
 run_9x35() {
+	/etc/init.d/adbd stop
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo F000 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
@@ -43,6 +44,7 @@ run_9x35() {
 	echo mass_storage > /sys/class/android_usb/android$num/functions
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
 	echo 1 > /sys/class/android_usb/android$num/enable
+	/etc/init.d/adbd start
 }
 
 case `source /usr/bin/usb/target` in
