@@ -26,7 +26,19 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-target=`getprop ro.product.device`
+if  [ "$1" == "mdm9635" ]
+then
+    target="mdm9635"
+else
+    target=`getprop ro.product.device`
+fi
+
+case "$target" in
+    "mdm9635" )
+    echo 1 > /sys/bus/coresight/devices/coresight-modem-etm0/enable
+    echo 1 > /sys/bus/coresight/devices/coresight-tmc-etr/curr_sink
+esac
+
 case "$target" in
     "msm7201a_ffa" | "msm7201a_surf" | "msm7627_ffa" | "msm7627_surf" | "msm7627a" | \
     "qsd8250_surf" | "qsd8250_ffa" | "msm7630_surf" | "msm7630_1x" | "msm7630_fusion" | "qsd8650a_st1x")
@@ -144,7 +156,11 @@ case "$target" in
     ;;
 esac
 
-emmc_boot=`getprop ro.emmc`
+if [ "$target" != "mdm9635" ]
+then
+	emmc_boot=`getprop ro.emmc`
+fi
+
 case "$emmc_boot"
     in "1")
         chown -h system /sys/devices/platform/rs300000a7.65536/force_sync
