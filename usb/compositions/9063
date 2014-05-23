@@ -71,6 +71,7 @@ run_9x25() {
 }
 
 run_9x35() {
+	/etc/init.d/adbd stop
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 9063 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
@@ -85,6 +86,7 @@ run_9x35() {
 	echo 1 > /sys/class/android_usb/android0/f_rndis_qc/wceis
 	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
+	/etc/init.d/adbd start
 }
 
 case `source /usr/bin/usb/target` in
