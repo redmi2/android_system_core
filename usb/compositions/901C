@@ -36,6 +36,14 @@ else
 	mode="hsusb"
 fi
 
+for i in $( echo $(seq 10) )
+do
+	if [ -e /dev/snd/controlC0 ]; then
+		break
+	fi
+	sleep 2
+done
+
 run_9x15() {
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 0x901c > /sys/class/android_usb/android$num/idProduct
