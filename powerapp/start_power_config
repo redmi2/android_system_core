@@ -90,10 +90,10 @@ case "$1" in
                   counter=$(( $counter + 1 ))
                   sleep 1
                 done
-                echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/suspend_enabled
-                echo 1 > /sys/module/msm_pm/modes/cpu0/standalone_power_collapse/suspend_enabled
-                echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/idle_enabled
-                echo 1 > /sys/module/msm_pm/modes/cpu0/standalone_power_collapse/idle_enabled
+                echo Y > /sys/module/lpm_levels/system/cpu0/pc/idle_enabled
+                echo Y > /sys/module/lpm_levels/system/cpu0/pc/suspend_enabled
+                echo Y > /sys/module/lpm_levels/system/cpu0/standalone_pc/idle_enabled
+                echo Y > /sys/module/lpm_levels/system/cpu0/standalone_pc/suspend_enabled
                 echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
                 echo "done";
                 ;;
