@@ -50,7 +50,7 @@ run_9x35() {
 	echo QTI,BAM2BAM_IPA > /sys/class/android_usb/android0/f_rmnet/transports
 	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
-	/etc/init.d/adbd stop
+	/etc/init.d/adbd start
 }
 
 case `source /usr/bin/usb/target` in
