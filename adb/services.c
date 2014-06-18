@@ -188,30 +188,16 @@ void restart_usb_service(int fd, void *cookie)
 void reboot_service(int fd, void *arg)
 {
     char buf[100];
-    int pid, ret;
+    int ret;
 
     sync();
-
-    /* Attempt to unmount the SD card first.
-     * No need to bother checking for errors.
-     */
-    pid = fork();
-    if (pid == 0) {
-        /* ask vdc to unmount it */
-        execl("/system/bin/vdc", "/system/bin/vdc", "volume", "unmount",
-                getenv("EXTERNAL_STORAGE"), "force", NULL);
-    } else if (pid > 0) {
-        /* wait until vdc succeeds or fails */
-        waitpid(pid, &ret, 0);
-    }
-
-#if ADB_REBOOT_ENABLED
+    #if ADB_REBOOT_ENABLED
     ret = syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
                     LINUX_REBOOT_CMD_RESTART2, (char *)arg);
-#else
+    #else
     ret = __reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
                     LINUX_REBOOT_CMD_RESTART2, (char *)arg);
-#endif
+    #endif 
     if (ret < 0) {
         snprintf(buf, sizeof(buf), "reboot failed: %s\n", strerror(errno));
         writex(fd, buf, strlen(buf));
