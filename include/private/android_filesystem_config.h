@@ -80,6 +80,7 @@
 #define AID_NET_BT_STACK  3008  /* bluetooth: access config files */
 #define AID_QCOM_DIAG     3009  /* can read/write /dev/diag */
 #define AID_QCOM_THERMAL  3010  /* access for thermal-client socket */
+#define AID_SENSORS       3011 /* access to /dev/socket/sensor_ctl_socket & QCCI/QCSI */
 
 #define AID_MISC          9998  /* access to misc storage */
 #define AID_NOBODY        9999
@@ -142,6 +143,7 @@ static const struct android_id_info android_ids[] = {
     { "net_bw_acct", AID_NET_BW_ACCT, },
     { "qcom_diag", AID_QCOM_DIAG, },
     { "qcom_thermal", AID_QCOM_THERMAL, },
+    { "sensors",       AID_SENSORS, },
     { "misc",      AID_MISC, },
     { "fm_radio",  AID_FM_RADIO, },
     { "nobody",    AID_NOBODY, },
