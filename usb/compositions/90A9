@@ -41,7 +41,8 @@ else
 fi
 
 run_9x35() {
-	pkill -x adbd
+	/etc/init.d/adbd stop
+	pkill -f `which adbd`
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 90A9 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
