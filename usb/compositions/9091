@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
+# Copyright (c) 2014, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -24,9 +24,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# DESCRIPTION: DIAG + QDSS + ADB
+# DESCRIPTION: DIAG + MODEM + QMI_RMNET + ADB
 
-echo "Switching to composition number 0x9060"
+echo "Switching to composition number 0x9091"
 
 if [ "$1" = "y" ]; then
 	num="1"
@@ -40,27 +40,29 @@ else
 	delay="0"
 fi
 
-run_9x25() {
-	echo 0 > /sys/class/android_usb/android$num/enable
-	echo 0x9060 > /sys/class/android_usb/android$num/idProduct
-	echo 0x05C6 > /sys/class/android_usb/android$num/idVendor
-	echo diag > /sys/class/android_usb/android0/f_diag/clients
-	echo diag,qdss,adb > /sys/class/android_usb/android$num/functions
-	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
-	sleep $delay
-	echo 1 > /sys/class/android_usb/android$num/enable
-}
-
 run_9x35() {
 	pkill -xf `which adbd`
 	echo 0 > /sys/class/android_usb/android$num/enable
-	echo 9060 > /sys/class/android_usb/android$num/idProduct
+	echo 9025 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
 	echo diag > /sys/class/android_usb/android0/f_diag/clients
-	echo 1 > /sys/class/android_usb/android0/f_qdss/debug_intf
-	echo bam > /sys/class/android_usb/android0/f_qdss/transports
-	echo qdss_bam > /sys/class/android_usb/android0/f_qdss/transport_names
-	echo diag,qdss,ffs > /sys/class/android_usb/android$num/functions
+	echo smd > /sys/class/android_usb/android0/f_serial/transports
+	echo QTI,BAM2BAM_IPA > /sys/class/android_usb/android0/f_rmnet/transports
+	echo diag,serial,rmnet,adb > /sys/class/android_usb/android$num/functions
+	sleep $delay
+	echo 1 > /sys/class/android_usb/android$num/enable
+	/etc/init.d/adbd start
+}
+
+run_ferrum() {
+	pkill -xf `which adbd`
+	echo 0 > /sys/class/android_usb/android$num/enable
+	echo 9091 > /sys/class/android_usb/android$num/idProduct
+	echo 05C6 > /sys/class/android_usb/android$num/idVendor
+	echo diag > /sys/class/android_usb/android0/f_diag/clients
+	echo smd > /sys/class/android_usb/android0/f_serial/transports
+	echo QTI,BAM > /sys/class/android_usb/android0/f_rmnet/transports
+	echo diag,serial,rmnet,adb > /sys/class/android_usb/android$num/functions
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
 	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
@@ -68,16 +70,13 @@ run_9x35() {
 }
 
 case `source /usr/bin/usb/target` in
-	*9x25* )
-		run_9x25 &
-		;;
 	*9x35* )
 		run_9x35 &
 		;;
 	*ferrum* )
-		run_9x35 &
+		run_ferrum &
 		;;
 	* )
-		run_9x25 &
+		run_9x35 &
 		;;
 esac

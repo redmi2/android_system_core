@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2012-2013, The Linux Foundation. All rights reserved.
+# Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -31,6 +31,15 @@ export SOFTAP_W_DUN="N"
 
 case "$1" in
   start)
+	if [ -d /sys/class/android_usb/android0/f_ffs ]
+	then
+		echo adb > /sys/class/android_usb/android0/f_ffs/aliases
+		mkdir -p /dev/usb-ffs/adb
+		mount -o uid=2000,gid=2000 -t functionfs adb /dev/usb-ffs/adb
+		mount -o remount,gid=5,mode=620 /dev/pts
+		mkdir -p /system/bin
+		ln -s /bin/sh  /system/bin/sh
+	fi
 
         case $KERNEL in
           3.*)
@@ -43,12 +52,6 @@ case "$1" in
 			echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
 			;;
 			*9x35* )
-                        echo adb > /sys/class/android_usb/android0/f_ffs/aliases
-			mkdir -p /dev/usb-ffs/adb
-			mount -o uid=2000,gid=2000 -t functionfs adb /dev/usb-ffs/adb
-			mount -o remount,gid=5,mode=620 /dev/pts
-			mkdir -p /system/bin
-			ln -s /bin/sh  /system/bin/sh
 			echo 1 > /sys/devices/virtual/android_usb/android0/f_rndis_qc/max_pkt_per_xfer
 
 			if [ -f /usr/bin/usb/softap_w_dun ]
@@ -56,6 +59,10 @@ case "$1" in
 				SOFTAP_W_DUN=`cat /usr/bin/usb/softap_w_dun`
 			fi
 
+			;;
+			*ferrum* )
+			ln -fs /usr/bin/usb/compositions/9091 \
+				/usr/bin/usb/boot_hsusb_composition
 			;;
 		esac
 
