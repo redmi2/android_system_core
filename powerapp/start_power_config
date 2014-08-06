@@ -200,6 +200,48 @@ case "$1" in
          esac
 
          case "$soc_id" in
+          "206"| "247" | "248" | "250")
+                set +e
+                echo -n "Starting powerconfig for 8916: "
+		echo 4 > /sys/module/lpm_levels/enable_low_power/l2
+                echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu1/power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu2/power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu3/power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu0/standalone_power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu1/standalone_power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu2/standalone_power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu3/standalone_power_collapse/suspend_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu0/standalone_power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu1/standalone_power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu2/standalone_power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu3/standalone_power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu1/power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu2/power_collapse/idle_enabled
+                echo 1 > /sys/module/msm_pm/modes/cpu3/power_collapse/idle_enabled
+                echo 1 > /sys/devices/system/cpu/cpu1/online
+                echo 1 > /sys/devices/system/cpu/cpu2/online
+                echo 1 > /sys/devices/system/cpu/cpu3/online
+                echo "interactive" > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+                echo "25000 1094400:50000" > /sys/devices/system/cpu/cpufreq/interactive/above_hispeed_delay
+                echo 90 > /sys/devices/system/cpu/cpufreq/interactive/go_hispeed_load
+                echo 25000 > /sys/devices/system/cpu/cpufreq/interactive/timer_rate
+                echo 998400 > /sys/devices/system/cpu/cpufreq/interactive/hispeed_freq
+                echo 0 > /sys/devices/system/cpu/cpufreq/interactive/io_is_busy
+                echo "85 998400:90 1094400:80" > /sys/devices/system/cpu/cpufreq/interactive/target_loads
+                echo 50000 > /sys/devices/system/cpu/cpufreq/interactive/min_sample_time
+                echo 50000 > /sys/devices/system/cpu/cpufreq/interactive/sampling_down_factor
+                echo 800000 > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq
+                chmod 664 /sys/devices/system/cpu/cpu1/online
+                chmod 664 /sys/devices/system/cpu/cpu2/online
+                chmod 664 /sys/devices/system/cpu/cpu3/online
+                echo "done"
+                set +e
+                ;;
+         esac
+
+         case "$soc_id" in
          "145" | "158" | "159" | "198" | "205" | "220" | "221" | "222" | "223" | "224" | "200")
                 set +e
                 echo -n "Starting powerconfig for 8226: "
