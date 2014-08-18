@@ -42,6 +42,9 @@ case `cat ${TARGET_DIR}/build_id` in
 	*ferrum* )
 		res="ferrum"
 		;;
+	*8916* )
+		res="8916"
+		;;
 	* )
 		res="none"
 		;;
