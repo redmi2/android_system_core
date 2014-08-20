@@ -113,8 +113,8 @@ case `source /usr/bin/usb/target` in
 	*9x35* )
 		run_9x35 &
 		;;
-	*ferrum* )
-		echo "This composition can't be supported on ferrum"
+	*ferrum* | *8916* )
+		echo "This composition can't be supported on ferrum or 8916"
 		;;
 	* )
 		run_9x15 &

@@ -60,7 +60,7 @@ case "$1" in
 			fi
 
 			;;
-			*ferrum* )
+			*ferrum* | *8916* )
 			ln -fs /usr/bin/usb/compositions/9091 \
 				/usr/bin/usb/boot_hsusb_composition
 			;;
