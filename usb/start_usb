@@ -48,10 +48,12 @@ case "$1" in
 			# Nothing to do here for 9x15
 			;;
 			*9x25* )
-			echo "Shutdown EHCI HSIC device"
+			echo "Unbind EHCI HSIC host device driver"
 			echo msm_hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
 			;;
 			*9x35* )
+			echo "Unbind EHCI HSIC host device driver"
+			echo f9a15000.hsic > /sys/bus/platform/drivers/msm_hsic_host/unbind
 			echo 1 > /sys/devices/virtual/android_usb/android0/f_rndis_qc/max_pkt_per_xfer
 
 			if [ -f /usr/bin/usb/softap_w_dun ]
