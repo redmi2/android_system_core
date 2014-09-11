@@ -50,7 +50,7 @@ case "$1" in
 			mkdir -p /system/bin
 			ln -s /bin/sh  /system/bin/sh
 			echo "Unbind EHCI HSIC host device driver"
-			echo f9a15000.hsic > /sys/bus/platform/drivers/msm_hsic_host/unbind
+			echo f9a15000.hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
 			echo 1 > /sys/devices/virtual/android_usb/android0/f_rndis_qc/max_pkt_per_xfer
 
 			if [ -f /usr/bin/usb/softap_w_dun ]
