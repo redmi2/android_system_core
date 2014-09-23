@@ -79,6 +79,9 @@ case `source /usr/bin/usb/target` in
 	*ferrum* )
 		run_9x35 &
 		;;
+	*zirc* )
+		run_9x35 &
+		;;
 	* )
 		run_9x25 &
 		;;
