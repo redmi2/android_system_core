@@ -92,10 +92,10 @@ case `source /usr/bin/usb/target` in
 		run_9x25 &
 		;;
 	*9x35* )
-		run_9x25 &
+		run_9x35 &
 		;;
 	*ferrum* )
-		run_ferrum &
+		run_9x25 &
 		;;
 	* )
 		run_9x15 &
