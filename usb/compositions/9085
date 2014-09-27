@@ -110,7 +110,6 @@ run_ferrum() {
 	echo 1 > /sys/class/android_usb/android$num/enable
 	/etc/init.d/adbd start
 }
-}
 
 case `source /usr/bin/usb/target` in
 	*9x15* )
