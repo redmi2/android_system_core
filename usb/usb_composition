@@ -214,8 +214,14 @@ fi
 
 common=`common_functions $other $pid`
 if [ $common != "0" ]; then
-	echo "Can't change composition, hsusb and hsic cant use the same usb function : $common"
-	exit 7
+	echo "******************************************************************************"
+	echo "*                        !!!WARNING!!!                                       *"
+	echo "* Due to this composition change, HSIC and USB have the potential to use the *"
+	echo "* same usb function : $common.                                               *"
+	echo "* Please take care to not use the same function on both ports as this is not *"
+	echo "* properly supported.                                                        *"
+	echo "*                                                                            *"
+	echo "******************************************************************************"
 fi
 
 if [ $persistent = "y" ]; then
