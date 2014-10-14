@@ -1196,7 +1196,7 @@ void *alarm_thread(void *p)
 
     LOGI("Exit from power off charging, reboot the phone!\n");
     set_backlight(false);
-    android_reboot(ANDROID_RB_RESTART, 0, 0);
+    android_reboot(ANDROID_RB_RESTART2, 0, (char *)"rtc");
 
 err:
     LOGE("Exit from alarm thread\n");
