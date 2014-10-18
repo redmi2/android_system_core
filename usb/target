@@ -24,12 +24,12 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-TARGET_DIR=/sys/devices/system/soc/soc0 # default directory
-if [ ! -d $TARGET_DIR ]; then
-	TARGET_DIR=/sys/devices/soc0
+TARGET_DIR=/target # default directory
+if [ ! -f $TARGET_DIR ]; then
+	TARGET_DIR=/sys/devices/soc0/build_id
 fi
 
-case `cat ${TARGET_DIR}/build_id` in
+case `cat ${TARGET_DIR}` in
 	*9x15* )
 		res="9x15"
 		;;
@@ -41,6 +41,9 @@ case `cat ${TARGET_DIR}/build_id` in
 		;;
 	*ferrum* )
 		res="ferrum"
+		;;
+	*zirc* )
+		res="zirc";
 		;;
 	* )
 		res="none"
