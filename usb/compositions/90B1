@@ -42,10 +42,6 @@ else
 fi
 
 run_9x35() {
-	if [ `ps -a | grep adbd | wc -l` -gt 1 ]
-	then
-		pkill -x `which adbd`
-	fi
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 90B1 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
@@ -56,10 +52,6 @@ run_9x35() {
 }
 
 run_ferrum() {
-	if [ `ps -a | grep adbd | wc -l` -gt 1 ]
-	then
-		pkill -x `which adbd`
-	fi
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 90B1 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor

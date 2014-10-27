@@ -40,8 +40,14 @@ else
 	delay="0"
 fi
 
+if [ "$#" -ge 3 ]; then
+	from_adb=$3
+else
+	from_adb="n"
+fi
+
 run_9x35() {
-	if [ `ps -a | grep adbd | wc -l` -gt 1 ]
+	if [ $from_adb = "n" ]
 	then
 		pkill -x `which adbd`
 	fi
@@ -54,11 +60,14 @@ run_9x35() {
 	echo diag,serial,rmnet,adb > /sys/class/android_usb/android$num/functions
 	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
-	/etc/init.d/adbd start
+	if [ $from_adb = "n" ]
+	then
+		/etc/init.d/adbd start
+	fi
 }
 
 run_ferrum() {
-	if [ `ps -a | grep adbd | wc -l` -gt 1 ]
+	if [ $from_adb = "n" ]
 	then
 		pkill -x `which adbd`
 	fi
@@ -72,7 +81,10 @@ run_ferrum() {
 	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
 	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
-	/etc/init.d/adbd start
+	if [ $from_adb = "n" ]
+	then
+		/etc/init.d/adbd start
+	fi
 }
 
 case `source /usr/bin/usb/target` in
