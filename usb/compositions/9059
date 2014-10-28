@@ -24,7 +24,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# DESCRIPTION:  RNDIS+DIAG+ADB : ECM
+# DESCRIPTION:  DIAG+ADB+RNDIS : ECM
 
 echo "Switching to composition number 0x9059"
 
@@ -38,6 +38,12 @@ if [ "$#" -ge 2 ]; then
 	delay=$2
 else
 	delay="0"
+fi
+
+if [ "$#" -ge 3 ]; then
+	from_adb=$3
+else
+	from_adb="n"
 fi
 
 run_9x15() {
@@ -66,7 +72,7 @@ run_9x25() {
 }
 
 run_9x35() {
-	if [ `ps -a | grep adbd | wc -l` -gt 1 ]
+	if [ $from_adb = "n" ]
 	then
 		pkill -x `which adbd`
 	fi
@@ -81,7 +87,10 @@ run_9x35() {
 	echo 1 > /sys/class/android_usb/android0/f_rndis_qc/wceis
 	sleep $delay
 	echo 1 > /sys/class/android_usb/android$num/enable
-	/etc/init.d/adbd start
+	if [ $from_adb = "n" ]
+	then
+		/etc/init.d/adbd start
+	fi
 }
 
 case `source /usr/bin/usb/target` in
