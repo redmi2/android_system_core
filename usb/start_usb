@@ -50,7 +50,7 @@ case "$1" in
 			mkdir -p /system/bin
 			ln -s /bin/sh  /system/bin/sh
 			echo 1 > /sys/devices/virtual/android_usb/android0/f_rndis_qc/max_pkt_per_xfer
-			echo 4 > /sys/module/dwc3/parameters/bulk_ep_xfer_timeout_ms
+			echo 3 > /sys/module/dwc3/parameters/bulk_ep_xfer_timeout_ms
 
 			if [ -f /usr/bin/usb/softap_w_dun ]
 			then
