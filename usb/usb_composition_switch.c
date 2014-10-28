@@ -34,21 +34,21 @@
 #include <string.h>
 #include <signal.h>
 
-
-#define COMMAND_SIZE 27
+#define COMMAND_SIZE sizeof("usb_composition 9060 n n y y")
 
 int main(int argc, char **argv) {
 
         /* Our process ID and Session ID */
         pid_t pid, sid;
-        char command[30];
+        char command[COMMAND_SIZE];
 
         if (argc < 5) {
             exit(EXIT_FAILURE);
         }
 
-        /* E.g. "usb_composition 9060 n n y" to switch to composition 9060*/
-        snprintf(command, COMMAND_SIZE, "usb_composition %s %s %s", argv[1], argv[2], argv[3]);
+        /* E.g. "usb_composition 9060 n n y n" to switch to composition 9060*/
+        snprintf(command, COMMAND_SIZE, "usb_composition %s %s %s y y",
+			argv[1], argv[2], argv[3]);
 
         pid = fork();
         if (pid < 0) {
