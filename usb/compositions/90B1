@@ -42,24 +42,6 @@ else
 fi
 
 run_9x35() {
-	if [ `ps -a | grep adbd | wc -l` -gt 1 ]
-	then
-		pkill -x `which adbd`
-	fi
-	echo 0 > /sys/class/android_usb/android$num/enable
-	echo 90B1 > /sys/class/android_usb/android$num/idProduct
-	echo 05C6 > /sys/class/android_usb/android$num/idVendor
-	echo ecm > /sys/class/android_usb/android$num/functions
-	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
-	sleep $delay
-	echo 1 > /sys/class/android_usb/android$num/enable
-}
-
-run_ferrum() {
-	if [ `ps -a | grep adbd | wc -l` -gt 1 ]
-	then
-		pkill -x `which adbd`
-	fi
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 90B1 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
@@ -72,9 +54,6 @@ run_ferrum() {
 case `source /usr/bin/usb/target` in
 	*9x35* )
 		run_9x35 &
-		;;
-	*ferrum* )
-		run_ferrum &
 		;;
 	* )
 		run_9x35 &
