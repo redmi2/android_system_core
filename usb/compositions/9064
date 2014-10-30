@@ -121,7 +121,6 @@ run_9x35() {
 		/etc/init.d/adbd start
 	fi
 }
-}
 
 case `source /usr/bin/usb/target` in
 	*9x15* )
