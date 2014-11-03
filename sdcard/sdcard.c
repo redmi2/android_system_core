@@ -236,6 +236,32 @@ struct fuse_handler {
     };
 };
 
+#include <sys/syscall.h>
+
+/* many glibc's are not yet up to date */
+#ifndef __NR_sched_setaffinity
+#define __NR_sched_setaffinity (__NR_SYSCALL_BASE + 241 )
+#endif
+
+/* Copied from glibc's <sched.h> and <bits/sched.h> and munged */
+#define CPU_SETSIZE	1024
+#define __NCPUBITS	(8 * sizeof (unsigned long))
+typedef struct
+{
+	unsigned long __bits[CPU_SETSIZE / __NCPUBITS];
+} cpu_set_t;
+
+#define CPU_SET(cpu, cpusetp) \
+	((cpusetp)->__bits[(cpu)/__NCPUBITS] |= (1UL << ((cpu) % __NCPUBITS)))
+#define CPU_ZERO(cpusetp) \
+	memset((cpusetp), 0, sizeof(cpu_set_t))
+
+static int
+sched_setaffinity(pid_t pid, size_t len, cpu_set_t const * cpusetp)
+{
+	return syscall(__NR_sched_setaffinity, pid, len, cpusetp);
+}
+
 static inline void *id_to_ptr(__u64 nid)
 {
     return (void *) (uintptr_t) nid;
@@ -1818,6 +1844,41 @@ error:
     return res;
 }
 
+static void set_cpu0_affinity( void )
+{
+	cpu_set_t set;
+	int err;
+
+	CPU_ZERO(&set);
+	CPU_SET(0, &set);
+
+	err = sched_setaffinity(getpid(), sizeof(set), &set);
+
+	if (err == -1) {
+		perror("Failed to set affinity");
+		exit(EXIT_FAILURE);
+	}
+}
+
+static void set_cluster0_affinity( void )
+{
+	cpu_set_t set;
+	int err;
+
+	CPU_ZERO(&set);
+	CPU_SET(0, &set);
+	CPU_SET(1, &set);
+	CPU_SET(2, &set);
+	CPU_SET(3, &set);
+
+	err = sched_setaffinity(getpid(), sizeof(set), &set);
+
+	if (err == -1) {
+		perror("Failed to set affinity");
+		exit(EXIT_FAILURE);
+	}
+}
+
 int main(int argc, char **argv)
 {
     int res;
@@ -1898,6 +1959,8 @@ int main(int argc, char **argv)
         ERROR("cannot split permissions without deriving\n");
         return usage();
     }
+
+    set_cpu0_affinity();
 
     rlim.rlim_cur = 8192;
     rlim.rlim_max = 8192;
