@@ -331,6 +331,9 @@ on property:vold.decrypt=trigger_shutdown_framework
     class_reset late_start
     class_reset main
 
+on property:sys.powerctl=*
+   powerctl ${sys.powerctl}
+
 # system server cannot write to /proc/sys files,
 # and chown/chmod does not work for /proc/sys/ entries.
 # So proxy writes through init.
