@@ -81,7 +81,7 @@ case `source /usr/bin/usb/target` in
 	*ferrum* )
 		echo "This composition can't be supported on ferrum"
 		;;
-	*zirc* )
+	*9640* )
 		run_9x35 &
 		;;
 	* )
