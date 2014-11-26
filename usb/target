@@ -42,8 +42,8 @@ case `cat ${TARGET_DIR}` in
 	*ferrum* )
 		res="ferrum"
 		;;
-	*zirc* )
-		res="zirc";
+	*9640* )
+		res="9640";
 		;;
 	* )
 		res="none"

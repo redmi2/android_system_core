@@ -50,7 +50,7 @@ case `source /usr/bin/usb/target` in
 	*9x35* )
 		run_9x35 &
 		;;
-	*zirc* )
+	*9640* )
 		run_9x35 &
 		;;
 	* )
