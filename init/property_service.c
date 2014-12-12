@@ -127,6 +127,7 @@ struct {
     // used for setting Dolby specific properties
     { "dolby.", AID_SYSTEM,   0 },
 #endif // DOLBY_DAP
+    { "sys.audio.init",   AID_MEDIA,    0 },
     { NULL, 0, 0 }
 };
 
