@@ -454,41 +454,6 @@ static void parse_event(const char *msg, struct uevent *uevent)
                     uevent->firmware, uevent->major, uevent->minor);
 }
 
-static char **get_v4l_device_symlinks(struct uevent *uevent)
-{
-    char **links;
-    int fd = -1;
-    int nr;
-    char link_name_path[256];
-    char link_name[64];
-
-    if (strncmp(uevent->path, "/devices/virtual/video4linux/video", 34))
-        return NULL;
-
-    links = malloc(sizeof(char *) * 2);
-    if (!links)
-        return NULL;
-    memset(links, 0, sizeof(char *) * 2);
-
-    snprintf(link_name_path, sizeof(link_name_path), "%s%s%s",
-            SYSFS_PREFIX, uevent->path, "/link_name");
-    fd = open(link_name_path, O_RDONLY);
-    if (fd < 0)
-        goto err;
-    nr = read(fd, link_name, sizeof(link_name) - 1);
-    close(fd);
-    if (nr <= 0)
-        goto err;
-    link_name[nr] = '\0';
-    if (asprintf(&links[0], "/dev/video/%s", link_name) <= 0)
-        links[0] = NULL;
-
-    return links;
-err:
-    free(links);
-    return NULL;
-}
-
 static char **get_character_device_symlinks(struct uevent *uevent)
 {
     const char *parent;
@@ -497,6 +462,10 @@ static char **get_character_device_symlinks(struct uevent *uevent)
     int link_num = 0;
     int width;
     struct platform_node *pdev;
+    int fd = -1;
+    int nr;
+    char link_name_path[256];
+    char link_name[64];
 
     pdev = find_platform_device(uevent->path);
     if (!pdev)
@@ -531,6 +500,20 @@ static char **get_character_device_symlinks(struct uevent *uevent)
         else
             links[link_num] = NULL;
         mkdir("/dev/usb", 0755);
+    }
+    else if (!strncmp(parent, "/video4linux", 12)) {
+        snprintf(link_name_path, sizeof(link_name_path), "%s%s%s",
+                SYSFS_PREFIX, uevent->path, "/link_name");
+        fd = open(link_name_path, O_RDONLY);
+        if (fd < 0)
+            goto err;
+        nr = read(fd, link_name, sizeof(link_name) - 1);
+        close(fd);
+        if (nr <= 0)
+            goto err;
+        link_name[nr] = '\0';
+        if (asprintf(&links[0], "/dev/video/%s", link_name) <= 0)
+            links[0] = NULL;
     }
     else {
         goto err;
@@ -857,8 +840,6 @@ static void handle_generic_device_event(struct uevent *uevent)
      } else
          base = "/dev/";
      links = get_character_device_symlinks(uevent);
-     if (!links)
-         links = get_v4l_device_symlinks(uevent);
 
      if (!devpath[0])
          snprintf(devpath, sizeof(devpath), "%s%s", base, name);
