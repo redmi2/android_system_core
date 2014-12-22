@@ -51,11 +51,29 @@ loglevel 3
     write /sys/fs/cgroup/memory/memory.move_charge_at_immigrate 1
     chown root system /sys/fs/cgroup/memory/tasks
     chmod 0660 /sys/fs/cgroup/memory/tasks
-    mkdir /sys/fs/cgroup/memory/sw 0750 root system
-    write /sys/fs/cgroup/memory/sw/memory.swappiness 100
-    write /sys/fs/cgroup/memory/sw/memory.move_charge_at_immigrate 1
-    chown root system /sys/fs/cgroup/memory/sw/tasks
-    chmod 0660 /sys/fs/cgroup/memory/sw/tasks
+    mkdir /sys/fs/cgroup/memory/foreground 0750 root system
+    write /sys/fs/cgroup/memory/foreground/memory.swappiness 0
+    write /sys/fs/cgroup/memory/foreground/memory.move_charge_at_immigrate 1
+    chown root system /sys/fs/cgroup/memory/foreground/tasks
+    chmod 0660 /sys/fs/cgroup/memory/foreground/tasks
+
+    mkdir /sys/fs/cgroup/memory/background 0750 root system
+    write /sys/fs/cgroup/memory/background/memory.swappiness 100
+    write /sys/fs/cgroup/memory/background/memory.move_charge_at_immigrate 1
+    chown root system /sys/fs/cgroup/memory/background/tasks
+    chmod 0660 /sys/fs/cgroup/memory/background/tasks
+
+    mkdir /sys/fs/cgroup/memory/native 0750 root system
+    write /sys/fs/cgroup/memory/native/memory.swappiness 0
+    write /sys/fs/cgroup/memory/native/memory.move_charge_at_immigrate 1
+    chown root system /sys/fs/cgroup/memory/native/tasks
+    chmod 0660 /sys/fs/cgroup/memory/native/tasks
+
+    mkdir /sys/fs/cgroup/memory/persistent 0750 root system
+    write /sys/fs/cgroup/memory/persistent/memory.swappiness 0
+    write /sys/fs/cgroup/memory/persistent/memory.move_charge_at_immigrate 1
+    chown root system /sys/fs/cgroup/memory/persistent/tasks
+    chmod 0660 /sys/fs/cgroup/memory/persistent/tasks
 
     mkdir /system
     mkdir /data 0771 system system
