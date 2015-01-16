@@ -303,7 +303,11 @@ on post-fs-data
 
     # create directory for DRM plug-ins - give drm the read/write access to
     # the following directory.
-    mkdir /data/drm 0770 drm drm
+    mkdir /data/drm 0774 drm drm
+
+    # Adding a new Directory
+    mkdir /data/local/.Drm 0777 system system
+    mkdir /data/local/.Drm/rights 0777 system system
 
     # create directory for MediaDrm plug-ins - give drm the read/write access to
     # the following directory.
@@ -563,7 +567,7 @@ service surfaceflinger /system/bin/surfaceflinger
 service drm /system/bin/drmserver
     class main
     user drm
-    group drm system inet drmrpc
+    group drm system inet drmrpc sdcard_r sdcard_rw media_rw
 
 service media /system/bin/mediaserver
     class main
