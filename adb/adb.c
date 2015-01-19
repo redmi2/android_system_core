@@ -40,7 +40,6 @@
 #include <sys/mount.h>
 #include <sys/prctl.h>
 #include <getopt.h>
-#include <selinux/selinux.h>
 #else
 #include "usb_vendors.h"
 #endif
@@ -1377,12 +1376,6 @@ int adb_main(int is_daemon, int server_port)
         D("Local port disabled\n");
     } else {
         char local_name[30];
-        if ((root_seclabel != NULL) && (is_selinux_enabled() > 0)) {
-            // b/12587913: fix setcon to allow const pointers
-            if (setcon((char *)root_seclabel) < 0) {
-                exit(1);
-            }
-        }
         build_local_name(local_name, sizeof(local_name), server_port);
         if(install_listener(local_name, "*smartsocket*", NULL, 0)) {
             exit(1);

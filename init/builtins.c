@@ -35,9 +35,6 @@
 #include <cutils/android_reboot.h>
 #include <fs_mgr.h>
 
-#include <selinux/selinux.h>
-#include <selinux/label.h>
-
 #include "init.h"
 #include "keywords.h"
 #include "property_service.h"
@@ -582,20 +579,10 @@ int do_swapon_all(int nargs, char **args)
 }
 
 int do_setcon(int nargs, char **args) {
-    if (is_selinux_enabled() <= 0)
-        return 0;
-    if (setcon(args[1]) < 0) {
-        return -errno;
-    }
     return 0;
 }
 
 int do_setenforce(int nargs, char **args) {
-    if (is_selinux_enabled() <= 0)
-        return 0;
-    if (security_setenforce(atoi(args[1])) < 0) {
-        return -errno;
-    }
     return 0;
 }
 
@@ -871,30 +858,6 @@ int do_restorecon_recursive(int nargs, char **args) {
 }
 
 int do_setsebool(int nargs, char **args) {
-    const char *name = args[1];
-    const char *value = args[2];
-    SELboolean b;
-    int ret;
-
-    if (is_selinux_enabled() <= 0)
-        return 0;
-
-    b.name = name;
-    if (!strcmp(value, "1") || !strcasecmp(value, "true") || !strcasecmp(value, "on"))
-        b.value = 1;
-    else if (!strcmp(value, "0") || !strcasecmp(value, "false") || !strcasecmp(value, "off"))
-        b.value = 0;
-    else {
-        ERROR("setsebool: invalid value %s\n", value);
-        return -EINVAL;
-    }
-
-    if (security_set_boolean_list(1, &b, 0) < 0) {
-        ret = -errno;
-        ERROR("setsebool: could not set %s to %s\n", name, value);
-        return ret;
-    }
-
     return 0;
 }
 

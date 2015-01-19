@@ -5,8 +5,6 @@
 #include <dirent.h>
 #include <errno.h>
 
-#include <selinux/selinux.h>
-
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
@@ -255,7 +253,6 @@ static int listfile_maclabel(const char *path, struct stat *s)
         name++;
     }
 
-    lgetfilecon(path, &maclabel);
     if (!maclabel) {
         return -1;
     }

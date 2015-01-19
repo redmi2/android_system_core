@@ -140,8 +140,4 @@ void service_restart(struct service *svc);
 void service_start(struct service *svc, const char *dynamic_args);
 void property_changed(const char *name, const char *value);
 
-extern struct selabel_handle *sehandle;
-extern struct selabel_handle *sehandle_prop;
-extern int selinux_reload_policy(void);
-
 #endif	/* _INIT_INIT_H */

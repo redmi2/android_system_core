@@ -26,7 +26,6 @@ LOCAL_SHARED_LIBRARIES := \
     libbacktrace \
     libcutils \
     liblog \
-    libselinux \
 
 include external/stlport/libstlport.mk
 
