@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
-#include <selinux/selinux.h>
 
 #include <private/android_filesystem_config.h>
 
@@ -81,10 +80,6 @@ int ueventd_main(int argc, char **argv)
         klog_set_level(KLOG_INFO_LEVEL);
     }
 #endif
-
-    union selinux_callback cb;
-    cb.func_log = log_callback;
-    selinux_set_callback(SELINUX_CB_LOG, cb);
 
     INFO("starting ueventd\n");
 

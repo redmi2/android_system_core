@@ -139,7 +139,6 @@ BSD_TOOLS := \
     sync \
 
 OUR_TOOLS := \
-    chcon \
     chmod \
     clear \
     cmp \
@@ -149,7 +148,6 @@ OUR_TOOLS := \
     getenforce \
     getevent \
     getprop \
-    getsebool \
     hd \
     id \
     ifconfig \
@@ -157,7 +155,6 @@ OUR_TOOLS := \
     insmod \
     ioctl \
     ionice \
-    load_policy \
     log \
     ls \
     lsmod \
@@ -175,15 +172,11 @@ OUR_TOOLS := \
     ps \
     readlink \
     renice \
-    restorecon \
     rmmod \
     route \
-    runcon \
     schedtop \
     sendevent \
-    setenforce \
     setprop \
-    setsebool \
     smd \
     start \
     stop \
@@ -221,7 +214,6 @@ LOCAL_C_INCLUDES += external/openssl/include
 LOCAL_SHARED_LIBRARIES := \
     libcrypto \
     libcutils \
-    libselinux \
 
 # libusbhost is only used by lsusb, and that isn't usually included in toolbox.
 # The linker strips out all the unused library code in the normal case.

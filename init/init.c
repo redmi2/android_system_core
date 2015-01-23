@@ -32,10 +32,6 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 
-#include <selinux/selinux.h>
-#include <selinux/label.h>
-#include <selinux/android.h>
-
 #include <libgen.h>
 
 #include <cutils/list.h>
@@ -57,9 +53,6 @@
 #include "util.h"
 #include "ueventd.h"
 #include "watchdogd.h"
-
-struct selabel_handle *sehandle;
-struct selabel_handle *sehandle_prop;
 
 static int property_triggers_enabled = 0;
 
@@ -170,7 +163,6 @@ void service_start(struct service *svc, const char *dynamic_args)
     pid_t pid;
     int needs_console;
     int n;
-    char *scon = NULL;
     int rc;
 
         /* starting a service removes it from the disabled or reset
@@ -209,43 +201,6 @@ void service_start(struct service *svc, const char *dynamic_args)
         return;
     }
 
-    if (is_selinux_enabled() > 0) {
-        if (svc->seclabel) {
-            scon = strdup(svc->seclabel);
-            if (!scon) {
-                ERROR("Out of memory while starting '%s'\n", svc->name);
-                return;
-            }
-        } else {
-            char *mycon = NULL, *fcon = NULL;
-
-            INFO("computing context for service '%s'\n", svc->args[0]);
-            rc = getcon(&mycon);
-            if (rc < 0) {
-                ERROR("could not get context while starting '%s'\n", svc->name);
-                return;
-            }
-
-            rc = getfilecon(svc->args[0], &fcon);
-            if (rc < 0) {
-                ERROR("could not get context while starting '%s'\n", svc->name);
-                freecon(mycon);
-                return;
-            }
-
-            rc = security_compute_create(mycon, fcon, string_to_security_class("process"), &scon);
-            if (rc == 0 && !strcmp(scon, mycon)) {
-                ERROR("Warning!  Service %s needs a SELinux domain defined; please fix!\n", svc->name);
-            }
-            freecon(mycon);
-            freecon(fcon);
-            if (rc < 0) {
-                ERROR("could not get context while starting '%s'\n", svc->name);
-                return;
-            }
-        }
-    }
-
     NOTICE("starting '%s'\n", svc->name);
 
     pid = fork();
@@ -271,14 +226,11 @@ void service_start(struct service *svc, const char *dynamic_args)
                     !strcmp(si->type, "stream") ? SOCK_STREAM :
                         (!strcmp(si->type, "dgram") ? SOCK_DGRAM : SOCK_SEQPACKET));
             int s = create_socket(si->name, socket_type,
-                                  si->perm, si->uid, si->gid, si->socketcon ?: scon);
+                                  si->perm, si->uid, si->gid, si->socketcon);
             if (s >= 0) {
                 publish_socket(si->name, s);
             }
         }
-
-        freecon(scon);
-        scon = NULL;
 
         if (svc->ioprio_class != IoSchedClass_NONE) {
             if (android_set_ioprio(getpid(), svc->ioprio_class, svc->ioprio_pri)) {
@@ -325,10 +277,6 @@ void service_start(struct service *svc, const char *dynamic_args)
             }
         }
         if (svc->seclabel) {
-            if (is_selinux_enabled() > 0 && setexeccon(svc->seclabel) < 0) {
-                ERROR("cannot setexeccon('%s'): %s\n", svc->seclabel, strerror(errno));
-                _exit(127);
-            }
         }
 
         if (!dynamic_args) {
@@ -355,8 +303,6 @@ void service_start(struct service *svc, const char *dynamic_args)
         }
         _exit(127);
     }
-
-    freecon(scon);
 
     if (pid < 0) {
         ERROR("failed to start '%s'\n", svc->name);
@@ -859,145 +805,6 @@ static int bootchart_init_action(int nargs, char **args)
 }
 #endif
 
-static const struct selinux_opt seopts_prop[] = {
-        { SELABEL_OPT_PATH, "/property_contexts" },
-        { SELABEL_OPT_PATH, "/data/security/current/property_contexts" },
-        { 0, NULL }
-};
-
-struct selabel_handle* selinux_android_prop_context_handle(void)
-{
-    int policy_index = selinux_android_use_data_policy() ? 1 : 0;
-    struct selabel_handle* sehandle = selabel_open(SELABEL_CTX_ANDROID_PROP,
-                                                   &seopts_prop[policy_index], 1);
-    if (!sehandle) {
-        ERROR("SELinux:  Could not load property_contexts:  %s\n",
-              strerror(errno));
-        return NULL;
-    }
-    INFO("SELinux: Loaded property contexts from %s\n", seopts_prop[policy_index].value);
-    return sehandle;
-}
-
-void selinux_init_all_handles(void)
-{
-    sehandle = selinux_android_file_context_handle();
-    selinux_android_set_sehandle(sehandle);
-    sehandle_prop = selinux_android_prop_context_handle();
-}
-
-static bool selinux_is_disabled(void)
-{
-#ifdef ALLOW_DISABLE_SELINUX
-    char tmp[PROP_VALUE_MAX];
-
-    if (access("/sys/fs/selinux", F_OK) != 0) {
-        /* SELinux is not compiled into the kernel, or has been disabled
-         * via the kernel command line "selinux=0".
-         */
-        return true;
-    }
-
-    if ((property_get("ro.boot.selinux", tmp) != 0) && (strcmp(tmp, "disabled") == 0)) {
-        /* SELinux is compiled into the kernel, but we've been told to disable it. */
-        return true;
-    }
-#endif
-
-    return false;
-}
-
-static bool selinux_is_enforcing(void)
-{
-#ifdef ALLOW_DISABLE_SELINUX
-    char tmp[PROP_VALUE_MAX];
-
-    if (property_get("ro.boot.selinux", tmp) == 0) {
-        /* Property is not set.  Assume enforcing */
-        return true;
-    }
-
-    if (strcmp(tmp, "permissive") == 0) {
-        /* SELinux is in the kernel, but we've been told to go into permissive mode */
-        return false;
-    }
-
-    if (strcmp(tmp, "enforcing") != 0) {
-        ERROR("SELinux: Unknown value of ro.boot.selinux. Got: \"%s\". Assuming enforcing.\n", tmp);
-    }
-
-#endif
-    return true;
-}
-
-int selinux_reload_policy(void)
-{
-    if (selinux_is_disabled()) {
-        return -1;
-    }
-
-    INFO("SELinux: Attempting to reload policy files\n");
-
-    if (selinux_android_reload_policy() == -1) {
-        return -1;
-    }
-
-    if (sehandle)
-        selabel_close(sehandle);
-
-    if (sehandle_prop)
-        selabel_close(sehandle_prop);
-
-    selinux_init_all_handles();
-    return 0;
-}
-
-static int audit_callback(void *data, security_class_t cls __attribute__((unused)), char *buf, size_t len)
-{
-    snprintf(buf, len, "property=%s", !data ? "NULL" : (char *)data);
-    return 0;
-}
-
-int log_callback(int type, const char *fmt, ...)
-{
-    int level;
-    va_list ap;
-    switch (type) {
-    case SELINUX_WARNING:
-        level = KLOG_WARNING_LEVEL;
-        break;
-    case SELINUX_INFO:
-        level = KLOG_INFO_LEVEL;
-        break;
-    default:
-        level = KLOG_ERROR_LEVEL;
-        break;
-    }
-    va_start(ap, fmt);
-    klog_vwrite(level, fmt, ap);
-    va_end(ap);
-    return 0;
-}
-
-static void selinux_initialize(void)
-{
-    if (selinux_is_disabled()) {
-        return;
-    }
-
-    INFO("loading selinux policy\n");
-    if (selinux_android_load_policy() < 0) {
-        ERROR("SELinux: Failed to load policy; rebooting into recovery mode\n");
-        android_reboot(ANDROID_RB_RESTART2, 0, "recovery");
-        while (1) { pause(); }  // never reached
-    }
-
-    selinux_init_all_handles();
-    bool is_enforcing = selinux_is_enforcing();
-    INFO("SELinux: security_setenforce(%d)\n", is_enforcing);
-    security_setenforce(is_enforcing);
-}
-
 int main(int argc, char **argv)
 {
     int fd_count = 0;
@@ -1051,23 +858,6 @@ int main(int argc, char **argv)
     get_hardware_name(hardware, &revision);
 
     process_kernel_cmdline();
-
-    union selinux_callback cb;
-    cb.func_log = log_callback;
-    selinux_set_callback(SELINUX_CB_LOG, cb);
-
-    cb.func_audit = audit_callback;
-    selinux_set_callback(SELINUX_CB_AUDIT, cb);
-
-    selinux_initialize();
-    /* These directories were necessarily created before initial policy load
-     * and therefore need their security context restored to the proper value.
-     * This must happen before /dev is populated by ueventd.
-     */
-    restorecon("/dev");
-    restorecon("/dev/socket");
-    restorecon("/dev/__properties__");
-    restorecon_recursive("/sys");
 
     is_ffbm = !strncmp(bootmode, "ffbm", 4);
     if (!is_ffbm)

@@ -60,9 +60,6 @@
 #include <sys/mman.h>
 #include <private/android_filesystem_config.h>
 
-#include <selinux/selinux.h>
-#include <selinux/label.h>
-
 #include "property_service.h"
 #include "init.h"
 #include "util.h"
@@ -184,29 +181,7 @@ static int init_property_area(void)
 
 static int check_mac_perms(const char *name, char *sctx)
 {
-    if (is_selinux_enabled() <= 0)
-        return 1;
-
-    char *tctx = NULL;
-    const char *class = "property_service";
-    const char *perm = "set";
-    int result = 0;
-
-    if (!sctx)
-        goto err;
-
-    if (!sehandle_prop)
-        goto err;
-
-    if (selabel_lookup(sehandle_prop, &tctx, name, 1) != 0)
-        goto err;
-
-    if (selinux_check_access(sctx, tctx, class, perm, (void*) name) == 0)
-        result = 1;
-
-    freecon(tctx);
- err:
-    return result;
+    return 1;
 }
 
 static int check_control_mac_perms(const char *name, char *sctx)
@@ -340,7 +315,7 @@ int property_set(const char *name, const char *value)
         write_persistent_property(name, value);
     } else if (strcmp("selinux.reload_policy", name) == 0 &&
                strcmp("1", value) == 0) {
-        selinux_reload_policy();
+
     }
     property_changed(name, value);
     return 0;
@@ -405,8 +380,6 @@ void handle_property_set_fd()
             return;
         }
 
-        getpeercon(s, &source_ctx);
-
         if(memcmp(msg.name,"ctl.",4) == 0) {
             // Keep the old close-socket-early behavior when handling
             // ctl.* properties.
@@ -430,7 +403,6 @@ void handle_property_set_fd()
             // the property is written to memory.
             close(s);
         }
-        freecon(source_ctx);
         break;
 
     default:
