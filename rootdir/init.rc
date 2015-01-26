@@ -35,7 +35,10 @@ on init
 
     loglevel 3
 
-    # Backward compatibility
+# Redirect rilpoxy to rild
+    symlink /dev/socket/rild /dev/socket/rilproxy
+
+# Backward compatibility
     symlink /system/etc /etc
     symlink /sys/kernel/debug /d
 
