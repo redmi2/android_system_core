@@ -77,6 +77,7 @@ int fs_mgr_is_nonremovable(struct fstab_rec *fstab);
 int fs_mgr_is_encryptable(struct fstab_rec *fstab);
 int fs_mgr_is_noemulatedsd(struct fstab_rec *fstab);
 int fs_mgr_swapon_all(struct fstab *fstab);
+int fs_mgr_is_mdtp_activated(void);
 #ifdef __cplusplus
 }
 #endif
