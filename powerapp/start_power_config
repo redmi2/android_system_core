@@ -177,9 +177,9 @@ case "$1" in
          esac
 
          case "$soc_id" in
-         "145" | "158" | "159" | "198" | "205" | "220" | "221" | "222" | "223" | "224" | "200")
+         "145" | "158" | "199" | "200" | "219" | "221" | "223" | "224")
                 set +e
-                echo -n "Starting powerconfig for 8226: "
+                echo -n "Starting powerconfig for 8226, 8926, 8026: "
                 echo 4 > /sys/module/lpm_levels/enable_low_power/l2
                 echo 1 > /sys/module/msm_pm/modes/cpu0/power_collapse/suspend_enabled
                 echo 1 > /sys/module/msm_pm/modes/cpu1/power_collapse/suspend_enabled
