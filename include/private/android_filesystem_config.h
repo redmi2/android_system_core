@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
- * Copyright (c) 2009, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2009,2015 The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,53 +32,21 @@
 */
 
 #define AID_ROOT             0  /* traditional unix root user */
-
-#define AID_SYSTEM        1000  /* system server */
-
-#define AID_RADIO         1001  /* telephony subsystem, RIL */
-#define AID_BLUETOOTH     1002  /* bluetooth subsystem */
-#define AID_GRAPHICS      1003  /* graphics devices */
-#define AID_INPUT         1004  /* input devices */
-#define AID_AUDIO         1005  /* audio devices */
-#define AID_CAMERA        1006  /* camera devices */
-#define AID_LOG           1007  /* log devices */
-#define AID_COMPASS       1008  /* compass device */
-#define AID_MOUNT         1009  /* mountd socket */
-#define AID_WIFI          1010  /* wifi subsystem */
-#define AID_ADB           1011  /* android debug bridge (adbd) */
-#define AID_INSTALL       1012  /* group for installing packages */
-#define AID_MEDIA         1013  /* mediaserver process */
-#define AID_DHCP          1014  /* dhcp client */
-#define AID_SDCARD_RW     1015  /* external storage write access */
-#define AID_SDCARD_R      1028  /* external storage read access */
-#define AID_NET_BW_STATS  3006  /* read bandwidth statistics */
-#define AID_VPN           1016  /* vpn system */
-#define AID_KEYSTORE      1017  /* keystore subsystem */
-#define AID_USB           1018  /* USB devices */
-#define AID_FM_RADIO      1019  /* FM radio */
-#define AID_GPS           1021  /* GPS daemon */
-#define AID_UNUSED1       1022  /* deprecated, DO NOT USE */
-#define AID_RFU1          1023  /* RFU */
-#define AID_RFU2          1024  /* RFU */
-#define AID_NFC           1025  /* nfc subsystem */
-
-#define AID_SHELL         2000  /* adb and debug shell user */
-#define AID_CACHE         2001  /* cache access */
-#define AID_DIAG          2002  /* access to diagnostic resources */
-
-/* The 3000 series are intended for use as supplemental group id's only.
- * They indicate special Android capabilities that the kernel is aware of. */
-#define AID_NET_BT_ADMIN  3001  /* bluetooth: create any socket */
-#define AID_NET_BT        3002  /* bluetooth: create sco, rfcomm or l2cap sockets */
-#define AID_INET          3003  /* can create AF_INET and AF_INET6 sockets */
-#define AID_NET_RAW       3004  /* can create raw INET sockets */
-#define AID_NET_ADMIN     3005  /* can configure interfaces and routing tables. */
-#define AID_QCOM_ONCRPC   3006  /* can read/write /dev/oncrpc files */
-
-#define AID_MISC          9998  /* access to misc storage */
-#define AID_NOBODY        9999
-
-#define AID_APP          10000 /* first app user */
+#define AID_DAEMON           1
+#define AID_BIN              2
+#define AID_SYS              3
+#define AID_ADM              4
+#define AID_TTY              5
+#define AID_DISK             6
+#define AID_KMEM            15
+#define AID_WWWDATA         33
+#define AID_BACKUP          34
+#define AID_SHADOW          42
+#define AID_UTMP            43
+#define AID_DIAG            53
+#define AID_SDCARD        1015
+#define AID_REBOOTERS     1301
+#define AID_NOBODY       65534
 
 #if !defined(EXCLUDE_FS_CONFIG_STRUCTURES)
 struct android_id_info {
@@ -88,46 +56,26 @@ struct android_id_info {
 
 static const struct android_id_info android_ids[] = {
     { "root",      AID_ROOT, },
-    { "system",    AID_SYSTEM, },
-    { "radio",     AID_RADIO, },
-    { "bluetooth", AID_BLUETOOTH, },
-    { "graphics",  AID_GRAPHICS, },
-    { "input",     AID_INPUT, },
-    { "audio",     AID_AUDIO, },
-    { "camera",    AID_CAMERA, },
-    { "log",       AID_LOG, },
-    { "compass",   AID_COMPASS, },
-    { "mount",     AID_MOUNT, },
-    { "wifi",      AID_WIFI, },
-    { "dhcp",      AID_DHCP, },
-    { "adb",       AID_ADB, },
-    { "install",   AID_INSTALL, },
-    { "media",     AID_MEDIA, },
-    { "nfc",       AID_NFC, },
-    { "shell",     AID_SHELL, },
-    { "cache",     AID_CACHE, },
+    { "daemon",    AID_DAEMON, },
+    { "bin",       AID_BIN, },
+    { "sys",       AID_SYS, },
+    { "adm",       AID_ADM, },
+    { "tty",       AID_TTY, },
+    { "disk",      AID_DISK, },
+    { "kmem",      AID_KMEM, },
+    { "www-data",  AID_WWWDATA, },
+    { "backup",    AID_BACKUP, },
+    { "shadow",    AID_SHADOW, },
+    { "utmp",      AID_UTMP, },
     { "diag",      AID_DIAG, },
-    { "net_bt_admin", AID_NET_BT_ADMIN, },
-    { "net_bt",    AID_NET_BT, },
-    { "sdcard_rw", AID_SDCARD_RW, },
-    { "sdcard_r",  AID_SDCARD_R, },
-    { "net_bw_stats", AID_NET_BW_STATS, },
-    { "vpn",       AID_VPN, },
-    { "keystore",  AID_KEYSTORE, },
-    { "usb",       AID_USB, },
-    { "gps",       AID_GPS, },
-    { "inet",      AID_INET, },
-    { "net_raw",   AID_NET_RAW, },
-    { "net_admin", AID_NET_ADMIN, },
-    { "qcom_oncrpc", AID_QCOM_ONCRPC, },
-    { "misc",      AID_MISC, },
-    { "fm_radio",   AID_FM_RADIO, },
+    { "sdcard",    AID_SDCARD, },
+    { "rebooters", AID_REBOOTERS, },
     { "nobody",    AID_NOBODY, },
 };
 
 #define android_id_count \
     (sizeof(android_ids) / sizeof(android_ids[0]))
-    
+
 struct fs_path_config {
     unsigned mode;
     unsigned uid;
@@ -136,6 +84,9 @@ struct fs_path_config {
     const char *prefix;
 };
 
+/* system appears as rootfs / on MDM */
+/* userdata appears as /usr on MDM   */
+
 /* Rules for directories.
 ** These rules are applied based on "first match", so they
 ** should start with the most specific path and work their
@@ -143,26 +94,10 @@ struct fs_path_config {
 */
 
 static struct fs_path_config android_dirs[] = {
-    { 00770, AID_SYSTEM, AID_CACHE,  "cache" },
-    { 00771, AID_SYSTEM, AID_SYSTEM, "data/app" },
-    { 00771, AID_SYSTEM, AID_SYSTEM, "data/app-private" },
-    { 00771, AID_SYSTEM, AID_SYSTEM, "data/dalvik-cache" },
-    { 00771, AID_SYSTEM, AID_SYSTEM, "data/data" },
-    { 00771, AID_SHELL,  AID_SHELL,  "data/local/tmp" },
-    { 00771, AID_SHELL,  AID_SHELL,  "data/local" },
-    { 01771, AID_SYSTEM, AID_MISC,   "data/misc" },
-    { 00770, AID_DHCP,   AID_DHCP,   "data/misc/dhcp" },
-    { 00771, AID_SYSTEM, AID_SYSTEM, "data" },
-    { 00750, AID_ROOT,   AID_SHELL,  "sbin" },
-    { 00755, AID_ROOT,   AID_ROOT,   "system/sbin" },
-    { 00750, AID_ROOT,   AID_SHELL,  "userdata/sbin" },
-    { 00755, AID_ROOT,   AID_SHELL,  "system/bin" },
-    { 00755, AID_ROOT,   AID_SHELL,  "userdata/bin" },
-    { 00755, AID_ROOT,   AID_SHELL,  "system/vendor" },
-    { 00755, AID_ROOT,   AID_SHELL,  "system/xbin" },
-    { 00755, AID_ROOT,   AID_ROOT,   "system/etc/ppp" },
-    { 00777, AID_ROOT,   AID_ROOT,   "sdcard" },
-    { 00755, AID_ROOT,   AID_ROOT,   0 },
+    { 00770, AID_WWWDATA,   AID_WWWDATA,   "system/WEBSERVER" },
+    { 00770, AID_WWWDATA,   AID_WWWDATA,   "system/www" },
+    { 01755, AID_ROOT,      AID_ROOT,      "system/tmp" },
+    { 00755, AID_ROOT,      AID_ROOT,      0 },
 };
 
 /* Rules for files.
@@ -172,58 +107,56 @@ static struct fs_path_config android_dirs[] = {
 ** and will allow partial matches.
 */
 static struct fs_path_config android_files[] = {
-    { 00755, AID_ROOT,      AID_ROOT,     "system/etc/init.d/*" },
+    /* rootfs permissions */
+    { 00755, AID_ROOT,      AID_ROOT,      "system/bin/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/sbin/*" },
     { 00755, AID_ROOT,      AID_ROOT,      "system/lib/*" },
-    { 00440, AID_ROOT,      AID_SHELL,     "system/etc/init.goldfish.rc" },
-    { 00550, AID_ROOT,      AID_SHELL,     "system/etc/init.goldfish.sh" },
-    { 00777, AID_SYSTEM,    AID_SYSTEM,    "system/etc/init.qcom.sdio.sh" },
-    { 00440, AID_ROOT,      AID_SHELL,     "system/etc/init.trout.rc" },
-    { 00440, AID_ROOT,      AID_SHELL,     "system/etc/init.qcom.rc" },
-    { 00550, AID_ROOT,      AID_SHELL,     "system/etc/init.ril" },
-    { 00550, AID_ROOT,      AID_SHELL,     "system/etc/init.testmenu" },
-    { 00550, AID_DHCP,      AID_SHELL,     "system/etc/dhcpcd/dhcpcd-run-hooks" },
-    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/dbus.conf" },
-    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/udev/scripts/*" },
-    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/udhcpc.d/udhcpc.script"},
-    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluetooth/main.conf" },
-    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluetooth/input.conf" },
-    { 00440, AID_BLUETOOTH, AID_BLUETOOTH, "system/etc/bluetooth/audio.conf" },
-    { 00444, AID_NET_BT,    AID_NET_BT,    "system/etc/bluetooth/blacklist.conf" },
-    { 00640, AID_SYSTEM,    AID_SYSTEM,    "system/etc/bluetooth/auto_pairing.conf" },
-    { 00444, AID_RADIO,     AID_AUDIO,     "system/etc/AudioPara4.csv" },
-    { 00555, AID_ROOT,      AID_ROOT,      "system/etc/ppp/*" },
-    { 00644, AID_SYSTEM,    AID_SYSTEM,    "data/app/*" },
-    { 00644, AID_SYSTEM,    AID_SYSTEM,    "data/app-private/*" },
-    { 00644, AID_APP,       AID_APP,       "data/data/*" },
-        /* the following two files are INTENTIONALLY set-gid and not set-uid.
-         * Do not change. */
-    { 02755, AID_ROOT,      AID_NET_RAW,   "system/bin/ping" },
-    { 02750, AID_ROOT,      AID_INET,      "system/bin/netcfg" },
-    { 04750, AID_ROOT,      AID_SYSTEM,    "system/bin/diag_mdlog" },
-    	/* the following five files are INTENTIONALLY set-uid, but they
-	 * are NOT included on user builds. */
-    { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/su" },
-    { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/librank" },
-    { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/procrank" },
-    { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/procmem" },
-    { 06755, AID_ROOT,      AID_ROOT,      "system/xbin/tcpdump" },
-    { 04770, AID_ROOT,      AID_RADIO,     "system/bin/pppd-ril" },
-		/* the following file is INTENTIONALLY set-uid, and IS included
-		 * in user builds. */
-    { 06750, AID_ROOT,      AID_SHELL,     "system/bin/run-as" },
-    { 04755, AID_ROOT,      AID_SHELL,     "system/bin/btwlancoex" },
-    { 04750, AID_ROOT,      AID_SYSTEM,    "system/bin/tc" },
-    { 04750, AID_ROOT,      AID_SYSTEM,    "system/bin/iptables" },
 
-    { 00755, AID_ROOT,      AID_SHELL,     "system/bin/*" },
-    { 00755, AID_ROOT,      AID_SHELL,     "userdata/bin/*" },
-    { 00750, AID_ROOT,      AID_SHELL,     "system/sbin/*" },
-    { 00755, AID_ROOT,      AID_SHELL,     "system/xbin/*" },
-    { 00755, AID_ROOT,      AID_SHELL,     "system/vendor/bin/*" },
-    { 00750, AID_ROOT,      AID_SHELL,     "sbin/*" },
-    { 00750, AID_ROOT,      AID_SHELL,     "userdata/sbin/*" },
-    { 00755, AID_ROOT,      AID_ROOT,      "bin/*" },
-    { 00750, AID_ROOT,      AID_SHELL,     "init*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc0.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc1.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc2.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc3.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc4.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc5.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rc6.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/rcS.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/avahi/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/disconnect" },
+    { 00600, AID_ROOT,      AID_ROOT,      "system/etc/group-" },
+    { 00600, AID_ROOT,      AID_ROOT,      "system/etc/gshadow" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/init.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/mdev/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/network/if-down-up.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/network/if-post-down.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/network/if-pre-up.d/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/network/if-up.d/*" },
+    { 00600, AID_ROOT,      AID_ROOT,      "system/etc/passwd-" },
+    { 00600, AID_ROOT,      AID_ROOT,      "system/etc/ppp/chap-secrets" },
+    { 00600, AID_ROOT,      AID_ROOT,      "system/etc/ppp/pap-secrets" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/ppp/*" },
+    { 00600, AID_ROOT,      AID_ROOT,      "system/etc/securetty" },
+    { 00600, AID_ROOT,      AID_ROOT,      "system/etc/shadow" },
+    { 00755, AID_ROOT,      AID_ROOT,      "system/etc/udhcpc.d/*" },
+    { 00644, AID_ROOT,      AID_ROOT,      "system/etc/*" },
+    { 00644, AID_ROOT,      AID_ROOT,      "system/*" },
+
+    /* /usr permissions */
+
+    /* suid binaries */
+    { 04755, AID_ROOT,      AID_ROOT,      "userdata/bin/chage" },
+    { 04755, AID_ROOT,      AID_ROOT,      "userdata/bin/chfn.shadow" },
+    { 04755, AID_ROOT,      AID_ROOT,      "userdata/bin/chsh.shadow" },
+    { 04755, AID_ROOT,      AID_ROOT,      "userdata/bin/newgrp.shadow" },
+    { 04755, AID_ROOT,      AID_ROOT,      "userdata/bin/su" },
+    { 04755, AID_ROOT,      AID_ROOT,      "userdata/sbin/pppd" },
+
+    { 00755, AID_ROOT,      AID_ROOT,      "userdata/bin/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "userdata/sbin/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "userdata/lib/*" },
+    { 00755, AID_ROOT,      AID_ROOT,      "userdata/kernel-tests/*" },
+    { 00644, AID_ROOT,      AID_ROOT,      "userdata/*" },
+
     { 00644, AID_ROOT,      AID_ROOT,       0 },
 };
 
@@ -232,7 +165,7 @@ static inline void fs_config(const char *path, int dir,
 {
     struct fs_path_config *pc;
     int plen;
-    
+
     pc = dir ? android_dirs : android_files;
     plen = strlen(path);
     for(; pc->prefix; pc++){
@@ -252,9 +185,9 @@ static inline void fs_config(const char *path, int dir,
     *uid = pc->uid;
     *gid = pc->gid;
     *mode = (*mode & (~07777)) | pc->mode;
-    
+
 #if 0
-    fprintf(stderr,"< '%s' '%s' %d %d %o >\n", 
+    fprintf(stderr,"< '%s' '%s' %d %d %o >\n",
             path, pc->prefix ? pc->prefix : "", *uid, *gid, *mode);
 #endif
 }
