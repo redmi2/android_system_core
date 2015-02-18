@@ -168,6 +168,10 @@ on property:sys.boot_from_charger_mode=1
 on load_all_props_action
     load_all_props
 
+# Animated splash load
+on load_animated_splash
+    start animated_splash
+
 # Indicate to fw loaders that the relevant mounts are up.
 on firmware_mounts_complete
     rm /dev/.booting
@@ -183,6 +187,9 @@ on late-init
     # this in another action so that the load will be scheduled after the prior
     # issued fs triggers have completed.
     trigger load_all_props_action
+
+    # Animated splash trigger
+    trigger load_animated_splash
 
     # Remove a file to wake up anything waiting for firmware.
     trigger firmware_mounts_complete
@@ -477,6 +484,13 @@ service ueventd /sbin/ueventd
     class core
     critical
     seclabel u:r:ueventd:s0
+
+# Animated splash app load
+service animated_splash /system/bin/animated-splash
+    class core
+    critical
+    disabled
+    oneshot
 
 service logd /system/bin/logd
     class core
