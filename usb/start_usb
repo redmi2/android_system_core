@@ -56,12 +56,6 @@ case "$1" in
 			echo f9a15000.hsic_host > /sys/bus/platform/drivers/msm_hsic_host/unbind
 			echo 1 > /sys/devices/virtual/android_usb/android0/f_rndis_qc/max_pkt_per_xfer
 			echo 3 > /sys/module/dwc3/parameters/bulk_ep_xfer_timeout_ms
-
-			if [ -f /usr/bin/usb/softap_w_dun ]
-			then
-				SOFTAP_W_DUN=`cat /usr/bin/usb/softap_w_dun`
-			fi
-
 			;;
 			*ferrum* )
 			ln -fs /usr/bin/usb/compositions/9091 \
@@ -76,6 +70,11 @@ case "$1" in
 			usb_debug -f on n /usr/bin/usb/debuger/default_debug
 		fi
 
+		# enable concurrent SoftAP and DUN
+		if [ -f /usr/bin/usb/softap_w_dun ]
+		then
+			SOFTAP_W_DUN=`cat /usr/bin/usb/softap_w_dun`
+		fi
 
 		# boot hsusb composition:
 		if [ -d /sys/class/android_usb/android0 ]
