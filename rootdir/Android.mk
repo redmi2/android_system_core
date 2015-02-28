@@ -30,9 +30,14 @@ LOCAL_POST_INSTALL_CMD := mkdir -p $(addprefix $(TARGET_ROOT_OUT)/, \
 
 include $(BUILD_SYSTEM)/base_rules.mk
 
+ifneq ($(strip $(TARGET_LDPRELOAD)),)
+	TARGET_LDPRELOAD_STR := $(TARGET_LDPRELOAD)
+endif
+
 $(LOCAL_BUILT_MODULE): $(LOCAL_PATH)/init.environ.rc.in
 	@echo "Generate: $< -> $@"
 	@mkdir -p $(dir $@)
-	$(hide) sed -e 's?%BOOTCLASSPATH%?$(PRODUCT_BOOTCLASSPATH)?g' $< >$@
+	$(hide) sed -e 's?%BOOTCLASSPATH%?$(PRODUCT_BOOTCLASSPATH)?g' \
+		    -e 's?%TARGET_LDPRELOAD%?$(TARGET_LDPRELOAD_STR)?g' $< >$@
 
 #######################################
