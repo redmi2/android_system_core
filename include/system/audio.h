@@ -785,7 +785,10 @@ typedef enum {
                                          // path for VOIP calls
     AUDIO_OUTPUT_FLAG_INCALL_MUSIC = 0x2000, //use this flag for incall music delivery
     // flag for HDMI compressed passthrough
-    AUDIO_OUTPUT_FLAG_COMPRESS_PASSTHROUGH = 0x4000
+    AUDIO_OUTPUT_FLAG_COMPRESS_PASSTHROUGH = 0x4000,
+    AUDIO_OUTPUT_FLAG_DRIVER_SIDE = 0x10000 //use this flag for playback of audio
+                                            //that is intended only for the driver
+                                            //in an automotive environment.
 } audio_output_flags_t;
 
 /* The audio input flags are analogous to audio output flags.
