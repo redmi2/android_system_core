@@ -105,7 +105,7 @@ run_9x35() {
 	fi
 }
 
-case `source /usr/bin/usb/target` in
+case `source /sbin/usb/target` in
 	*9x15* )
 		run_9x15 &
 		;;
