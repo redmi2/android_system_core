@@ -172,6 +172,7 @@ OUR_TOOLS := \
     ps \
     readlink \
     renice \
+    prlimit \
     rmmod \
     route \
     schedtop \
