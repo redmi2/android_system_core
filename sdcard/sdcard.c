@@ -24,6 +24,9 @@
 #include <limits.h>
 #include <linux/fuse.h>
 #include <pthread.h>
+#ifdef APPOPS_SDCARD_PROTECT
+#include <sqlite3.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,6 +43,7 @@
 #include <cutils/hashmap.h>
 #include <cutils/log.h>
 #include <cutils/multiuser.h>
+#include <cutils/properties.h>
 
 #include <private/android_filesystem_config.h>
 
@@ -126,6 +130,53 @@ static const char* const kPackagesListFile = "/data/system/packages.list";
 
 /* Supplementary groups to execute with */
 static const gid_t kGroups[1] = { AID_PACKAGE_INFO };
+
+#ifdef APPOPS_SDCARD_PROTECT
+
+static bool appops_enabled = false;
+struct fuse* g_fuse;
+static uint32_t secprotect_appid = -1;
+
+static const int POLLING_INTERVAL = 1000 * 1000;
+/* Consider the UI launch time, the timeout should be a little longer than
+ * the UI notification timeout.
+ * */
+static const int POLLING_TIMEOUT = 15 * 1000 * 1000;
+static const char* EXTERNAL_PROTECT_PATH = "/mnt/media_rw/sdcard1/.secprotect";
+static const char* INTERNAL_PROTECT_PATH = "/data/media/0/.secprotect";
+static const char* DBPATH = "/data/media/.secprotect/secprotect.db";
+static const char* SECPROTECT_APP = "com.qapp.secprotect";
+
+enum APPOPS_PERM {
+    APPOPS_DENY = -1, APPOPS_NONE, APPOPS_GRANT
+};
+enum PROTECTED_OPS {
+    OP_OPEN, OP_UNLINK
+};
+
+Hashmap* handling_requests;
+pthread_mutex_t dialog_launch_lock;
+
+typedef struct {
+    uint32_t uid;
+    struct timespec time;
+} app_info_t;
+
+typedef struct {
+    sqlite3* db;
+    int result;
+    bool remember_only;
+} db_req_t;
+
+typedef struct {
+    struct fuse* fuse;
+    struct fuse_handler* handler;
+    const struct fuse_in_header* hdr;
+    const void* req;
+    int op;
+    char path[PATH_MAX];
+} request_info_t;
+#endif
 
 /* Permission mode for a specific node. Controls how file permissions
  * are derived for children nodes. */
@@ -750,6 +801,12 @@ static void fuse_init(struct fuse *fuse, int fd, const char *source_path,
         fuse->root.perm = PERM_ROOT;
         fuse->root.mode = 0775;
         fuse->root.gid = AID_SDCARD_RW;
+#ifdef APPOPS_SDCARD_PROTECT
+        if (appops_enabled) {
+            fuse->package_to_appid = hashmapCreate(256, str_hash, str_icase_equals);
+            fuse->appid_with_rw = hashmapCreate(128, int_hash, int_equals);
+        }
+#endif
         break;
     case DERIVE_LEGACY:
         /* Legacy behavior used to support internal multiuser layout which
@@ -850,6 +907,277 @@ static int fuse_reply_attr(struct fuse* fuse, __u64 unique, const struct node* n
     fuse_reply(fuse, unique, &out, sizeof(out));
     return NO_STATUS;
 }
+
+#ifdef APPOPS_SDCARD_PROTECT
+
+static int uid_hash(void *key) {
+    return *(int*) key;
+}
+
+static bool uid_equals(void *keyA, void *keyB) {
+    return *(int*) keyA == *(int*) keyB;
+}
+
+static void remove_database_item(sqlite3* db, char* uid) {
+    char remove[64];
+    snprintf(remove, sizeof(remove), "delete from authaccess where uid='%s';", uid);
+    int rc = sqlite3_exec(db, remove, NULL, NULL, NULL);
+    int i = 0;
+    while (rc == SQLITE_BUSY && i++ < 10) {
+        usleep(50000);
+        rc = sqlite3_exec(db, remove, NULL, NULL, NULL);
+    }
+}
+
+static int check_database_callback(void *data, int col_num, char **col_val,
+        char **col_name) {
+
+    db_req_t* db_req = (db_req_t*) data;
+    if (db_req == NULL) {
+        return 0;
+    }
+    db_req->result = APPOPS_NONE;
+    int i;
+
+    int remember = atoi(col_val[5]);
+    if (db_req->remember_only) {
+        if (remember > 0) {
+            // check if database is consistent with packages.list
+            appid_t appid = (appid_t) (uintptr_t) hashmapGet(g_fuse->package_to_appid, col_val[2]);
+            if (appid == (uint32_t) atoi(col_val[0])) {
+                db_req->result = atoi(col_val[4]);
+            } else {
+                ERROR("database inconsistent with packages.list\n");
+                remove_database_item(db_req->db, col_val[0]);
+            }
+        }
+    } else {
+        db_req->result = atoi(col_val[4]);
+    }
+    /** delete what is just found if not need to remember*/
+    if (remember <= 0) {
+        remove_database_item(db_req->db, col_val[0]);
+    }
+    return 0;
+}
+
+static int check_database(int uid, bool remember_only) {
+    sqlite3 *db;
+    int rc = sqlite3_open_v2(DBPATH, &db, SQLITE_OPEN_READWRITE, NULL);
+
+    if (!rc) {
+        char *errorMessage;
+        char query[64];
+        db_req_t db_req;
+        db_req.db = db;
+        db_req.result = APPOPS_NONE;
+        db_req.remember_only = remember_only;
+        snprintf(query, sizeof(query), "select * from authaccess where uid=%d limit 1;", uid);
+        rc = sqlite3_exec(db, query, check_database_callback, &db_req, &errorMessage);
+        int i = 0;
+        while (rc == SQLITE_BUSY && i++ < 10) {
+            usleep(50000);
+            rc = sqlite3_exec(db, query, check_database_callback, &db_req, &errorMessage);
+        }
+        if (rc != SQLITE_OK) {
+            ERROR("[%d]rc=%d %s\n\n", gettid(), rc, query);
+            sqlite3_close(db);
+            return APPOPS_NONE;
+        }
+        sqlite3_close(db);
+        return db_req.result;
+    } else{
+        ERROR("[%d] database open failed. rc=%d\n", gettid(), rc);
+    }
+    sqlite3_close(db);
+    return APPOPS_NONE;
+}
+
+static int check_permission(char* path, const struct fuse_in_header* hdr) {
+    int allow = APPOPS_DENY;
+    char value[PROPERTY_VALUE_MAX];
+
+    int retval = check_database(hdr->uid, true);
+    if (retval) {
+        return retval;
+    }
+    char am_cmd[512];
+    snprintf(am_cmd, sizeof(am_cmd),
+            "am start -n com.qapp.secprotect/.authaccess.RequestActivity"
+            " --ei uid %d --ei gid %d --ei pid %d --es path %s > /dev/null",
+            hdr->uid, hdr->gid, hdr->pid, path);
+    pthread_mutex_lock(&dialog_launch_lock);
+    if (system(am_cmd)) {
+        ERROR("start %s failed\n", SECPROTECT_APP);
+        pthread_mutex_unlock(&dialog_launch_lock);
+        return APPOPS_DENY;
+    }
+
+    int i;
+    for (i = 0; i < POLLING_TIMEOUT / POLLING_INTERVAL; i++) {
+        usleep(POLLING_INTERVAL);
+        retval = check_database(hdr->uid, false);
+        if (retval != 0) {
+            allow = retval > 0 ? APPOPS_GRANT : APPOPS_DENY;
+            break;
+        }
+    }
+    pthread_mutex_unlock(&dialog_launch_lock);
+
+    return allow;
+}
+
+static int appops_handle_open(request_info_t* info) {
+    struct fuse_open_out out;
+    struct handle *h;
+    struct fuse* fuse = info->fuse;
+    const struct fuse_in_header* hdr = info->hdr;
+    const struct fuse_open_in* req = info->req;
+    struct fuse_handler* handler = info->handler;
+    char* path = info->path;
+
+    if (check_permission(path, hdr) != APPOPS_GRANT) {
+        return -EACCES;
+    }
+
+    h = malloc(sizeof(*h));
+    if (!h) {
+        return -ENOMEM;
+    }
+    h->fd = open(path, req->flags);
+    if (h->fd < 0) {
+        free(h);
+        return -errno;
+    }
+    out.fh = ptr_to_id(h);
+    out.open_flags = 0;
+    out.padding = 0;
+    fuse_reply(fuse, hdr->unique, &out, sizeof(out));
+    return NO_STATUS;
+}
+
+static int appops_handle_unlink(request_info_t* info) {
+    const struct fuse_in_header* hdr = info->hdr;
+    char* path = info->path;
+
+    if (check_permission(path, hdr) != APPOPS_GRANT) {
+        return -EACCES;
+    }
+
+    if (unlink(path) < 0) {
+        return -errno;
+    }
+    return 0;
+}
+
+static void* appops_thread_handler(void* data) {
+
+    pthread_detach(pthread_self());
+    request_info_t* request_info = data;
+    request_info->handler->token = (int) gettid();
+    int ret = NO_STATUS;
+    switch (request_info->op) {
+        case OP_OPEN:
+            ret = appops_handle_open(request_info);
+            break;
+        case OP_UNLINK:
+            ret = appops_handle_unlink(request_info);
+            break;
+        default:
+            break;
+    }
+    if (ret != NO_STATUS) {
+        fuse_status(request_info->fuse, request_info->hdr->unique, ret);
+    }
+
+    // remove request from handling_requests list
+    hashmapLock(handling_requests);
+    int uid = request_info->hdr->uid;
+    app_info_t* app_info = (app_info_t*) hashmapRemove(handling_requests, &uid);
+    if (app_info != NULL) {
+        free(app_info);
+    }
+    hashmapUnlock(handling_requests);
+
+    free(request_info->handler);
+    free(request_info);
+    return NULL;
+}
+
+static int check_ops_permission(int op, struct fuse* fuse, struct fuse_handler* handler,
+        const struct fuse_in_header* hdr, const char* path) {
+
+    if (hdr->uid != AID_MEDIA_RW && hdr->uid != secprotect_appid
+            && (!strncmp(EXTERNAL_PROTECT_PATH, path, strlen(EXTERNAL_PROTECT_PATH))
+            || !strncmp(INTERNAL_PROTECT_PATH, path, strlen(INTERNAL_PROTECT_PATH)))) {
+
+        uint32_t uid = hdr->uid;
+        int allow = check_database(uid, true);
+
+        if (allow == APPOPS_NONE) { // not exist in database
+            hashmapLock(handling_requests); // hashmapLock
+            if (hashmapContainsKey(handling_requests, &uid)) { // still processing this uid
+                ERROR("ignore %s request. uid:%d is processing.\n", path, hdr->uid);
+                hashmapUnlock(handling_requests); // hashmapUnlock
+                return -EACCES;
+            } else {
+                app_info_t* app_info = (app_info_t*) malloc(sizeof(app_info_t));
+                if (!app_info) {
+                    ERROR("cannot malloc op_info\n");
+                    hashmapUnlock(handling_requests); // hashmapUnlock
+                    return -ENOMEM;
+                }
+                app_info->uid = uid;
+                clock_gettime(CLOCK_MONOTONIC, &app_info->time);
+                hashmapPut(handling_requests, &(app_info->uid), app_info);
+                hashmapUnlock(handling_requests); // hashmapUnlock
+
+                struct fuse_handler* op_fuse_handler;
+                op_fuse_handler = malloc(sizeof(struct fuse_handler));
+                if (!op_fuse_handler) {
+                    ERROR("cannot malloc op_fuse_handler\n");
+                    free(app_info);
+                    return -ENOMEM;
+                }
+                memcpy(op_fuse_handler, handler, sizeof(struct fuse_handler));
+                op_fuse_handler->fuse = fuse;
+
+                request_info_t* request_info = malloc(sizeof(request_info_t));
+                if (!request_info) {
+                    ERROR("cannot malloc appops_fuse_info\n");
+                    free(app_info);
+                    free(op_fuse_handler);
+                    return -ENOMEM;
+                }
+
+                request_info->fuse = fuse;
+                request_info->handler = op_fuse_handler;
+                request_info->hdr = (void*) op_fuse_handler->request_buffer;
+                request_info->req = (void*) (op_fuse_handler->request_buffer
+                        + sizeof(struct fuse_in_header));
+                request_info->op = op;
+                memcpy(request_info->path, path, sizeof(request_info->path));
+
+                pthread_t thread;
+                int res = pthread_create(&thread, NULL, appops_thread_handler, request_info);
+                if (res) {
+                    ERROR("failed to start appops thread, error=%d\n", res);
+                    free(app_info);
+                    free(request_info->handler);
+                    free(request_info);
+                    return -EACCES;
+                }
+                return NO_STATUS;
+            } // not processing this uid
+
+        } else if (allow < 0) {
+            return -EACCES;
+        }
+    } // appops_enabled
+    // don't check
+    return 0;
+}
+#endif
 
 static int handle_lookup(struct fuse* fuse, struct fuse_handler* handler,
         const struct fuse_in_header *hdr, const char* name)
@@ -1085,6 +1413,14 @@ static int handle_unlink(struct fuse* fuse, struct fuse_handler* handler,
     if (!check_caller_access_to_name(fuse, hdr, parent_node, name, W_OK, has_rw)) {
         return -EACCES;
     }
+#ifdef APPOPS_SDCARD_PROTECT
+    if (appops_enabled) {
+        int ret = check_ops_permission(OP_UNLINK, fuse, handler, hdr, child_path);
+        if (ret) {
+            return ret;
+        }
+    }
+#endif
     if (unlink(child_path) < 0) {
         return -errno;
     }
@@ -1236,6 +1572,14 @@ static int handle_open(struct fuse* fuse, struct fuse_handler* handler,
             open_flags_to_access_mode(req->flags), has_rw)) {
         return -EACCES;
     }
+#ifdef APPOPS_SDCARD_PROTECT
+    if (appops_enabled) {
+        int ret = check_ops_permission(OP_OPEN, fuse, handler, hdr, path);
+        if (ret) {
+            return ret;
+        }
+    }
+#endif
     h = malloc(sizeof(*h));
     if (!h) {
         return -ENOMEM;
@@ -1673,6 +2017,7 @@ static int read_package_list(struct fuse *fuse) {
     }
 
     char buf[512];
+    bool secprotect_found = false;
     while (fgets(buf, sizeof(buf), file) != NULL) {
         char package_name[512];
         int appid;
@@ -1681,7 +2026,13 @@ static int read_package_list(struct fuse *fuse) {
         if (sscanf(buf, "%s %d %*d %*s %*s %s", package_name, &appid, gids) == 3) {
             char* package_name_dup = strdup(package_name);
             hashmapPut(fuse->package_to_appid, package_name_dup, (void*) (uintptr_t) appid);
-
+#ifdef APPOPS_SDCARD_PROTECT
+            if (!secprotect_found && package_name_dup != NULL
+                    && !strcmp(package_name_dup, SECPROTECT_APP)) {
+                secprotect_appid = appid;
+                secprotect_found = true;
+            }
+#endif
             char* token = strtok(gids, ",");
             while (token != NULL) {
                 if (strtoul(token, NULL, 10) == fuse->write_gid) {
@@ -1781,7 +2132,16 @@ static int ignite_fuse(struct fuse* fuse, int num_threads)
 
     /* When deriving permissions, this thread is used to process inotify events,
      * otherwise it becomes one of the FUSE handlers. */
+#ifdef APPOPS_SDCARD_PROTECT
+    if (!appops_enabled) {
+        i = (fuse->derive == DERIVE_NONE) ? 1 : 0;
+    } else {
+        i = 0;
+    }
+#else
     i = (fuse->derive == DERIVE_NONE) ? 1 : 0;
+#endif
+
     for (; i < num_threads; i++) {
         pthread_t thread;
         int res = pthread_create(&thread, NULL, start_handler, &handlers[i]);
@@ -1791,7 +2151,11 @@ static int ignite_fuse(struct fuse* fuse, int num_threads)
         }
     }
 
+#ifdef APPOPS_SDCARD_PROTECT
+    if (fuse->derive == DERIVE_NONE && !appops_enabled) {
+#else
     if (fuse->derive == DERIVE_NONE) {
+#endif
         handle_fuse_requests(&handlers[0]);
     } else {
         watch_package_list(fuse);
@@ -1865,7 +2229,9 @@ static int run(const char* source_path, const char* dest_path, uid_t uid,
     }
 
     fuse_init(&fuse, fd, source_path, write_gid, derive, split_perms);
-
+#ifdef APPOPS_SDCARD_PROTECT
+    g_fuse = &fuse;
+#endif
     umask(0);
     res = ignite_fuse(&fuse, num_threads);
 
@@ -1969,6 +2335,16 @@ int main(int argc, char **argv)
         ERROR("installd fs upgrade not yet complete. Waiting...\n");
         sleep(1);
     }
+
+#ifdef APPOPS_SDCARD_PROTECT
+    char value[PROPERTY_VALUE_MAX];
+    property_get("persist.sys.strict_op_enable", value, "");
+    if (strcmp(value, "true") == 0 || strcmp(value, "1") == 0) {
+        appops_enabled = true;
+        pthread_mutex_init(&dialog_launch_lock, NULL);
+        handling_requests = hashmapCreate(5, uid_hash, uid_equals);
+    }
+#endif
 
     res = run(source_path, dest_path, uid, gid, write_gid, num_threads, derive, split_perms);
     return res < 0 ? 1 : 0;
