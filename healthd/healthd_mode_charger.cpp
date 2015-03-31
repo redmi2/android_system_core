@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2013 The Android Open Source Project
+ * Copyright (C) 2011-2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -258,7 +258,8 @@ static int set_battery_soc_leds(int soc)
 }
 
 #define BACKLIGHT_ON_LEVEL    100
-static int set_backlight_on(void)
+#define BACKLIGHT_OFF_LEVEL    0
+static int set_backlight(bool en)
 {
     int fd;
     char buffer[10];
@@ -275,8 +276,12 @@ static int set_backlight_on(void)
         LOGE("Could not open backlight node : %s\n", strerror(errno));
         goto cleanup;
     }
-    LOGV("Enabling backlight\n");
-    snprintf(buffer, sizeof(buffer), "%d\n", BACKLIGHT_ON_LEVEL);
+    LOGV("set backlight status to %d\n", en);
+    if (en)
+        snprintf(buffer, sizeof(buffer), "%d\n", BACKLIGHT_ON_LEVEL);
+    else
+        snprintf(buffer, sizeof(buffer), "%d\n", BACKLIGHT_OFF_LEVEL);
+
     if (write(fd, buffer,strlen(buffer)) < 0) {
         LOGE("Could not write to backlight node : %s\n", strerror(errno));
         goto cleanup;
@@ -552,6 +557,7 @@ static void update_screen_state(struct charger *charger, int64_t now)
         gr_font_size(&char_width, &char_height);
 
 #ifndef CHARGER_DISABLE_INIT_BLANK
+        set_backlight(false);
         gr_fb_blank(true);
 #endif
         minui_inited = true;
@@ -561,6 +567,7 @@ static void update_screen_state(struct charger *charger, int64_t now)
     if (batt_anim->cur_cycle == batt_anim->num_cycles) {
         reset_animation(batt_anim);
         charger->next_screen_transition = -1;
+        set_backlight(false);
         gr_fb_blank(true);
         LOGV("[%" PRId64 "] animation done\n", now);
         if (charger->charger_connected)
@@ -597,7 +604,7 @@ static void update_screen_state(struct charger *charger, int64_t now)
     /* unblank the screen on first cycle */
     if (batt_anim->cur_cycle == 0) {
         gr_fb_blank(false);
-        set_backlight_on();
+        set_backlight(true);
     }
 
     /* draw the new frame (@ cur_frame) */
@@ -731,6 +738,7 @@ static void process_key(struct charger *charger, int code, int64_t now)
                 } else {
                     reset_animation(batt_anim);
                     charger->next_screen_transition = -1;
+                    set_backlight(false);
                     gr_fb_blank(true);
                     if (charger->charger_connected)
                         request_suspend(true);
@@ -768,6 +776,7 @@ static void handle_power_supply_state(struct charger *charger, int64_t now)
         request_suspend(false);
         if (charger->next_pwr_check == -1) {
             if (mode == QUICKBOOT) {
+                set_backlight(false);
                 gr_fb_blank(true);
                 request_suspend(true);
                 /* exit here. There is no need to keep running when charger
