@@ -291,6 +291,7 @@ typedef enum {
     AUDIO_FORMAT_FLAC                = 0x1D000000UL,
     AUDIO_FORMAT_E_AC3_JOC           = 0x1E000000UL,
     AUDIO_FORMAT_ALAC                = 0x1F000000UL,
+    AUDIO_FORMAT_APE                 = 0x20000000UL,
     AUDIO_FORMAT_MAIN_MASK           = 0xFF000000UL,
     AUDIO_FORMAT_SUB_MASK            = 0x00FFFFFFUL,
 
@@ -1421,6 +1422,7 @@ static inline bool audio_is_valid_format(audio_format_t format)
     case AUDIO_FORMAT_FLAC:
     case AUDIO_FORMAT_E_AC3_JOC:
     case AUDIO_FORMAT_ALAC:
+    case AUDIO_FORMAT_APE:
         return true;
     case AUDIO_FORMAT_PCM_OFFLOAD:
         if (format != AUDIO_FORMAT_PCM_16_BIT_OFFLOAD &&
