@@ -29,10 +29,10 @@
 # and also allows the user to save the debug configuration for the next reboot
 # This in order to allow early boot debug information.
 
-DBG_FILE="/usr/bin/usb/debuger/debugFiles"
-DEFAULT_FILE="/usr/bin/usb/debuger/default_debug"
-HELP="/usr/bin/usb/debuger/help"
-statusFile="/usr/bin/usb/debuger/statusFile"
+DBG_FILE="/sbin/usb/debuger/debugFiles"
+DEFAULT_FILE="/sbin/usb/debuger/default_debug"
+HELP="/sbin/usb/debuger/help"
+statusFile="/sbin/usb/debuger/statusFile"
 
 legal_fileName(){
 	file_list=`cat $DBG_FILE| cut -f 2| grep -v ___`

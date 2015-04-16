@@ -85,7 +85,7 @@ run_9x25_v2() {
 }
 
 run_9x35() {
-	pkill -x `which adbd`
+	pkill adbd
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 9067 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
@@ -101,7 +101,7 @@ run_9x35() {
 }
 
 run_ferrum() {
-	pkill -x `which adbd`
+	pkill adbd
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 9067 > /sys/class/android_usb/android$num/idProduct
 	echo 05C6 > /sys/class/android_usb/android$num/idVendor
@@ -116,7 +116,7 @@ run_ferrum() {
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
 
-case `source /usr/bin/usb/target` in
+case `source /sbin/usb/target` in
 	*9x15* )
 		run_9x15 &
 		;;

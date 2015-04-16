@@ -43,7 +43,7 @@ case "$1" in
 
         case $KERNEL in
           3.*)
-		case `source /usr/bin/usb/target` in
+		case `source /sbin/usb/target` in
 			*9x15* )
 			# Nothing to do here for 9x15
 			;;
@@ -57,30 +57,35 @@ case "$1" in
 			echo 1 > /sys/devices/virtual/android_usb/android0/f_rndis_qc/max_pkt_per_xfer
 			echo 3 > /sys/module/dwc3/parameters/bulk_ep_xfer_timeout_ms
 
-			if [ -f /usr/bin/usb/softap_w_dun ]
+			if [ -f /sbin/usb/softap_w_dun ]
 			then
-				SOFTAP_W_DUN=`cat /usr/bin/usb/softap_w_dun`
+				SOFTAP_W_DUN=`cat /sbin/usb/softap_w_dun`
 			fi
 
 			;;
 			*ferrum* )
-			ln -fs /usr/bin/usb/compositions/9091 \
-				/usr/bin/usb/boot_hsusb_composition
+			ln -fs /sbin/usb/compositions/9091 \
+				/sbin/usb/boot_hsusb_composition
 			;;
 		esac
 
 		# enable debug message
-		if [ -f /usr/bin/usb/debuger/default_debug ];
+		if [ -f /sbin/usb/debuger/default_debug ];
 		then
-			rm -rf /usr/bin/usb/debuger/statusFile
-			usb_debug -f on n /usr/bin/usb/debuger/default_debug
+			rm -rf /sbin/usb/debuger/statusFile
+			usb_debug -f on n /sbin/usb/debuger/default_debug
 		fi
 
+		# enable concurrent SoftAP and DUN
+		if [ -f /sbin/usb/softap_w_dun ]
+		then
+			SOFTAP_W_DUN=`cat /sbin/usb/softap_w_dun`
+		fi
 
 		# boot hsusb composition:
 		if [ -d /sys/class/android_usb/android0 ]
 		then
-			/usr/bin/usb/boot_hsusb_composition n
+			/sbin/usb/boot_hsusb_composition n
 
 			if [ "$SOFTAP_W_DUN" == "Y" ]
 			then
@@ -93,7 +98,7 @@ case "$1" in
 		# boot hsic composition:
 		if [ -d /sys/class/android_usb/android1 ]
 		then
-			/usr/bin/usb/boot_hsic_composition y
+			/sbin/usb/boot_hsic_composition y
 		fi
 
 		;;
