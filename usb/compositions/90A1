@@ -49,7 +49,7 @@ fi
 run_9x35() {
 	if [ $from_adb = "n" ]
 	then
-		pkill -x `which adbd`
+		pkill adbd
 	fi
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 90A1 > /sys/class/android_usb/android$num/idProduct
@@ -68,7 +68,7 @@ run_9x35() {
 run_ferrum() {
 	if [ $from_adb = "n" ]
 	then
-		pkill -x `which adbd`
+		pkill adbd
 	fi
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 90A1 > /sys/class/android_usb/android$num/idProduct
