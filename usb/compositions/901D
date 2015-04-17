@@ -44,9 +44,22 @@ run_9x35() {
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
 
+run_8226() {
+	echo 0 > /sys/class/android_usb/android0/enable
+	echo 901D > /sys/class/android_usb/android0/idProduct
+	echo 05C6 > /sys/class/android_usb/android0/idVendor
+	echo diag > /sys/class/android_usb/android0/f_diag/clients
+	echo diag,adb > /sys/class/android_usb/android0/functions
+	echo 1 > /sys/class/android_usb/android0/remote_wakeup
+	echo 1 > /sys/class/android_usb/android0/enable
+}
+
 case `source /usr/bin/usb/target` in
 	*9x35* )
 		run_9x35 &
+		;;
+	*8226* )
+		run_8226 &
 		;;
 	* )
 		run_9x35 &

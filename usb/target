@@ -39,6 +39,9 @@ case `cat ${TARGET_DIR}/build_id` in
 	*9x35* )
 		res="9x35"
 		;;
+	*8226* )
+		res="8226"
+		;;
 	* )
 		res="none"
 		;;
