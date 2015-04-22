@@ -170,7 +170,7 @@ oops:
     return 0;
 }
 
-#define MAX_MTD_PARTITIONS 16
+#define MAX_MTD_PARTITIONS 24
 
 static struct {
     char name[16];
