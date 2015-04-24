@@ -41,6 +41,7 @@ int do_loglevel(int nargs, char **args);
 int do_load_persist_props(int nargs, char **args);
 int do_load_all_props(int nargs, char **args);
 int do_wait(int nargs, char **args);
+int do_bootchart(int nargs, char **args);
 #define __MAKE_KEYWORD_ENUM__
 #define KEYWORD(symbol, flags, nargs, func) K_##symbol,
 enum {
@@ -96,6 +97,7 @@ enum {
     KEYWORD(sysclktz,    COMMAND, 1, do_sysclktz)
     KEYWORD(user,        OPTION,  0, 0)
     KEYWORD(wait,        COMMAND, 1, do_wait)
+    KEYWORD(bootchart,   COMMAND, 0, do_bootchart)
     KEYWORD(write,       COMMAND, 2, do_write)
     KEYWORD(copy,        COMMAND, 2, do_copy)
     KEYWORD(chown,       COMMAND, 2, do_chown)

@@ -52,6 +52,7 @@ int add_environment(const char *name, const char *value);
 
 extern int init_module(void *, unsigned long, const char *);
 
+extern int bootchart_init_action(void);
 static int write_file(const char *path, const char *value)
 {
     int fd, ret, len;
@@ -185,7 +186,7 @@ static int __ifupdown(const char *interface, int up)
         ifr.ifr_flags &= ~IFF_UP;
 
     ret = ioctl(s, SIOCSIFFLAGS, &ifr);
-    
+
 done:
     close(s);
     return ret;
@@ -933,6 +934,14 @@ int do_load_all_props(int nargs, char **args) {
         return 0;
     }
     return -1;
+}
+
+int do_bootchart(int nargs, char **args)
+{
+#if BOOTCHART
+    bootchart_init_action();
+#endif
+    return 0;
 }
 
 int do_wait(int nargs, char **args)

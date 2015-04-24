@@ -76,6 +76,9 @@ static struct {
 static int lookup_keyword(const char *s)
 {
     switch (*s++) {
+    case 'b':
+        if (!strcmp(s, "ootchart")) return K_bootchart;
+        break;
     case 'c':
     if (!strcmp(s, "opy")) return K_copy;
         if (!strcmp(s, "apability")) return K_capability;
