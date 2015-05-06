@@ -59,7 +59,7 @@
   AC_ARG_WITH([host-os],
           [AS_HELP_STRING([--with-host-os=HOST_OS],[Host OS to build adb host.(default: linux)])],
           [HOST_OS="$withval"],
-          [HOST_OS= 'linux'])
+          [HOST_OS='linux'])
 
 
   AC_ARG_WITH(sanitized-headers,
