@@ -817,6 +817,7 @@ typedef struct {
     bool is_streaming;                  // true if streaming, false if local playback
     uint16_t bit_width;                 // bits per sample
     bool use_small_bufs;                // true if offloading audio track
+    audio_format_t source_format;       // audio src format
 } audio_offload_info_t;
 
 #define AUDIO_MAKE_OFFLOAD_INFO_VERSION(maj,min) \
@@ -838,6 +839,7 @@ static const audio_offload_info_t AUDIO_INFO_INITIALIZER = {
     is_streaming: false,
     bit_width: 16,
     use_small_bufs: false,
+    source_format: AUDIO_FORMAT_DEFAULT,
 };
 
 /* common audio stream configuration parameters
@@ -867,7 +869,10 @@ static const audio_config_t AUDIO_CONFIG_INITIALIZER = {
         bit_rate: 0,
         duration_us: 0,
         has_video: false,
-        is_streaming: false
+        is_streaming: false,
+        bit_width: 16,
+        use_small_bufs: false,
+        source_format: AUDIO_FORMAT_DEFAULT
     },
     frame_count: 0,
 };
