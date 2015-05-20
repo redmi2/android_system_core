@@ -69,14 +69,21 @@ char *locale;
 
 #define BATTERY_FULL_THRESH     95
 
+#define HVDCP_CHARGER		"USB_HVDCP"
+#define HVDCP_COLOR_MAP		(RED_LED | GREEN_LED)
+#define HVDCP_BLINK_TYPE	2
+
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
 #define LAST_KMSG_PSTORE_PATH   "/sys/fs/pstore/console-ramoops"
 #define LAST_KMSG_MAX_SZ        (32 * 1024)
 #define RED_LED_PATH            "/sys/class/leds/red/brightness"
+#define RED_LED_BLINK_PATH      "/sys/class/leds/red/blink"
 #define GREEN_LED_PATH          "/sys/class/leds/green/brightness"
 #define BLUE_LED_PATH           "/sys/class/leds/blue/brightness"
 #define BACKLIGHT_PATH          "/sys/class/leds/lcd-backlight/brightness"
 #define CHARGING_ENABLED_PATH   "/sys/class/power_supply/battery/charging_enabled"
+#define CHARGER_TYPE_PATH       "/sys/class/power_supply/usb/type"
+
 
 #define LOGE(x...) do { KLOG_ERROR("charger", x); } while (0)
 #define LOGW(x...) do { KLOG_WARNING("charger", x); } while (0)
@@ -115,6 +122,7 @@ struct animation {
 struct charger {
     bool have_battery_state;
     bool charger_connected;
+    bool blink_enable;
     int capacity;
     int64_t next_screen_transition;
     int64_t next_key_check;
@@ -209,6 +217,72 @@ static int char_width;
 static int char_height;
 static bool minui_inited;
 
+static int read_file(const char *path, char *buf, size_t sz)
+{
+    int fd;
+    size_t cnt;
+
+    fd = open(path, O_RDONLY, 0);
+    if (fd < 0)
+        goto err;
+
+    cnt = read(fd, buf, sz - 1);
+    if (cnt <= 0)
+        goto err;
+    buf[cnt] = '\0';
+    if (buf[cnt - 1] == '\n') {
+        cnt--;
+        buf[cnt] = '\0';
+    }
+
+    close(fd);
+    return cnt;
+
+err:
+    if (fd >= 0)
+        close(fd);
+    return -1;
+}
+
+static int read_file_int(const char *path, int *val)
+{
+    char buf[32];
+    int ret;
+    int tmp;
+    char *end;
+
+    ret = read_file(path, buf, sizeof(buf));
+    if (ret < 0)
+        return -1;
+
+    tmp = strtol(buf, &end, 0);
+    if (end == buf ||
+        ((end < buf+sizeof(buf)) && (*end != '\n' && *end != '\0')))
+        goto err;
+
+    *val = tmp;
+    return 0;
+
+err:
+    return -1;
+}
+
+static int write_file_int(char const* path, int value)
+{
+    int fd;
+    char buffer[20];
+    int rc = -1, bytes;
+
+    fd = open(path, O_WRONLY);
+    if (fd >= 0) {
+        bytes = snprintf(buffer, sizeof(buffer), "%d\n", value);
+        rc = write(fd, buffer, bytes);
+        close(fd);
+    }
+
+    return rc > 0 ? 0 : -1;
+}
+
 static int set_tricolor_led(int on, int color)
 {
     int fd, i;
@@ -237,9 +311,9 @@ cleanup:
     return 0;
 }
 
-static int set_battery_soc_leds(int soc)
+static int set_battery_soc_leds(int soc, bool blink)
 {
-    int i, color;
+    int i, color, rc;
     static int old_color = 0;
 
     for (i = 0; i < (int)ARRAY_SIZE(soc_leds); i++) {
@@ -247,11 +321,20 @@ static int set_battery_soc_leds(int soc)
             break;
     }
     color = soc_leds[i].color;
+
     if (old_color != color) {
-        set_tricolor_led(0, old_color);
-        set_tricolor_led(1, color);
-        old_color = color;
-        LOGV("soc = %d, set led color 0x%x\n", soc, soc_leds[i].color);
+        if ((color == HVDCP_COLOR_MAP) && blink) {
+             rc = write_file_int(RED_LED_BLINK_PATH, HVDCP_BLINK_TYPE);
+             if (rc < 0) {
+                 LOGE("Fail to write blink file %s\n", RED_LED_BLINK_PATH);
+                 return 0;
+             }
+        } else {
+                set_tricolor_led(0, old_color);
+                set_tricolor_led(1, color);
+                old_color = color;
+                LOGV("soc = %d, set led color 0x%x\n", soc, soc_leds[i].color);
+        }
     }
 
     return 0;
@@ -358,59 +441,9 @@ out:
     LOGW("\n");
 }
 
-static int read_file(const char *path, char *buf, size_t sz)
-{
-    int fd;
-    size_t cnt;
-
-    fd = open(path, O_RDONLY, 0);
-    if (fd < 0)
-        goto err;
-
-    cnt = read(fd, buf, sz - 1);
-    if (cnt <= 0)
-        goto err;
-    buf[cnt] = '\0';
-    if (buf[cnt - 1] == '\n') {
-        cnt--;
-        buf[cnt] = '\0';
-    }
-
-    close(fd);
-    return cnt;
-
-err:
-    if (fd >= 0)
-        close(fd);
-    return -1;
-}
-
-static int read_file_int(const char *path, int *val)
-{
-    char buf[32];
-    int ret;
-    int tmp;
-    char *end;
-
-    ret = read_file(path, buf, sizeof(buf));
-    if (ret < 0)
-        return -1;
-
-    tmp = strtol(buf, &end, 0);
-    if (end == buf ||
-        ((end < buf+sizeof(buf)) && (*end != '\n' && *end != '\0')))
-        goto err;
-
-    *val = tmp;
-    return 0;
-
-err:
-    return -1;
-}
-
 static int get_battery_capacity()
 {
-    return charger_state.capacity;
+    return batt_prop->batteryLevel;
 }
 
 #ifdef CHARGER_ENABLE_SUSPEND
@@ -761,14 +794,22 @@ static void handle_power_supply_state(struct charger *charger, int64_t now)
 {
     static int old_soc = 0;
     int soc;
+    bool blink = false;
+    char buff[16] = "\0";
 
     if (!charger->have_battery_state)
         return;
 
+    if (charger->blink_enable) {
+        read_file(CHARGER_TYPE_PATH, buff, 10);
+        if(!strncmp(buff, HVDCP_CHARGER, 9))
+           blink = true;
+    }
+
     soc = get_battery_capacity();
     if (old_soc != soc) {
         old_soc = soc;
-        set_battery_soc_leds(soc);
+        set_battery_soc_leds(soc, blink);
     }
 
     if (!charger->charger_connected) {
@@ -890,8 +931,8 @@ void healthd_mode_charger_init(struct healthd_config* config)
     int ret;
     int charging_enabled = 1;
     struct charger *charger = &charger_state;
-    int i;
-    int epollfd;
+    int i, rc;
+    int epollfd, blink_fd = -1, type_fd = -1;
 
     dump_last_kmsg();
 
@@ -904,6 +945,28 @@ void healthd_mode_charger_init(struct healthd_config* config)
             /* if charging is disabled, reboot and exit power off charging */
             LOGW("android charging is disabled, exit!\n");
             android_reboot(ANDROID_RB_RESTART, 0, 0);
+        }
+    }
+
+    blink_fd = open(RED_LED_BLINK_PATH, O_RDWR);
+    if (blink_fd < 0) {
+        LOGE("Could not open red led blink node\n");
+    } else {
+           type_fd = open(CHARGER_TYPE_PATH, O_RDONLY);
+           if (type_fd < 0) {
+               LOGE("Could not open USB type node\n");
+               close(blink_fd);
+           }
+
+           close(blink_fd);
+           close(type_fd);
+    }
+
+    if ((blink_fd > 0) && (type_fd > 0)) {
+        charger->blink_enable = true;
+        rc = write_file_int(RED_LED_BLINK_PATH, 0);
+        if (rc < 0) {
+                 LOGE("Fail to write blink file %s\n", RED_LED_BLINK_PATH);
         }
     }
 
