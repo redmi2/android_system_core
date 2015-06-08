@@ -110,6 +110,7 @@ typedef enum {
     AUDIO_USAGE_ASSISTANCE_SONIFICATION            = 13,
     AUDIO_USAGE_GAME                               = 14,
     AUDIO_USAGE_VIRTUAL_SOURCE                     = 15,
+    AUDIO_USAGE_REAR_ENTERTAINMENT_SYSTEM          = 16,
 
     AUDIO_USAGE_CNT,
     AUDIO_USAGE_MAX                                = AUDIO_USAGE_CNT - 1,
@@ -793,9 +794,13 @@ typedef enum {
     AUDIO_OUTPUT_FLAG_INCALL_MUSIC = 0x2000, //use this flag for incall music delivery
     // flag for HDMI compressed passthrough
     AUDIO_OUTPUT_FLAG_COMPRESS_PASSTHROUGH = 0x4000,
-    AUDIO_OUTPUT_FLAG_DRIVER_SIDE = 0x10000 //use this flag for playback of audio
-                                            //that is intended only for the driver
-                                            //in an automotive environment.
+    AUDIO_OUTPUT_FLAG_DRIVER_SIDE = 0x10000, //use this flag for playback of audio
+                                             //that is intended only for the driver
+                                             //in an automotive environment.
+    AUDIO_OUTPUT_FLAG_REAR_ENTERTAINMENT_SYSTEM = 0x20000 //use this flag for playback of
+                                                          //audio that is intended for the
+                                                          //rear entertainment system in an
+                                                          //automotive environment.
 } audio_output_flags_t;
 
 /* The audio input flags are analogous to audio output flags.
