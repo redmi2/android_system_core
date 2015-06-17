@@ -95,12 +95,16 @@ static int remount(const char* dir, int* dir_ro)
     if (!dev)
         return -1;
 
-    fd = unix_open(dev, O_RDONLY | O_CLOEXEC);
-    if (fd < 0)
-        return -1;
+    // BLKROSET ioctl does not need to be called for UBIFS devices since
+    // they are never set to read-only
+    if (strncmp(dev, "ubi", sizeof("ubi") - 1) != 0) {
+        fd = unix_open(dev, O_RDONLY | O_CLOEXEC);
+        if (fd < 0)
+            return -1;
 
-    ioctl(fd, BLKROSET, &OFF);
-    adb_close(fd);
+        ioctl(fd, BLKROSET, &OFF);
+        adb_close(fd);
+    }
 
     *dir_ro = mount(dev, dir, "none", MS_REMOUNT, NULL);
 
@@ -167,4 +171,3 @@ void remount_service(int fd, void *cookie)
 
     adb_close(fd);
 }
-
