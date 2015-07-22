@@ -61,6 +61,10 @@ case "$1" in
 			ln -fs /sbin/usb/compositions/9091 \
 				/sbin/usb/boot_hsusb_composition
 			;;
+			*8909* )
+			ln -fs /sbin/usb/compositions/9091 \
+				/sbin/usb/boot_hsusb_composition
+			;;
 		esac
 
 		# enable debug message

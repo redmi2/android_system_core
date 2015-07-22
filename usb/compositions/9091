@@ -87,6 +87,27 @@ run_ferrum() {
 	fi
 }
 
+run_8909() {
+        if [ $from_adb = "n" ]
+        then
+                pkill adbd
+        fi
+        echo 0 > /sys/class/android_usb/android$num/enable
+        echo 9091 > /sys/class/android_usb/android$num/idProduct
+        echo 05C6 > /sys/class/android_usb/android$num/idVendor
+        echo diag > /sys/class/android_usb/android0/f_diag/clients
+        echo smd > /sys/class/android_usb/android0/f_serial/transports
+        echo QTI,BAM > /sys/class/android_usb/android0/f_rmnet/transports
+        echo diag,serial,rmnet,adb > /sys/class/android_usb/android$num/functions
+        echo 1 > /sys/class/android_usb/android$num/remote_wakeup
+        sleep $delay
+        echo 1 > /sys/class/android_usb/android$num/enable
+        if [ $from_adb = "n" ]
+        then
+                /etc/init.d/adbd start
+        fi
+}
+
 case `source /sbin/usb/target` in
 	*9x35* )
 		run_9x35 &
@@ -96,6 +117,9 @@ case `source /sbin/usb/target` in
 		;;
 	*9640* )
 		run_9x35 &
+		;;
+	*8909* )
+		run_8909 &
 		;;
 	* )
 		run_9x35 &
