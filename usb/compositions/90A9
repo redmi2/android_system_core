@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (c) 2014, The Linux Foundation. All rights reserved.
+# Copyright (c) 2014-2015, The Linux Foundation. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
@@ -74,12 +74,42 @@ run_9x35() {
 	fi
 }
 
+run_fermium() {
+	if [ $from_adb = "n" ]
+	then
+		pkill adbd
+	fi
+	echo 0 > /sys/class/android_usb/android$num/enable
+	echo 90A9 > /sys/class/android_usb/android$num/idProduct
+	echo 05C6 > /sys/class/android_usb/android$num/idVendor
+	echo 239 > /sys/class/android_usb/android$num/bDeviceClass
+	echo 2 > /sys/class/android_usb/android$num/bDeviceSubClass
+	echo 1 > /sys/class/android_usb/android$num/bDeviceProtocol
+	echo diag > /sys/class/android_usb/android0/f_diag/clients
+	echo smd,tty > /sys/class/android_usb/android0/f_serial/transports
+	echo bam > /sys/class/android_usb/android0/f_qdss/transports
+	echo QTI,BAM_DMUX > /sys/class/android_usb/android0/f_rmnet/transports
+	echo BAM_DMUX > /sys/class/android_usb/android0/f_usb_mbim/mbim_transports
+	echo qdss_bam > /sys/class/android_usb/android0/f_qdss/transport_names
+	echo diag,ffs,serial,qdss,rmnet:ecm:usb_mbim > /sys/class/android_usb/android$num/functions
+	echo 1 > /sys/class/android_usb/android$num/remote_wakeup
+	sleep $delay
+	echo 1 > /sys/class/android_usb/android$num/enable
+	if [ $from_adb = "n" ]
+	then
+		/etc/init.d/adbd start
+	fi
+}
+
 case `source /sbin/usb/target` in
 	*9x35* )
 		run_9x35 &
 		;;
-	*ferrum* )
-		echo "This composition can't be supported on ferrum"
+	*fermium* )
+		run_fermium &
+		;;
+	*8909* )
+		echo "This composition can't be supported on 8909"
 		;;
 	*9640* )
 		run_9x35 &

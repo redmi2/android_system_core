@@ -70,9 +70,39 @@ run_9x35() {
 	fi
 }
 
+run_fermium() {
+	if [ $from_adb = "n" ]
+	then
+		pkill adbd
+	fi
+	echo 0 > /sys/class/android_usb/android$num/enable
+	echo 90AD > /sys/class/android_usb/android$num/idProduct
+	echo 05C6 > /sys/class/android_usb/android$num/idVendor
+	echo diag > /sys/class/android_usb/android0/f_diag/clients
+	echo smd,tty > /sys/class/android_usb/android0/f_serial/transports
+	echo 0 > /sys/class/android_usb/android0/f_qdss/debug_intf
+	# DPL functionality is implemented using QDSS function driver.
+	echo QTI,BAM_DMUX > /sys/class/android_usb/android0/f_qdss/transports
+	echo QTI,BAM_DMUX > /sys/class/android_usb/android0/f_rmnet/transports
+	echo qdss_bam > /sys/class/android_usb/android0/f_qdss/transport_names
+	echo diag,ffs,serial,rmnet,mass_storage,qdss > /sys/class/android_usb/android$num/functions
+	sleep $delay
+	echo 1 > /sys/class/android_usb/android$num/enable
+	if [ $from_adb = "n" ]
+	then
+		/etc/init.d/adbd start
+	fi
+}
+
 case `source /sbin/usb/target` in
 	*9x35* )
 		run_9x35 &
+		;;
+	*fermium* )
+		run_fermium &
+		;;
+	*8909* )
+		echo "This composition can't be supported on 8909 "
 		;;
 	* )
 		run_9x35 &
