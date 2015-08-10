@@ -34,6 +34,14 @@ void klog_writev(int level, const struct iovec* iov, int iov_count);
 
 __END_DECLS
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+    void printMarker(const char *makerName);
+#ifdef __cplusplus
+}
+#endif
+
 #define KLOG_ERROR_LEVEL   3
 #define KLOG_WARNING_LEVEL 4
 #define KLOG_NOTICE_LEVEL  5
