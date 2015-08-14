@@ -1,12 +1,12 @@
-bin_PROGRAMS = usb_composition_switch
+usbdir = /usr/bin/usb
+compdir = /usr/bin/usb/compositions
+initddir = /etc/init.d
 
-# Program to switch USB compositions
-# =========================================================
-usb_composition_switch_CC = @CC@
+usb_SCRIPTS = target
+comp_SCRIPTS = compositions/9025 compositions/empty compositions/hsic_next \
+	compositions/hsusb_next
+initd_SCRIPTS = start_usb
 
-usb_composition_switch_SOURCES = usb_composition_switch.c
-
-usb_composition_switch_CFLAGS = -O2 \
-				-g \
-				-Wall \
-				-Wno-unused-parameter
+install-data-hook:
+	test -L $(DESTDIR)$(usbdir)/boot_hsusb_composition || $(LN_S) $(compdir)/9025 $(DESTDIR)$(usbdir)/boot_hsusb_composition
+	test -L $(DESTDIR)$(usbdir)/boot_hsic_composition || $(LN_S) $(compdir)/empty $(DESTDIR)$(usbdir)/boot_hsic_composition

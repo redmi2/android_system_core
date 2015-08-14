@@ -22,6 +22,7 @@
 
   # Checks for programs.
   AM_PROG_AS
+  AM_PROG_AR
   AC_PROG_CC
   AM_PROG_CC_C_O
   AC_PROG_LIBTOOL
@@ -68,7 +69,7 @@
         [CPPFLAGS="$CPPFLAGS -I$withval"])
 
 
-  if test "x$HOST_OS" = "xlinux-gnueabi"; then
+  if test "x$HOST_OS" = "xlinux-gnueabihf"; then
 	HOST_OS=linux
   else
 	AC_MSG_NOTICE([Unknown host OS $HOST_OS detected.])
@@ -87,5 +88,7 @@
           libzipfile/Makefile \
           fastboot/Makefile \
           adb/Makefile \
-          usb/Makefile
+          usb/Makefile \
+          fs_mgr/Makefile \
+          mkbootimg/Makefile
   ])

@@ -5,6 +5,6 @@ BUILD_COMPONENTS += libcutils
 endif
 BUILD_COMPONENTS += liblog logcat libzipfile
 
-BUILD_COMPONENTS += adb libmincrypt fastboot usb
+BUILD_COMPONENTS += adb libmincrypt fastboot usb fs_mgr mkbootimg
 
 SUBDIRS := $(BUILD_COMPONENTS)

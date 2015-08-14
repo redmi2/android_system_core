@@ -22,5 +22,5 @@ AM_CFLAGS = -O2 \
 
 fastboot_LDFLAGS = -lpthread -all-static
 
-fastboot_LDADD = ../libzipfile/libzipfile.a
+fastboot_LDADD = ../libzipfile/libzipfile.la
 fastboot_LDADD += -lz

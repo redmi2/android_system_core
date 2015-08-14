@@ -27,6 +27,7 @@
 
 #include "mincrypt/rsa.h"
 #include "mincrypt/sha.h"
+#include "mincrypt/sha256.h"
 
 /* a[] -= mod */
 static void subM(const RSAPublicKey *key, uint32_t *a) {
@@ -156,6 +157,23 @@ static const uint8_t padding[RSANUMBYTES - SHA_DIGEST_SIZE] = {
     0x04,0x14
 };
 
+// SHA-1 of PKCS1.5 signature sha_padding for 2048 bit, as above.
+// At the location of the bytes of the hash all 00 are hashed.
+static const uint8_t kExpectedPadShaRsa2048[SHA_DIGEST_SIZE] = {
+    0xdc, 0xbd, 0xbe, 0x42, 0xd5, 0xf5, 0xa7, 0x2e,
+    0x6e, 0xfc, 0xf5, 0x5d, 0xaf, 0x9d, 0xea, 0x68,
+    0x7c, 0xfb, 0xf1, 0x67
+};
+
+// SHA-256 of PKCS1.5 signature sha256_padding for 2048 bit, as above.
+// At the location of the bytes of the hash all 00 are hashed.
+static const uint8_t kExpectedPadSha256Rsa2048[SHA256_DIGEST_SIZE] = {
+    0xab, 0x28, 0x8d, 0x8a, 0xd7, 0xd9, 0x59, 0x92,
+    0xba, 0xcc, 0xf8, 0x67, 0x20, 0xe1, 0x15, 0x2e,
+    0x39, 0x8d, 0x80, 0x36, 0xd6, 0x6f, 0xf0, 0xfd,
+    0x90, 0xe8, 0x7d, 0x8b, 0xe1, 0x7c, 0x87, 0x59,
+};
+
 /* Verify a 2048 bit RSA PKCS1.5 signature against an expected SHA-1 hash.
 ** Returns 0 on failure, 1 on success.
 */
@@ -195,4 +213,72 @@ int RSA_verify(const RSAPublicKey *key,
     }
 
     return 1;
+}
+
+// Verify a 2048-bit RSA PKCS1.5 signature against an expected hash.
+// Both e=3 and e=65537 are supported.  hash_len may be
+// SHA_DIGEST_SIZE (== 20) to indicate a SHA-1 hash, or
+// SHA256_DIGEST_SIZE (== 32) to indicate a SHA-256 hash.  No other
+// values are supported.
+//
+// Returns 1 on successful verification, 0 on failure.
+int RSA_verify_hash(const RSAPublicKey *key,
+                    const uint8_t *signature,
+                    const int len,
+                    const uint8_t *hash,
+                    const int hash_len) {
+    uint8_t buf[RSANUMBYTES];
+    int i;
+    const uint8_t* padding_hash;
+
+    if (key->len != RSANUMWORDS) {
+        return 0;  // Wrong key passed in.
+    }
+
+    if (len != sizeof(buf)) {
+        return 0;  // Wrong input length.
+    }
+
+    if (hash_len != SHA_DIGEST_SIZE &&
+        hash_len != SHA256_DIGEST_SIZE) {
+        return 0;  // Unsupported hash.
+    }
+
+    if (key->exponent != 3 && key->exponent != 65537) {
+        return 0;  // Unsupported exponent.
+    }
+
+    for (i = 0; i < len; ++i) {  // Copy input to local workspace.
+        buf[i] = signature[i];
+    }
+
+    modpow3(key, buf);  // In-place exponentiation.
+
+    // Xor sha portion, so it all becomes 00 iff equal.
+    for (i = len - hash_len; i < len; ++i) {
+        buf[i] ^= *hash++;
+    }
+
+    // Hash resulting buf, in-place.
+    switch (hash_len) {
+        case SHA_DIGEST_SIZE:
+            padding_hash = kExpectedPadShaRsa2048;
+            SHA_hash(buf, len, buf);
+            break;
+        case SHA256_DIGEST_SIZE:
+            padding_hash = kExpectedPadSha256Rsa2048;
+            SHA256_hash(buf, len, buf);
+            break;
+        default:
+            return 0;
+    }
+
+    // Compare against expected hash value.
+    for (i = 0; i < hash_len; ++i) {
+        if (buf[i] != padding_hash[i]) {
+            return 0;
+        }
+    }
+
+    return 1;  // All checked out OK.
 }

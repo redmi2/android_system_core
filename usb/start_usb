@@ -1,4 +1,17 @@
 #!/bin/sh
+### BEGIN INIT INFO
+# Provides:          start_usb
+# Required-Start:
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start:
+# Default-Stop:
+# Short-Description: Configure usb composition for android debug bridge
+# Description:       This script configures usb composition to 9025 mode
+#                    i.e. diag,serial_smd,serial_tty,rmnet_bam,mass_storage,adb.
+#                    Does not start/stop on any runlevel. Called from upstart job only
+### END INIT INFO
 #
 # Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
 #
@@ -43,7 +56,7 @@ case "$1" in
 
         case $KERNEL in
           3.*)
-		case `source /sbin/usb/target` in
+		case `/usr/bin/usb/target` in
 			*9x15* )
 			# Nothing to do here for 9x15
 			;;
@@ -58,28 +71,28 @@ case "$1" in
 			echo 3 > /sys/module/dwc3/parameters/bulk_ep_xfer_timeout_ms
 			;;
 			*ferrum* )
-			ln -fs /sbin/usb/compositions/9091 \
-				/sbin/usb/boot_hsusb_composition
+			ln -fs /usr/bin/usb/compositions/9091 \
+				/usr/bin/usb/boot_hsusb_composition
 			;;
 		esac
 
 		# enable debug message
-		if [ -f /sbin/usb/debuger/default_debug ];
+		if [ -f /usr/bin/usb/debuger/default_debug ];
 		then
-			rm -rf /sbin/usb/debuger/statusFile
-			usb_debug -f on n /sbin/usb/debuger/default_debug
+			rm -rf /usr/bin/usb/debuger/statusFile
+			usb_debug -f on n /usr/bin/usb/debuger/default_debug
 		fi
 
 		# enable concurrent SoftAP and DUN
-		if [ -f /sbin/usb/softap_w_dun ]
+		if [ -f /usr/bin/usb/softap_w_dun ]
 		then
-			SOFTAP_W_DUN=`cat /sbin/usb/softap_w_dun`
+			SOFTAP_W_DUN=`cat /usr/bin/usb/softap_w_dun`
 		fi
 
 		# boot hsusb composition:
 		if [ -d /sys/class/android_usb/android0 ]
 		then
-			/sbin/usb/boot_hsusb_composition n
+			/usr/bin/usb/boot_hsusb_composition n
 
 			if [ "$SOFTAP_W_DUN" == "Y" ]
 			then
@@ -92,7 +105,7 @@ case "$1" in
 		# boot hsic composition:
 		if [ -d /sys/class/android_usb/android1 ]
 		then
-			/sbin/usb/boot_hsic_composition y
+			/usr/bin/usb/boot_hsic_composition y
 		fi
 
 		;;

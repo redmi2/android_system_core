@@ -52,7 +52,7 @@ void SHA_update(SHA_CTX* ctx, const void* data, int len);
 const uint8_t* SHA_final(SHA_CTX* ctx);
 
 /* Convenience method. Returns digest parameter value. */
-const uint8_t* SHA(const void* data, int len, uint8_t* digest);
+const uint8_t* SHA_hash(const void* data, int len, uint8_t* digest);
 
 #define SHA_DIGEST_SIZE 20
 

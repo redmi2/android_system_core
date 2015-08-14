@@ -30,6 +30,9 @@ if [ ! -f $TARGET_DIR ]; then
 fi
 
 case `cat ${TARGET_DIR}` in
+	*8974* )
+		res="8974"
+		;;
 	*9x15* )
 		res="9x15"
 		;;

@@ -1,4 +1,16 @@
 #! /bin/sh
+### BEGIN INIT INFO
+# Provides:          start_adbd
+# Required-Start:
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start:
+# Default-Stop:
+# Short-Description: Start android debug bridge deamon
+# Description:       This script enabls android debug bridge over usb.
+#                    Does not start/stop on any runlevel. Called from upstart job only
+### END INIT INFO
 #
 # Copyright (c) 2011, The Linux Foundation. All rights reserved.
 #
@@ -38,7 +50,7 @@ fi
 case "$1" in
   start)
         echo -n "Starting adbd: "
-        start-stop-daemon -S -b -a /sbin/adbd
+        start-stop-daemon -S --exec /usr/bin/adbd -b start_adbd
         # Check first if the /etc/adb_devid already has an id saved from earlier boot up.
         # If yes use it to retrieve adb devices else use the msm ID and save it to /etc/adb_devid for subsequent boot ups.
 

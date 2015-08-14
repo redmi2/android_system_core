@@ -1,42 +1,7 @@
-bin_PROGRAMS = adbd adb
+initddir = /etc/init.d
+initd_SCRIPTS = start_adbd
 
-# adb host tool for linux
-# =========================================================
-adb_SOURCES := \
-	adb.c \
-	console.c \
-	transport.c \
-	transport_local.c \
-	transport_usb.c \
-	commandline.c \
-	adb_client.c \
-	adb_auth_host.c \
-	sockets.c \
-	services.c \
-	file_sync_client.c  \
-	utils.c \
-	usb_vendors.c \
-	fdevent.c \
-	usb_linux.c \
-	get_my_path_linux.c
-
-adb_CFLAGS = -O2 \
-	-g \
-	-DADB_HOST=1 \
-	-Wall \
-	-Wno-unused-parameter \
-	-D_XOPEN_SOURCE \
-	-D_GNU_SOURCE \
-	-I../include \
-	-include ../include/arch/linux-arm/OEConfig.h \
-	${OPENSSL_CFLAGS} \
-	${GTHREAD_CFLAGS}
-
-adb_LDADD = ../libcutils/libcutils.a
-adb_LDADD += ../libzipfile/libzipfile.a
-adb_LDADD += -lz
-adb_LDADD += ${OPENSSL_LIBS} ${GTHREAD_LIBS}
-adb_LDADD += -ldl
+bin_PROGRAMS = adbd
 
 # adbd device daemon
 # =========================================================

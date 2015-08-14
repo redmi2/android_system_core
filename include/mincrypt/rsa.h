@@ -50,6 +50,12 @@ int RSA_verify(const RSAPublicKey *key,
                const int len,
                const uint8_t* sha);
 
+int RSA_verify_hash(const RSAPublicKey *key,
+                    const uint8_t *signature,
+                    const int len,
+                    const uint8_t *hash,
+                    const int hash_len);
+
 #ifdef __cplusplus
 }
 #endif

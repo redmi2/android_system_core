@@ -1,11 +1,10 @@
-noinst_lib_LIBRARIES := libzipfile.a
-noinst_libdir = noinstlibdir
+lib_LTLIBRARIES := libzipfile.la
 
-libzipfile_a_CFLAGS := -O2 -g
-libzipfile_a_CFLAGS += -I../include
-libzipfile_a_CFLAGS += -include ../include/arch/linux-arm/OEConfig.h
+libzipfile_la_CFLAGS := -O2 -g
+libzipfile_la_CFLAGS += -I../include
+libzipfile_la_CFLAGS += -include ../include/arch/linux-arm/OEConfig.h
 
-libzipfile_a_LDFLAGS = -lpthread -lz
+libzipfile_la_LDFLAGS = -lpthread -lz
 
-libzipfile_a_SOURCES = centraldir.c zipfile.c
+libzipfile_la_SOURCES = centraldir.c zipfile.c
 
