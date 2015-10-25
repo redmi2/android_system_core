@@ -547,6 +547,13 @@ service console /system/bin/sh
 on property:ro.debuggable=1
     start console
 
+# NativeHMI replacing bootanim
+service boot /system/bin/boot
+    class core
+    user root
+    group input graphics audio
+    oneshot
+
 # adbd is controlled via property triggers in init.<platform>.usb.rc
 service adbd /sbin/adbd --root_seclabel=u:r:su:s0
     class core
@@ -635,12 +642,12 @@ service encrypt /system/bin/vdc --wait cryptfs enablecrypto inplace default
     # vold will set vold.decrypt to trigger_restart_framework (default
     # encryption)
 
-service bootanim /system/bin/bootanimation
-    class core
-    user graphics
-    group graphics audio
-    disabled
-    oneshot
+#service bootanim /system/bin/bootanimation
+#    class core
+#    user graphics
+#    group graphics audio
+#    disabled
+#    oneshot
 
 service gatekeeperd /system/bin/gatekeeperd /data/misc/gatekeeper
     class late_start
