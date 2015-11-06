@@ -75,3 +75,17 @@ void klog_write(int level, const char* fmt, ...) {
     iov[0].iov_len = strlen(buf);
     klog_writev(level, iov, 1);
 }
+
+/*
+ * BootKPI Marker API for C/CPP code
+ */
+void printMarker(const char *makerName)
+{
+    FILE *fptr = NULL;
+    fptr = fopen("/sys/bootkpi/marker_entry", "w");
+        if (NULL != fptr) {
+            (makerName == NULL) ? fprintf(fptr,"%s", "DefaultMarker")
+                   : fprintf(fptr,"%s", makerName);
+            fclose(fptr);
+        }
+}
