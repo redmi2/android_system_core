@@ -100,7 +100,7 @@ run_9x35() {
 	echo 1 > /sys/class/android_usb/android$num/enable
 }
 
-run_fermium() {
+run_9607() {
 	pkill adbd
 	echo 0 > /sys/class/android_usb/android$num/enable
 	echo 9067 > /sys/class/android_usb/android$num/idProduct
@@ -150,11 +150,11 @@ case `source /sbin/usb/target` in
 	*9x35* )
 		run_9x35 &
 		;;
-	*fermium* )
-		run_fermium &
+	*9607* )
+		run_9607 &
 		;;
 	*8909* )
-		run_fermium &
+		run_9607 &
 		;;
 	*9640* )
 		run_9x35 &

@@ -105,7 +105,7 @@ run_9x35() {
 	fi
 }
 
-run_fermium() {
+run_9607() {
 	if [ $from_adb = "n" ]
 	then
 		pkill adbd
@@ -170,8 +170,8 @@ case `source /sbin/usb/target` in
 	*9x35* )
 		run_9x35 &
 		;;
-	*fermium* )
-		run_fermium &
+	*9607* )
+		run_9607 &
 		;;
 	*8909* )
 		echo "This composition can't be supported on 8909"

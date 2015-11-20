@@ -39,8 +39,8 @@ case `cat ${TARGET_DIR}` in
 	*9x35* )
 		res="9x35"
 		;;
-	*fermium* )
-		res="fermium"
+	*9607* )
+		res="9607"
 		;;
 	*8909* | *8009* )
 		res="8909"
