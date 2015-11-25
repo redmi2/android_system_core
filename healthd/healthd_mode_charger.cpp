@@ -69,6 +69,7 @@ char *locale;
 
 #define BATTERY_FULL_THRESH     95
 
+#define BACKLIGHT_PATH          "/sys/class/leds/lcd-backlight/brightness"
 #define LAST_KMSG_PATH          "/proc/last_kmsg"
 #define LAST_KMSG_PSTORE_PATH   "/sys/fs/pstore/console-ramoops"
 #define LAST_KMSG_MAX_SZ        (32 * 1024)
@@ -174,6 +175,39 @@ static struct android::BatteryProperties *batt_prop;
 static int char_width;
 static int char_height;
 static bool minui_inited;
+
+void healthd_set_backlight(bool en);
+
+#define BACKLIGHT_ON_LEVEL    100
+#define BACKLIGHT_OFF_LEVEL    0
+void healthd_set_backlight(bool en)
+{
+    int fd;
+    char buffer[10];
+
+    if (access(BACKLIGHT_PATH, R_OK | W_OK) != 0)
+        LOGW("Backlight control not support\n");
+
+    memset(buffer, '\0', sizeof(buffer));
+    fd = open(BACKLIGHT_PATH, O_RDWR);
+    if (fd < 0) {
+        LOGE("Could not open backlight node : %s\n", strerror(errno));
+        goto cleanup;
+    }
+    LOGV("set backlight status to %d\n", en);
+    if (en)
+        snprintf(buffer, sizeof(buffer), "%d\n", BACKLIGHT_ON_LEVEL);
+    else
+        snprintf(buffer, sizeof(buffer), "%d\n", BACKLIGHT_OFF_LEVEL);
+
+    if (write(fd, buffer,strlen(buffer)) < 0) {
+        LOGE("Could not write to backlight node : %s\n", strerror(errno));
+        goto cleanup;
+    }
+cleanup:
+    if (fd >= 0)
+        close(fd);
+}
 
 /* current time in milliseconds */
 static int64_t curr_time_ms(void)
