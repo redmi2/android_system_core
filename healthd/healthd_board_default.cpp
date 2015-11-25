@@ -16,6 +16,8 @@
 
 #include <healthd/healthd.h>
 
+extern void healthd_set_backlight(bool en);
+
 void healthd_board_init(struct healthd_config*)
 {
     // use defaults
@@ -38,9 +40,9 @@ void healthd_board_mode_charger_battery_update(struct android::BatteryProperties
 
 }
 
-void healthd_board_mode_charger_set_backlight(bool)
+void healthd_board_mode_charger_set_backlight(bool en)
 {
-
+	healthd_set_backlight(en);
 }
 
 void healthd_board_mode_charger_init()
