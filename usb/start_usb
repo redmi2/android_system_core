@@ -76,6 +76,14 @@ case "$1" in
 			SOFTAP_W_DUN=`cat /sbin/usb/softap_w_dun`
 		fi
 
+		# boot hsic composition:
+		if [ -d /sys/class/android_usb/android1 ]
+		then
+			/sbin/usb/boot_hsic_composition y
+			# let hsic compostion script run before starting hsusb
+			sleep 1
+		fi
+
 		# boot hsusb composition:
 		if [ -d /sys/class/android_usb/android0 ]
 		then
@@ -86,13 +94,6 @@ case "$1" in
 				echo "DUN+SOFTAP mode is enabled."
 				echo 1  > /sys/devices/virtual/android_usb/android0/f_serial/dun_w_softap_enable
 			fi
-		fi
-
-
-		# boot hsic composition:
-		if [ -d /sys/class/android_usb/android1 ]
-		then
-			/sbin/usb/boot_hsic_composition y
 		fi
 
 		;;
