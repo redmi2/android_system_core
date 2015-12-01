@@ -34,6 +34,7 @@ adbd_CFLAGS = -O2 \
 	-D_GNU_SOURCE \
 	-DANDROID_GADGET=1 \
 	-DADB_REBOOT_ENABLED=1 \
+	-D_FILE_OFFSET_BITS=64 \
 	-I../include \
 	-include ../include/arch/linux-arm/OEConfig.h \
         ${OPENSSL_CFLAGS} \
