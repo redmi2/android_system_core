@@ -353,9 +353,9 @@ static int create_subprocess(const char *cmd, const char *arg0, const char *arg1
 #endif  /* !ABD_HOST */
 
 #if ADB_HOST
-#define SHELL_COMMAND "/bin/sh"
+#define SHELL_COMMAND "/bin/bash"
 #else
-#define SHELL_COMMAND "/bin/sh"
+#define SHELL_COMMAND "/bin/bash"
 #endif
 
 #if !ADB_HOST
