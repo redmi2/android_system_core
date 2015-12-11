@@ -260,6 +260,15 @@ bool BatteryMonitor::update(void) {
                                 KLOG_WARNING(LOG_TAG, "%s: Unknown power supply type\n",
                                              name);
                             }
+	                    path.clear();
+                            path.appendFormat("%s/%s/current_max", POWER_SUPPLY_SYSFS_PATH,
+                                              name);
+                            if (access(path.string(), R_OK) == 0) {
+                                int maxChargingCurrent = getIntField(path);
+                                if (props.maxChargingCurrent < maxChargingCurrent) {
+                                    props.maxChargingCurrent = maxChargingCurrent;
+                                }
+                            }
                         }
                     }
                 }
