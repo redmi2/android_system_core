@@ -586,7 +586,7 @@ on property:ro.debuggable=1
     start console
 
 # NativeHMI replacing bootanim
-service boot /system/bin/boot
+service nativehmi /system/bin/nativehmi
     class core
     user graphics
     group graphics input audio
