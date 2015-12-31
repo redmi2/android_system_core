@@ -18,7 +18,6 @@
 
 #include "healthd.h"
 #include "BatteryMonitor.h"
-
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -270,7 +269,7 @@ bool BatteryMonitor::update(void) {
                                 KLOG_WARNING(LOG_TAG, "%s: Unknown power supply type\n",
                                              name);
                             }
-	                    path.clear();
+                            path.clear();
                             path.appendFormat("%s/%s/current_max", POWER_SUPPLY_SYSFS_PATH,
                                               name);
                             if (access(path.string(), R_OK) == 0) {
