@@ -587,11 +587,11 @@ on property:ro.debuggable=1
     start console
 
 # NativeHMI replacing bootanim
-service nativehmi /system/bin/nativehmi
-    class core
-    user graphics
-    group graphics input audio
-    oneshot
+#service nativehmi /system/bin/nativehmi
+#    class core
+#    user graphics
+#    group graphics input audio
+#    oneshot
 
 # adbd is controlled via property triggers in init.<platform>.usb.rc
 service adbd /sbin/adbd --root_seclabel=u:r:su:s0
