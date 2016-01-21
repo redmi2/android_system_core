@@ -261,6 +261,7 @@ static int read_from_file(const char *path, char *buf, ssize_t count)
 /* 1: in,  0: out */
 void handle_sd_plug_in_out(int in_out)
 {
+#if 1
     int i;
     struct stat info;
     char emp_str[2] = " ";
@@ -279,6 +280,7 @@ void handle_sd_plug_in_out(int in_out)
 		i = write_file(block_path, emp_str);
 		//if (i < 0 ) printf("remove sd failed, ret =%d\n", i);
     }
+#endif
 }
 
 static void handle_device_event(struct uevent *uevent)
@@ -479,7 +481,7 @@ void handle_device_fd()
         parse_event(msg, &uevent);
 
         handle_device_event(&uevent);
-        handle_firmware_event(&uevent);
+        //handle_firmware_event(&uevent);
     }
 }
 
@@ -547,7 +549,7 @@ void device_init(void)
 
     fcntl(device_fd, F_SETFD, FD_CLOEXEC);
     fcntl(device_fd, F_SETFL, O_NONBLOCK);
-
+#if 0
     if (stat(coldboot_done, &info) < 0) {
         t0 = get_usecs();
         coldboot("/sys/class");
@@ -560,6 +562,7 @@ void device_init(void)
     } else {
         log_event_print("skipping coldboot, already done\n");
     }
+#endif
 }
 
 int get_device_fd()
