@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2016 The Linux Foundation. All rights reserved.
+ * Not a contribution
+
  * Copyright (C) 2007 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +26,6 @@ extern void handle_device_fd();
 extern void device_init(void);
 extern int add_dev_perms(const char *name, const char *attr,
                          mode_t perm, unsigned int uid,
-                         unsigned int gid, unsigned short prefix,
-                         unsigned short wildcard);
+                         unsigned int gid, unsigned short prefix);
 int get_device_fd();
 #endif	/* _INIT_DEVICES_H */
