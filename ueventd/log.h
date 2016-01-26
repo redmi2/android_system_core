@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2016 The Linux Foundation. All rights reserved.
+ * Not a contribution
+ *
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +20,7 @@
 #ifndef _INIT_LOG_H_
 #define _INIT_LOG_H_
 
-#include <cutils/klog.h>
+void log_init(void);
 
-#define ERROR(x...)   KLOG_ERROR("init", x)
-#define NOTICE(x...)  KLOG_NOTICE("init", x)
-#define INFO(x...)    KLOG_INFO("init", x)
-
-extern int log_callback(int type, const char *fmt, ...);
 
 #endif
