@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2016 The Linux Foundation. All rights reserved.
+ * Not a contribution
+ *
  * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,44 +37,7 @@
 #include <private/android_filesystem_config.h>
 
 #include "log.h"
-#include "list.h"
 #include "util.h"
-
-static int log_fd = -1;
-/* Inital log level before init.rc is parsed and this this is reset. */
-static int log_level = LOG_DEFAULT_LEVEL;
-
-
-void log_set_level(int level) {
-    log_level = level;
-}
-
-void log_init(void)
-{
-    static const char *name = "/dev/__kmsg__";
-    if (mknod(name, S_IFCHR | 0600, (1 << 8) | 11) == 0) {
-        log_fd = open(name, O_WRONLY);
-        fcntl(log_fd, F_SETFD, FD_CLOEXEC);
-        unlink(name);
-    }
-}
-
-#define LOG_BUF_MAX 512
-
-void log_write(int level, const char *fmt, ...)
-{
-    char buf[LOG_BUF_MAX];
-    va_list ap;
-    
-    if (level > log_level) return;
-    if (log_fd < 0) return;
-    
-    va_start(ap, fmt);
-    vsnprintf(buf, LOG_BUF_MAX, fmt, ap);
-    buf[LOG_BUF_MAX - 1] = 0;
-    va_end(ap);
-    write(log_fd, buf, strlen(buf));
-}
 
 /*
  * android_name_to_id - returns the integer uid/gid associated with the given
@@ -124,7 +90,7 @@ int create_socket(const char *name, int type, mode_t perm, uid_t uid, gid_t gid)
 
     fd = socket(PF_UNIX, type, 0);
     if (fd < 0) {
-        ERROR("Failed to open socket '%s': %s\n", name, strerror(errno));
+        printf("Failed to open socket '%s': %s\n", name, strerror(errno));
         return -1;
     }
 
@@ -135,20 +101,20 @@ int create_socket(const char *name, int type, mode_t perm, uid_t uid, gid_t gid)
 
     ret = unlink(addr.sun_path);
     if (ret != 0 && errno != ENOENT) {
-        ERROR("Failed to unlink old socket '%s': %s\n", name, strerror(errno));
+        printf("Failed to unlink old socket '%s': %s\n", name, strerror(errno));
         goto out_close;
     }
 
     ret = bind(fd, (struct sockaddr *) &addr, sizeof (addr));
     if (ret) {
-        ERROR("Failed to bind socket '%s': %s\n", name, strerror(errno));
+        printf("Failed to bind socket '%s': %s\n", name, strerror(errno));
         goto out_unlink;
     }
 
     chown(addr.sun_path, uid, gid);
     chmod(addr.sun_path, perm);
 
-    INFO("Created socket '%s' with mode '%o', user '%d', group '%d'\n",
+    printf("Created socket '%s' with mode '%o', user '%d', group '%d'\n",
          addr.sun_path, perm, uid, gid);
 
     return fd;
@@ -192,26 +158,6 @@ oops:
     return 0;
 }
 
-void list_init(struct listnode *node)
-{
-    node->next = node;
-    node->prev = node;
-}
-
-void list_add_tail(struct listnode *head, struct listnode *item)
-{
-    item->next = head;
-    item->prev = head->prev;
-    head->prev->next = item;
-    head->prev = item;
-}
-
-void list_remove(struct listnode *item)
-{
-    item->next->prev = item->prev;
-    item->prev->next = item->next;
-}
-
 #define MAX_MTD_PARTITIONS 16
 
 static struct {
@@ -248,13 +194,13 @@ static void find_mtd_partitions(void)
             if (x) {
                 *x = 0;
             }
-            INFO("mtd partition %d, %s\n", mtdnum, mtdname + 1);
+            printf("mtd partition %d, %s\n", mtdnum, mtdname + 1);
             if (mtd_part_count < MAX_MTD_PARTITIONS) {
                 strcpy(mtd_part_map[mtd_part_count].name, mtdname + 1);
                 mtd_part_map[mtd_part_count].number = mtdnum;
                 mtd_part_count++;
             } else {
-                ERROR("too many mtd partitions\n");
+                printf("too many mtd partitions\n");
             }
         }
         while (pmtdsize > 0 && *pmtdbufp != '\n') {
@@ -284,24 +230,6 @@ int mtd_name_to_number(const char *name)
     return -1;
 }
 
-/*
- * gettime() - returns the time in seconds of the system's monotonic clock or
- * zero on error.
- */
-time_t gettime(void)
-{
-    struct timespec ts;
-    int ret;
-
-    ret = clock_gettime(CLOCK_MONOTONIC, &ts);
-    if (ret < 0) {
-        ERROR("clock_gettime(CLOCK_MONOTONIC) failed: %s\n", strerror(errno));
-        return 0;
-    }
-
-    return ts.tv_sec;
-}
-
 int mkdir_recursive(const char *pathname, mode_t mode)
 {
     char buf[128];
@@ -319,7 +247,7 @@ int mkdir_recursive(const char *pathname, mode_t mode)
         if (width == 0)
             continue;
         if ((unsigned int)width > sizeof(buf) - 1) {
-            ERROR("path too long for mkdir_recursive\n");
+            printf("path too long for mkdir_recursive\n");
             return -1;
         }
         memcpy(buf, pathname, width);
@@ -361,11 +289,11 @@ void make_link(const char *oldpath, const char *newpath)
     buf[width] = 0;
     ret = mkdir_recursive(buf, 0755);
     if (ret)
-        ERROR("Failed to create directory %s: %s (%d)\n", buf, strerror(errno), errno);
+        printf("Failed to create directory %s: %s (%d)\n", buf, strerror(errno), errno);
 
     ret = symlink(oldpath, newpath);
     if (ret && errno != EEXIST)
-        ERROR("Failed to symlink %s to %s: %s (%d)\n", oldpath, newpath, strerror(errno), errno);
+        printf("Failed to symlink %s to %s: %s (%d)\n", oldpath, newpath, strerror(errno), errno);
 }
 
 void remove_link(const char *oldpath, const char *newpath)
@@ -380,22 +308,10 @@ void remove_link(const char *oldpath, const char *newpath)
         unlink(newpath);
 }
 
-int wait_for_file(const char *filename, int timeout)
-{
-    struct stat info;
-    time_t timeout_time = gettime() + timeout;
-    int ret = -1;
-
-    while (gettime() < timeout_time && ((ret = stat(filename, &info)) < 0))
-        usleep(10000);
-
-    return ret;
-}
-
 void open_devnull_stdio(void)
 {
     int fd;
-    static const char *name = "/dev/__null__";
+    static const char *name = "/dev/null";
     if (mknod(name, S_IFCHR | 0600, (1 << 8) | 3) == 0) {
         fd = open(name, O_RDWR);
         unlink(name);

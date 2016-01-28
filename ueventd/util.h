@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2016 The Linux Foundation. All rights reserved.
+ * Not a contribution
+ *
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +26,8 @@
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
 static const char *coldboot_done = "/dev/.coldboot_done";
+static const char *sd_card = "/dev/mmcblk1p1";
+static const char *block_path = "/sys/class/android_usb/f_mass_storage/lun/file";
 
 int mtd_name_to_number(const char *name);
 int create_socket(const char *name, int type, mode_t perm,

@@ -1,7 +1,9 @@
 /*
+ * Copyright (c) 2009, 2016 The Linux Foundation. All rights reserved.
+ * Not a contribution
+
  * ncr
  * Copyright (C) 2007 The Android Open Source Project
- * Copyright (c) 2009, The Linux Foundation. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,13 +34,12 @@
 #include <linux/netlink.h>
 #include <private/android_filesystem_config.h>
 #include <sys/time.h>
-#include <asm/page.h>
 #include <sys/wait.h>
 
 #include "devices.h"
 #include "util.h"
 #include "log.h"
-#include "list.h"
+
 
 #define SYSFS_PREFIX    "/sys"
 #define FIRMWARE_DIR1   "/etc/firmware"
@@ -84,134 +85,6 @@ static int open_uevent_socket(void)
     return s;
 }
 
-struct perms_ {
-    char *name;
-    char *attr;
-    mode_t perm;
-    unsigned int uid;
-    unsigned int gid;
-    unsigned short prefix;
-};
-
-struct perm_node {
-    struct perms_ dp;
-    struct listnode plist;
-};
-
-static list_declare(sys_perms);
-static list_declare(dev_perms);
-
-int add_dev_perms(const char *name, const char *attr,
-                  mode_t perm, unsigned int uid, unsigned int gid,
-                  unsigned short prefix) {
-    struct perm_node *node = calloc(1, sizeof(*node));
-    if (!node)
-        return -ENOMEM;
-
-    node->dp.name = strdup(name);
-    if (!node->dp.name)
-        return -ENOMEM;
-
-    if (attr) {
-        node->dp.attr = strdup(attr);
-        if (!node->dp.attr)
-            return -ENOMEM;
-    }
-
-    node->dp.perm = perm;
-    node->dp.uid = uid;
-    node->dp.gid = gid;
-    node->dp.prefix = prefix;
-
-    if (attr)
-        list_add_tail(&sys_perms, &node->plist);
-    else
-        list_add_tail(&dev_perms, &node->plist);
-
-    return 0;
-}
-
-void fixup_sys_perms(const char *upath)
-{
-    char buf[512];
-    struct listnode *node;
-    struct perms_ *dp;
-
-        /* upaths omit the "/sys" that paths in this list
-         * contain, so we add 4 when comparing...
-         */
-    list_for_each(node, &sys_perms) {
-        dp = &(node_to_item(node, struct perm_node, plist))->dp;
-        if (dp->prefix) {
-            if (strncmp(upath, dp->name + 4, strlen(dp->name + 4)))
-                continue;
-        } else {
-            if (strcmp(upath, dp->name + 4))
-                continue;
-        }
-
-        if ((strlen(upath) + strlen(dp->attr) + 6) > sizeof(buf))
-            return;
-
-        sprintf(buf,"/sys%s/%s", upath, dp->attr);
-        INFO("fixup %s %d %d 0%o\n", buf, dp->uid, dp->gid, dp->perm);
-        chown(buf, dp->uid, dp->gid);
-        chmod(buf, dp->perm);
-    }
-}
-
-static mode_t get_device_perm(const char *path, unsigned *uid, unsigned *gid)
-{
-    mode_t perm;
-    struct listnode *node;
-    struct perm_node *perm_node;
-    struct perms_ *dp;
-
-    /* search the perms list in reverse so that ueventd.$hardware can
-     * override ueventd.rc
-     */
-    list_for_each_reverse(node, &dev_perms) {
-        perm_node = node_to_item(node, struct perm_node, plist);
-        dp = &perm_node->dp;
-
-        if (dp->prefix) {
-            if (strncmp(path, dp->name, strlen(dp->name)))
-                continue;
-        } else {
-            if (strcmp(path, dp->name))
-                continue;
-        }
-        *uid = dp->uid;
-        *gid = dp->gid;
-        return dp->perm;
-    }
-    /* Default if nothing found. */
-    *uid = 0;
-    *gid = 0;
-    return 0600;
-}
-
-static void make_device(const char *path,
-                        const char *upath,
-                        int block, int major, int minor)
-{
-    unsigned uid;
-    unsigned gid;
-    mode_t mode;
-    dev_t dev;
-
-    mode = get_device_perm(path, &uid, &gid) | (block ? S_IFBLK : S_IFCHR);
-    dev = makedev(major, minor);
-    /* Temporarily change egid to avoid race condition setting the gid of the
-     * device node. Unforunately changing the euid would prevent creation of
-     * some device nodes, so the uid has to be set with chown() and is still
-     * racy. Fixing the gid race at least fixed the issue with system_server
-     * opening dynamic input devices under the AID_INPUT gid. */
-    setegid(gid);
-    mknod(path, mode, dev);
-    chown(path, uid, -1);
-    setegid(AID_ROOT);
-}
 
 #if LOG_UEVENTS
 
@@ -343,154 +216,128 @@ err:
     return NULL;
 }
 
+static int write_to_file(const char *path, const char *value)
+{
+    int fd, ret, len;
+
+    fd = open(path, O_WRONLY);
+
+    if (fd < 0)
+        return -errno;
+
+    len = strlen(value);
+
+    do {
+        ret = write(fd, value, len);
+    } while (ret < 0 && errno == EINTR);
+
+    close(fd);
+    if (ret < 0)  
+	return -errno;
+    else 
+        return 0;
+}
+
+static int read_from_file(const char *path, char *buf, ssize_t count)
+{
+    int fd, ret;
+    ssize_t pos = 0;
+    ssize_t rv = 0;
+
+    fd = open(path, O_RDONLY);
+
+    if (fd < 0)
+        return -errno;
+
+    do {
+	pos += rv;
+	rv = read(fd, buf + pos, count - pos);
+    } while (rv > 0);
+
+    close(fd);
+    return (rv < 0) ? -errno : rv;
+}
+
+/* 1: in,  0: out */
+void handle_sd_plug_in_out(int in_out)
+{
+    int i;
+    struct stat info;
+    char emp_str[2] = " ";
+
+	if (access(block_path, W_OK) < 0)
+		printf("block path not writable\n");
+
+    if(in_out) {
+	if (stat(sd_card, &info) < 0)
+		return;
+
+	i = write_to_file(block_path, sd_card);
+	if (i < 0 ) printf("add sd failed, ret = %d\n", i);
+    } else {
+	//TODO, there is an I/O error here, we can use this error to write empty string
+		i = write_to_file(block_path, emp_str);
+		//if (i < 0 ) printf("remove sd failed, ret =%d\n", i);
+    }
+}
+
 static void handle_device_event(struct uevent *uevent)
 {
     char devpath[96];
     int devpath_ready = 0;
     char *base, *name;
     char **links = NULL;
-    int block;
-    int i;
 
-    if (!strcmp(uevent->action,"add"))
-        fixup_sys_perms(uevent->path);
-
-        /* if it's not a /dev device, nothing else to do */
-    if((uevent->major < 0) || (uevent->minor < 0))
-        return;
-
-        /* do we have a name? */
+    /* do we have a name? */
     name = strrchr(uevent->path, '/');
     if(!name)
-        return;
+    	return;
     name++;
 
-        /* too-long names would overrun our buffer */
-    if(strlen(name) > 64)
-        return;
-
-        /* are we block or char? where should we live? */
-    if(!strncmp(uevent->subsystem, "block", 5)) {
-        block = 1;
-        base = "/dev/block/";
-        mkdir(base, 0755);
-        if (!strncmp(uevent->path, "/devices/platform/", 18))
-            links = parse_platform_block_device(uevent);
-    } else {
-        block = 0;
-            /* this should probably be configurable somehow */
-        if (!strncmp(uevent->subsystem, "usb", 3)) {
-            if (!strcmp(uevent->subsystem, "usb")) {
-                /* This imitates the file system that would be created
-                 * if we were using devfs instead.
-                 * Minors are broken up into groups of 128, starting at "001"
-                 */
-                int bus_id = uevent->minor / 128 + 1;
-                int device_id = uevent->minor % 128 + 1;
-                /* build directories */
-                mkdir("/dev/bus", 0755);
-                mkdir("/dev/bus/usb", 0755);
-                snprintf(devpath, sizeof(devpath), "/dev/bus/usb/%03d", bus_id);
-                mkdir(devpath, 0755);
-                snprintf(devpath, sizeof(devpath), "/dev/bus/usb/%03d/%03d", bus_id, device_id);
-                devpath_ready = 1;
-            } else {
-                /* ignore other USB events */
-                return;
-            }
-        } else if (!strncmp(uevent->subsystem, "graphics", 8)) {
-            base = "/dev/graphics/";
-            mkdir(base, 0755);
-        } else if (!strncmp(uevent->subsystem, "oncrpc", 6)) {
-            base = "/dev/oncrpc/";
-            mkdir(base, 0755);
-        } else if (!strncmp(uevent->subsystem, "adsp", 4)) {
-            base = "/dev/adsp/";
-            mkdir(base, 0755);
-        } else if (!strncmp(uevent->subsystem, "msm_camera", 10)) {
-            base = "/dev/msm_camera/";
-            mkdir(base, 0755);
-        } else if(!strncmp(uevent->subsystem, "input", 5)) {
-            base = "/dev/input/";
-            mkdir(base, 0755);
-        } else if(!strncmp(uevent->subsystem, "mtd", 3)) {
-            base = "/dev/mtd/";
-            mkdir(base, 0755);
-        } else if(!strncmp(uevent->subsystem, "sound", 5)) {
-            base = "/dev/snd/";
-            mkdir(base, 0755);
-        } else if(!strncmp(uevent->subsystem, "misc", 4) &&
-                    !strncmp(name, "log_", 4)) {
-            base = "/dev/log/";
-            mkdir(base, 0755);
-            name += 4;
-        } else
-            base = "/dev/";
+    if (!strcmp(uevent->action,"add")){
+    	/* add block */
+    	if(!strncmp(uevent->subsystem, "block", 5)) {
+    		/* SD card plug in */
+    		if(!strncmp(name, "mmcblk1p1", 9)) {
+    			handle_sd_plug_in_out(1);
+    			return;
+    		}
+    	}
     }
 
-    if (!devpath_ready)
-        snprintf(devpath, sizeof(devpath), "%s%s", base, name);
+    if(!strcmp(uevent->action, "change")) {
+    	if(!strncmp(uevent->subsystem, "power_supply", 12)) {
+    	    char data[2];
+    	    if (access("/sys/devices/msm_dwc3/power_supply/usb/present", R_OK) < 0)
+    	    	printf("power supply path not readable\n");
 
-    if(!strcmp(uevent->action, "add")) {
-        make_device(devpath, uevent->path, block, uevent->major, uevent->minor);
-        if (links) {
-            for (i = 0; links[i]; i++)
-                make_link(devpath, links[i]);
-        }
+    	    /* use usb power state to judge if usb is present */
+    	    read_from_file("/sys/devices/msm_dwc3/power_supply/usb/present", data, 1);
+    	    data[1] = '\0';
+    	    if(!strncmp(data, "1", 1))
+    	    	handle_sd_plug_in_out(1);
+    	    else if(!strncmp(data, "0", 1))
+    	    	handle_sd_plug_in_out(0);
+    	    else
+    	    	return;
+    	}
     }
 
     if(!strcmp(uevent->action, "remove")) {
-        if (links) {
-            for (i = 0; links[i]; i++)
-                remove_link(devpath, links[i]);
-        }
-        unlink(devpath);
-    }
-
-    if (links) {
-        for (i = 0; links[i]; i++)
-            free(links[i]);
-        free(links);
+    	/* add block */
+    	if(!strncmp(uevent->subsystem, "block", 5)) {
+    		/* SD card plug out*/
+    		if(!strncmp(name, "mmcblk1p1", 9)) {
+    			handle_sd_plug_in_out(0);
+    			return;
+    		}
+    	}
     }
 }
 
 static int load_firmware(int fw_fd, int loading_fd, int data_fd)
 {
-    struct stat st;
-    long len_to_copy;
-    int ret = 0;
-
-    if(fstat(fw_fd, &st) < 0)
-        return -1;
-    len_to_copy = st.st_size;
-
-    while (len_to_copy > 0) {
-        char buf[PAGE_SIZE];
-        ssize_t nr;
-
-        nr = read(fw_fd, buf, sizeof(buf));
-        if(!nr)
-            break;
-        if(nr < 0) {
-            ret = -1;
-            break;
-        }
-
-        len_to_copy -= nr;
-        while (nr > 0) {
-            ssize_t nw = 0;
-
-            nw = write(data_fd, buf + nw, nr);
-            if(nw <= 0) {
-                ret = -1;
-                goto out;
-            }
-            nr -= nw;
-        }
-    }
-
-out:
-    return ret;
+    return 0;
 }
 
 static void process_firmware_event(struct uevent *uevent)
@@ -642,7 +489,7 @@ void handle_device_fd()
 **
 ** We drain any pending events from the netlink socket every time
 ** we poke another uevent file to make sure we don't overrun the
-** socket's buffer.  
+** socket's buffer.
 */
 
 static void do_coldboot(DIR *d)

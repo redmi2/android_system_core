@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) 2016 The Linux Foundation. All rights reserved.
+ * Not a contribution
+ *
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,28 +29,16 @@
 #include "log.h"
 #include "util.h"
 #include "devices.h"
-#include "ueventd_parser.h"
 
 static char hardware[32];
 static unsigned revision = 0;
 
-int ueventd_main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     struct pollfd ufd;
     int nr;
     char tmp[32];
 
-    open_devnull_stdio();
-    log_init();
-
-    INFO("starting ueventd\n");
-
-    get_hardware_name(hardware, &revision);
-
-    ueventd_parse_config_file("/ueventd.rc");
-
-    snprintf(tmp, sizeof(tmp), "/ueventd.%s.rc", hardware);
-    ueventd_parse_config_file(tmp);
 
     device_init();
 
@@ -73,6 +64,7 @@ static int get_android_id(const char *id)
     return 0;
 }
 
+#if 0
 void set_device_permission(int nargs, char **args)
 {
     char *name;
@@ -94,14 +86,14 @@ void set_device_permission(int nargs, char **args)
     name = args[0];
 
     if (!strncmp(name,"/sys/", 5) && (nargs == 5)) {
-        INFO("/sys/ rule %s %s\n",args[0],args[1]);
+        printf("/sys/ rule %s %s\n",args[0],args[1]);
         attr = args[1];
         args++;
         nargs--;
     }
 
     if (nargs != 4) {
-        ERROR("invalid line ueventd.rc line for '%s'\n", args[0]);
+        printf("invalid line ueventd.rc line for '%s'\n", args[0]);
         return;
     }
 
@@ -121,14 +113,14 @@ void set_device_permission(int nargs, char **args)
 
     perm = strtol(args[1], &endptr, 8);
     if (!endptr || *endptr != '\0') {
-        ERROR("invalid mode '%s'\n", args[1]);
+        printf("invalid mode '%s'\n", args[1]);
         free(tmp);
         return;
     }
 
     ret = get_android_id(args[2]);
     if (ret < 0) {
-        ERROR("invalid uid '%s'\n", args[2]);
+        printf("invalid uid '%s'\n", args[2]);
         free(tmp);
         return;
     }
@@ -136,7 +128,7 @@ void set_device_permission(int nargs, char **args)
 
     ret = get_android_id(args[3]);
     if (ret < 0) {
-        ERROR("invalid gid '%s'\n", args[3]);
+        printf("invalid gid '%s'\n", args[3]);
         free(tmp);
         return;
     }
@@ -145,3 +137,4 @@ void set_device_permission(int nargs, char **args)
     add_dev_perms(name, attr, perm, uid, gid, prefix);
     free(tmp);
 }
+#endif
