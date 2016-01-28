@@ -90,6 +90,5 @@
           adb/Makefile \
           usb/Makefile \
           fs_mgr/Makefile \
-          mkbootimg/Makefile \
-          ueventd/Makefile
+          mkbootimg/Makefile
   ])

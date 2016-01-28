@@ -1,7 +1,4 @@
 /*
- * Copyright (c) 2016 The Linux Foundation. All rights reserved.
- * Not a contribution
- *
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,12 +23,10 @@
 #define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
 
 static const char *coldboot_done = "/dev/.coldboot_done";
-static const char *sd_card = "/dev/mmcblk1p1";
-static const char *block_path = "/sys/class/android_usb/f_mass_storage/lun/file";
 
 int mtd_name_to_number(const char *name);
 int create_socket(const char *name, int type, mode_t perm,
-                  uid_t uid, gid_t gid);
+                  uid_t uid, gid_t gid, const char *socketcon);
 void *read_file(const char *fn, unsigned *_sz);
 time_t gettime(void);
 unsigned int decode_uid(const char *s);
@@ -43,4 +38,8 @@ void remove_link(const char *oldpath, const char *newpath);
 int wait_for_file(const char *filename, int timeout);
 void open_devnull_stdio(void);
 void get_hardware_name(char *hardware, unsigned int *revision);
+void import_kernel_cmdline(int in_qemu, void (*import_kernel_nv)(char *name, int in_qemu));
+int make_dir(const char *path, mode_t mode);
+int restorecon(const char *pathname);
+int restorecon_recursive(const char *pathname);
 #endif
