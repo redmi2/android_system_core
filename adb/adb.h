@@ -119,6 +119,7 @@ enum ConnectionState {
     kCsNoPerm,  // Insufficient permissions to communicate with the device.
     kCsSideload,
     kCsUnauthorized,
+    kCsOnline,
 };
 
 
