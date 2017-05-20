@@ -15,12 +15,14 @@
  */
 
 #include <healthd/healthd.h>
+#include "healthd_msm.h"
 
 extern void healthd_set_backlight(bool en);
 
 void healthd_board_init(struct healthd_config*)
 {
     // use defaults
+    power_off_alarm_init();
 }
 
 
