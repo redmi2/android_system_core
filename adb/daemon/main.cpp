@@ -221,6 +221,8 @@ int adbd_main(int server_port) {
     return 0;
 }
 
+int recovery_mode = 0;
+
 int main(int argc, char** argv) {
     while (true) {
         static struct option opts[] = {
@@ -252,6 +254,8 @@ int main(int argc, char** argv) {
             return 1;
         }
     }
+
+    recovery_mode = (strcmp(adb_device_banner, "recovery") == 0);
 
     close_stdin();
 
