@@ -196,6 +196,10 @@ void handle_control_message(const std::string& msg, const std::string& name) {
 
 static int wait_for_coldboot_done_action(const std::vector<std::string>& args) {
     Timer t;
+    std::chrono::nanoseconds timeout = 60s;
+#ifdef SLOW_BOARD
+    timeout = 6000s;
+#endif
 
     LOG(VERBOSE) << "Waiting for " COLDBOOT_DONE "...";
 
@@ -207,7 +211,7 @@ static int wait_for_coldboot_done_action(const std::vector<std::string>& args) {
     // property. We still panic if it takes more than a minute though,
     // because any build that slow isn't likely to boot at all, and we'd
     // rather any test lab devices fail back to the bootloader.
-    if (wait_for_file(COLDBOOT_DONE, 60s) < 0) {
+    if (wait_for_file(COLDBOOT_DONE, timeout) < 0) {
         LOG(ERROR) << "Timed out waiting for " COLDBOOT_DONE;
         panic();
     }
