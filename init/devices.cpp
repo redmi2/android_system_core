@@ -57,6 +57,7 @@
 #include "log.h"
 
 #define SYSFS_PREFIX    "/sys"
+#define DEVICES_BASE    "/devices/platform/soc"
 static const char *firmware_dirs[] = { "/etc/firmware",
                                        "/vendor/firmware",
                                        "/firmware/image" };
@@ -182,8 +183,14 @@ static void fixup_sys_perms(const char* upath, const char* subsystem) {
     }
 
     if (access(path.c_str(), F_OK) == 0) {
-        LOG(VERBOSE) << "restorecon_recursive: " << path;
-        restorecon(path.c_str(), SELINUX_ANDROID_RESTORECON_RECURSE);
+        if (strcmp(DEVICES_BASE,upath) == 0) {
+          LOG(VERBOSE) << "#Restorecon: " << path.c_str();
+          restorecon(path.c_str(), 0);
+        }
+        else {
+          LOG(VERBOSE) << "#Restorecon_recursive: " << path.c_str();
+          restorecon(path.c_str(), SELINUX_ANDROID_RESTORECON_RECURSE);
+        }
     }
 }
 
